@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { authApi } from '../../../services/api/auth'
 import { authStore } from '../../../store/authStore'
+import type { User } from '../../../types/auth'
 import { useSession } from './useSession'
 
 afterEach(() => {
@@ -29,9 +30,16 @@ describe('useSession', () => {
         role: 'CLIENTE' as const,
       },
     }
-    vi.spyOn(authApi, 'me').mockImplementation(async () => {
+    let resolveSecondUser!: (user: User) => void
+    vi.spyOn(authApi, 'me').mockImplementation(() => {
       const token = authStore.getState().token as keyof typeof usersByToken
-      return usersByToken[token]
+      if (token === 'token-a') {
+        return Promise.resolve(usersByToken[token])
+      }
+
+      return new Promise<User>((resolve) => {
+        resolveSecondUser = resolve
+      })
     })
     authStore.setState({ token: 'token-a', user: null })
     const queryClient = new QueryClient({
@@ -41,14 +49,29 @@ describe('useSession', () => {
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
 
-    renderHook(() => useSession(), { wrapper })
+    const { result } = renderHook(() => useSession(), { wrapper })
 
     await waitFor(() => expect(authStore.getState().user?.nome).toBe('Conta A'))
+    expect(queryClient.getQueryCache().getAll().map((query) => query.queryKey)).toEqual([
+      ['auth', 'session'],
+    ])
 
     act(() => {
       authStore.setState({ token: 'token-b', user: null })
     })
 
+    await waitFor(() => {
+      expect(queryClient.getQueryData(['auth', 'session'])).toBeUndefined()
+      expect(result.current.user).toBeNull()
+    })
+
+    act(() => {
+      resolveSecondUser(usersByToken['token-b'])
+    })
+
     await waitFor(() => expect(authStore.getState().user?.nome).toBe('Conta B'))
+    expect(queryClient.getQueryCache().getAll().map((query) => query.queryKey)).toEqual([
+      ['auth', 'session'],
+    ])
   })
 })
