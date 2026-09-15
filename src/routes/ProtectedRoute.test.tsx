@@ -35,7 +35,10 @@ describe('ProtectedRoute', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByRole('heading', { name: 'Painel' })).toBeInTheDocument()
+    expect(document.querySelector('.admin-header h1')).toHaveTextContent('Painel')
+    expect(screen.getByLabelText('Navegação administrativa')).toBeInTheDocument()
+    expect(document.querySelector('.admin-header')).toBeInTheDocument()
+    expect(document.querySelector('.admin-shell')).toBeInTheDocument()
   })
 
   it('redirects an authenticated CLIENTE from the admin panel to login', () => {

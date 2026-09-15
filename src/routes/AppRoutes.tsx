@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
+import { AdminShell } from '../components/layout/AdminShell'
 import { LoginPage } from '../pages/LoginPage'
 import { RegisterPage } from '../pages/RegisterPage'
 import { ProtectedRoute, type AdminSession } from './ProtectedRoute'
@@ -11,11 +12,12 @@ interface RoutePlaceholderProps {
   eyebrow: string
   title: string
   description: string
+  showTitle?: boolean
 }
 
-function RoutePlaceholder({ eyebrow, title, description }: RoutePlaceholderProps) {
+function RoutePlaceholder({ eyebrow, title, description, showTitle = true }: RoutePlaceholderProps) {
   return (
-    <main className="route-page">
+    <section className="route-page">
       <header className="topbar">
         <div className="brand-lockup" aria-label="Agenda+">
           <span className="brand-mark" aria-hidden="true">+</span>
@@ -23,12 +25,12 @@ function RoutePlaceholder({ eyebrow, title, description }: RoutePlaceholderProps
         </div>
         <span className="edition-label">CADERNO DE ATENDIMENTO</span>
       </header>
-      <section className="route-sheet" aria-labelledby="route-title">
+      <section className="route-sheet" aria-labelledby={showTitle ? 'route-title' : undefined}>
         <p className="eyebrow">{eyebrow}</p>
-        <h1 id="route-title">{title}</h1>
+        {showTitle && <h1 id="route-title">{title}</h1>}
         <p className="intro">{description}</p>
       </section>
-    </main>
+    </section>
   )
 }
 
@@ -53,7 +55,9 @@ export function AppRoutes({ session }: AppRoutesProps) {
           path={path}
           element={(
             <ProtectedRoute session={session}>
-              <RoutePlaceholder eyebrow="GESTÃO DO ESTÚDIO" title={title} description={description} />
+              <AdminShell title={title} subtitle={description}>
+              <RoutePlaceholder eyebrow="GESTÃO DO ESTÚDIO" title={title} description={description} showTitle={false} />
+              </AdminShell>
             </ProtectedRoute>
           )}
         />
