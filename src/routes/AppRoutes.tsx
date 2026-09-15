@@ -1,4 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
+import { LoginPage } from '../pages/LoginPage'
+import { RegisterPage } from '../pages/RegisterPage'
 import { ProtectedRoute, type AdminSession } from './ProtectedRoute'
 
 interface AppRoutesProps {
@@ -42,8 +44,8 @@ export function AppRoutes({ session }: AppRoutesProps) {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="/login" element={<RoutePlaceholder eyebrow="ÁREA ADMINISTRATIVA" title="Entrar" description="Acesse a agenda do seu negócio." />} />
-      <Route path="/cadastro" element={<RoutePlaceholder eyebrow="NOVO ATELIÊ" title="Criar conta" description="Prepare o espaço do seu negócio no Agenda+." />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/cadastro" element={<RegisterPage />} />
       <Route path="/agendar/*" element={<RoutePlaceholder eyebrow="RESERVA ONLINE" title="Agendar horário" description="Escolha seu serviço, profissional e melhor horário." />} />
       {protectedRoutes.map(([path, title, description]) => (
         <Route

@@ -1,13 +1,25 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { cleanup, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import type { ReactNode } from 'react'
 import { afterEach, describe, expect, it } from 'vitest'
 import { AppRoutes } from './AppRoutes'
 
 afterEach(cleanup)
 
+function renderRoutes(children: ReactNode) {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  })
+
+  return render(
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>,
+  )
+}
+
 describe('ProtectedRoute', () => {
   it('redirects visitors without a session from the admin panel to login', () => {
-    render(
+    renderRoutes(
       <MemoryRouter initialEntries={['/painel']}>
         <AppRoutes />
       </MemoryRouter>,
@@ -17,7 +29,7 @@ describe('ProtectedRoute', () => {
   })
 
   it('renders protected content for an authenticated ADMIN', () => {
-    render(
+    renderRoutes(
       <MemoryRouter initialEntries={['/painel']}>
         <AppRoutes session={{ role: 'ADMIN' }} />
       </MemoryRouter>,
@@ -27,7 +39,7 @@ describe('ProtectedRoute', () => {
   })
 
   it('redirects an authenticated CLIENTE from the admin panel to login', () => {
-    render(
+    renderRoutes(
       <MemoryRouter initialEntries={['/painel']}>
         <AppRoutes session={{ role: 'CLIENTE' }} />
       </MemoryRouter>,
