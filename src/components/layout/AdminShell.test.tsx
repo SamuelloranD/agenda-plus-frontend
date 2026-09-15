@@ -72,4 +72,23 @@ describe('AdminShell responsive interaction', () => {
     expect(openButton).toHaveAttribute('aria-label', 'Abrir navegação')
     expect(container.querySelector('.admin-shell')).not.toHaveClass('sidebar-open')
   })
+
+  it('uses one rounded editorial hit area for both toggle states', () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={['/painel']}>
+        <AdminShell title="Painel" subtitle="Visão geral"><p>Conteúdo</p></AdminShell>
+      </MemoryRouter>,
+    )
+
+    const toggle = container.querySelector('.admin-menu-button') as HTMLButtonElement
+    expect(toggle).toHaveClass('admin-menu-button--editorial')
+    expect(toggle).toHaveStyle({ width: '44px', height: '44px', borderRadius: '50%' })
+
+    const closedSize = { width: getComputedStyle(toggle).width, height: getComputedStyle(toggle).height }
+    fireEvent.click(toggle)
+
+    expect(toggle).toHaveClass('admin-menu-button--editorial')
+    expect(toggle).toHaveStyle({ width: '44px', height: '44px', borderRadius: '50%' })
+    expect({ width: getComputedStyle(toggle).width, height: getComputedStyle(toggle).height }).toEqual(closedSize)
+  })
 })
