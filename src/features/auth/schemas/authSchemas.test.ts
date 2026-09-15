@@ -25,4 +25,13 @@ describe('loginSchema', () => {
       },
     })
   })
+
+  it('preserves leading and trailing spaces in a nonblank password', () => {
+    const result = loginSchema.parse({
+      email: 'cliente@agenda.plus',
+      senha: ' segredo com espaços ',
+    })
+
+    expect(result.senha).toBe(' segredo com espaços ')
+  })
 })

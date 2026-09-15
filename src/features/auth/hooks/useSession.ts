@@ -3,15 +3,13 @@ import { useQuery } from '@tanstack/react-query'
 import { authApi } from '../../../services/api/auth'
 import { useAuthStore } from '../../../store/authStore'
 
-const sessionQueryKey = ['auth', 'session'] as const
-
 export function useSession() {
   const token = useAuthStore((state) => state.token)
   const user = useAuthStore((state) => state.user)
   const setSession = useAuthStore((state) => state.setSession)
   const clearSession = useAuthStore((state) => state.clearSession)
   const sessionQuery = useQuery({
-    queryKey: sessionQueryKey,
+    queryKey: ['auth', 'session', token],
     queryFn: authApi.me,
     enabled: Boolean(token),
     retry: false,
@@ -25,7 +23,7 @@ export function useSession() {
 
   return {
     token,
-    user,
+    user: sessionQuery.data ?? user,
     setSession,
     clearSession,
     isLoading: Boolean(token) && sessionQuery.isPending,

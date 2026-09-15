@@ -53,4 +53,20 @@ describe('normalizeAuthError', () => {
       message: 'Não foi possível concluir a solicitação. Tente novamente.',
     })
   })
+
+  it('ignores non-string API error fields', () => {
+    expect(
+      normalizeAuthError(
+        httpError(400, {
+          detail: { reason: 'invalid' },
+          message: 42,
+          title: 'Bad Request',
+          code: 400_001,
+        }),
+      ),
+    ).toEqual({
+      status: 400,
+      message: 'Bad Request',
+    })
+  })
 })

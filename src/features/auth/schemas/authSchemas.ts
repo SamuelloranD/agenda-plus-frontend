@@ -2,7 +2,7 @@ import { z } from 'zod'
 import type { LoginInput, RegisterInput } from '../../../types/auth'
 
 const emailSchema = z.string().trim().min(1, 'Informe o e-mail.').email('Informe um e-mail válido.')
-const passwordSchema = z.string().trim().min(1, 'Informe a senha.')
+const passwordSchema = z.string().refine((password) => password.trim().length > 0, 'Informe a senha.')
 
 export const loginSchema: z.ZodType<LoginInput> = z.object({
   email: emailSchema,
