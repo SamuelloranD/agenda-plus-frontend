@@ -37,6 +37,21 @@ describe('AdminShell responsive interaction', () => {
     expect(css).toMatch(/\.admin-menu-button\{[^}]*z-index:4/)
   })
 
+  it('places the open transform after the mobile closed transform', () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={['/painel']}>
+        <AdminShell title="Painel" subtitle="Visão geral"><p>Conteúdo</p></AdminShell>
+      </MemoryRouter>,
+    )
+
+    const css = container.querySelector('style')?.textContent ?? ''
+    const closedRule = css.indexOf('transform:translateX(-100%)')
+    const openRule = css.lastIndexOf('.sidebar-open .admin-sidebar{transform:translateX(0)}')
+
+    expect(closedRule).toBeGreaterThan(-1)
+    expect(openRule).toBeGreaterThan(closedRule)
+  })
+
   it('opens with a close toggle and closes when the overlay is clicked', () => {
     Object.defineProperty(window, 'innerWidth', { configurable: true, value: 375 })
     const { container } = render(
