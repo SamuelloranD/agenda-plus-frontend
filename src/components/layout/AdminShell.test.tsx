@@ -22,6 +22,21 @@ describe('AdminShell responsive interaction', () => {
     expect(activeLink).toHaveClass('admin-nav-link--active')
   })
 
+  it('keeps mobile layers ordered below the toggle', () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={['/painel']}>
+        <AdminShell title="Painel" subtitle="Visão geral"><p>Conteúdo</p></AdminShell>
+      </MemoryRouter>,
+    )
+
+    const css = container.querySelector('style')?.textContent ?? ''
+    expect(css).toMatch(/\.admin-main\{[^}]*position:relative;[^}]*padding/)
+    expect(css).not.toMatch(/\.admin-main\{[^}]*z-index:/)
+    expect(css).toMatch(/\.sidebar-overlay\{[^}]*z-index:2/)
+    expect(css).toMatch(/\.admin-sidebar\{[^}]*z-index:3/)
+    expect(css).toMatch(/\.admin-menu-button\{[^}]*z-index:4/)
+  })
+
   it('opens with a close toggle and closes when the overlay is clicked', () => {
     Object.defineProperty(window, 'innerWidth', { configurable: true, value: 375 })
     const { container } = render(
