@@ -107,6 +107,13 @@ describe('LoginForm', () => {
 })
 
 describe('RegisterForm', () => {
+  it('defaults to client registration when returning to a pending booking', () => {
+    renderAuthForm(<RegisterForm />, '/cadastro?returnTo=%2Fagendar')
+
+    expect(screen.getByRole('radio', { name: /cliente/i })).toBeChecked()
+    expect(screen.getByRole('radio', { name: /negócio/i })).not.toBeChecked()
+  })
+
   it('switches to client registration and returns to the pending booking path', async () => {
     const registerClient = vi.spyOn(authApi, 'registerClient').mockResolvedValue({
       id: '53f1b75c-ffb8-4289-a536-d20e24f360b1',
@@ -159,6 +166,7 @@ describe('RegisterForm', () => {
     vi.spyOn(authApi, 'login').mockRejectedValue({ status: 503, message: 'Serviço indisponível.' })
     renderAuthForm(<RegisterForm />, '/cadastro?returnTo=%2Fagendar%2Fresumo')
 
+    fireEvent.click(screen.getByRole('radio', { name: /negócio/i }))
     fireEvent.change(screen.getByLabelText(/nome/i), { target: { value: 'Ateliê Agenda' } })
     fireEvent.change(screen.getByLabelText(/e-mail/i), { target: { value: 'atelier@agenda.plus' } })
     fireEvent.change(screen.getByLabelText(/senha/i), { target: { value: 'segredo123' } })

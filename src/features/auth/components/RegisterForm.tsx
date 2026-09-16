@@ -18,8 +18,8 @@ function registerErrorMessage(error: unknown) {
 }
 
 export function RegisterForm() {
-  const [mode, setMode] = useState<RegistrationMode>('business')
   const location = useLocation()
+  const [mode, setMode] = useState<RegistrationMode>(() => getPendingReturnPath(location.search) ? 'client' : 'business')
   const navigate = useNavigate()
   const registration = useRegisterMutation(mode)
   const {
