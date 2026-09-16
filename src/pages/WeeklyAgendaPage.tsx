@@ -3,6 +3,7 @@ import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
 import { WeeklyCalendar } from '../features/scheduling/components/WeeklyCalendar'
+import { useAppointmentDirectory } from '../features/scheduling/hooks/useAppointmentDirectory'
 import { useAgendamentos } from '../features/scheduling/hooks/useAgendamentos'
 
 function startOfWeek(date: Date) {
@@ -29,6 +30,7 @@ export function WeeklyAgendaPage() {
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date()))
   const weekEnd = addDays(weekStart, 6)
   const appointmentsQuery = useAgendamentos({ dataInicio: dateKey(weekStart), dataFim: dateKey(weekEnd), tamanho: 100 }, { allPages: true })
+  const directoryQuery = useAppointmentDirectory()
   const rangeLabel = `${weekStart.getDate()} de ${new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(weekStart)} a ${weekEnd.getDate()} de ${new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(weekEnd)}`
 
   return (
@@ -42,10 +44,10 @@ export function WeeklyAgendaPage() {
           <button type="button" aria-label="Próxima semana" onClick={() => setWeekStart((current) => addDays(current, 7))}>›</button>
         </div>
       </header>
-      {appointmentsQuery.isLoading && <LoadingState message="Preparando a agenda da semana…" />}
-      {appointmentsQuery.isError && <ErrorState message="Não foi possível carregar a agenda semanal." onRetry={() => void appointmentsQuery.refetch()} />}
-      {appointmentsQuery.data && appointmentsQuery.data.conteudo.length === 0 && <EmptyState message="Nenhum agendamento nesta semana. A grade permanece disponível para novas reservas." />}
-      {appointmentsQuery.data && <WeeklyCalendar weekStart={weekStart} appointments={appointmentsQuery.data.conteudo} />}
+      {(appointmentsQuery.isLoading || directoryQuery.isLoading) && <LoadingState message="Preparando a agenda da semana…" />}
+      {(appointmentsQuery.isError || directoryQuery.isError) && <ErrorState message="Não foi possível carregar a agenda semanal." onRetry={() => void Promise.all([appointmentsQuery.refetch(), directoryQuery.refetch()])} />}
+      {!appointmentsQuery.isLoading && !directoryQuery.isLoading && !appointmentsQuery.isError && !directoryQuery.isError && appointmentsQuery.data && appointmentsQuery.data.conteudo.length === 0 && <EmptyState message="Nenhum agendamento nesta semana. A grade permanece disponível para novas reservas." />}
+      {!appointmentsQuery.isLoading && !directoryQuery.isLoading && !appointmentsQuery.isError && !directoryQuery.isError && appointmentsQuery.data && <WeeklyCalendar weekStart={weekStart} appointments={appointmentsQuery.data.conteudo} directory={directoryQuery.directory} />}
     </section>
   )
 }

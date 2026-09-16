@@ -3,6 +3,7 @@ import { LoadingState } from '../components/ui/LoadingState'
 import { MetricCard } from '../features/dashboard/components/MetricCard'
 import { TodayAppointments } from '../features/dashboard/components/TodayAppointments'
 import { deriveDashboardMetrics } from '../features/dashboard/utils/dashboardMetrics'
+import { useAppointmentDirectory } from '../features/scheduling/hooks/useAppointmentDirectory'
 import { useAgendamentos } from '../features/scheduling/hooks/useAgendamentos'
 
 function dateKey(date: Date) {
@@ -16,9 +17,10 @@ export function DashboardPage() {
   const today = new Date()
   const key = dateKey(today)
   const appointmentsQuery = useAgendamentos({ dataInicio: key, dataFim: key, tamanho: 100 }, { allPages: true })
+  const directoryQuery = useAppointmentDirectory()
 
-  if (appointmentsQuery.isLoading) return <LoadingState message="Abrindo o caderno de hoje…" />
-  if (appointmentsQuery.isError) return <ErrorState message="Não foi possível carregar o painel." onRetry={() => void appointmentsQuery.refetch()} />
+  if (appointmentsQuery.isLoading || directoryQuery.isLoading) return <LoadingState message="Abrindo o caderno de hoje…" />
+  if (appointmentsQuery.isError || directoryQuery.isError) return <ErrorState message="Não foi possível carregar o painel." onRetry={() => void Promise.all([appointmentsQuery.refetch(), directoryQuery.refetch()])} />
 
   const appointments = appointmentsQuery.data?.conteudo ?? []
   const metrics = deriveDashboardMetrics(appointments, today)
@@ -39,7 +41,7 @@ export function DashboardPage() {
       </div>
       <section className="today-panel" aria-labelledby="today-heading">
         <div className="section-heading"><div><p className="section-label">Linha do tempo</p><h3 id="today-heading">Atendimentos de hoje</h3></div><span>{metrics.todayCount} registros</span></div>
-        <TodayAppointments appointments={metrics.todayAppointments} />
+        <TodayAppointments appointments={metrics.todayAppointments} directory={directoryQuery.directory} />
       </section>
     </section>
   )
