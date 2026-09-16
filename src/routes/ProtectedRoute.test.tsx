@@ -50,4 +50,14 @@ describe('ProtectedRoute', () => {
 
     expect(screen.getByRole('heading', { name: 'Entrar' })).toBeInTheDocument()
   })
+
+  it('renders the professionals route for an authenticated ADMIN', () => {
+    renderRoutes(
+      <MemoryRouter initialEntries={['/painel/profissionais']}>
+        <AppRoutes session={{ role: 'ADMIN' }} />
+      </MemoryRouter>,
+    )
+
+    expect(document.querySelector('.admin-header h1')).toHaveTextContent('Profissionais')
+  })
 })
