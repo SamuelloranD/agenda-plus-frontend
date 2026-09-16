@@ -1,7 +1,9 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AdminShell } from '../components/layout/AdminShell'
+import { DashboardPage } from '../pages/DashboardPage'
 import { LoginPage } from '../pages/LoginPage'
 import { RegisterPage } from '../pages/RegisterPage'
+import { WeeklyAgendaPage } from '../pages/WeeklyAgendaPage'
 import { ProtectedRoute, type AdminSession } from './ProtectedRoute'
 
 interface AppRoutesProps {
@@ -34,9 +36,7 @@ function RoutePlaceholder({ eyebrow, title, description, showTitle = true }: Rou
   )
 }
 
-const protectedRoutes = [
-  ['/painel', 'Painel', 'Visão geral do seu estúdio.'],
-  ['/painel/agenda', 'Agenda', 'Organize a semana de atendimentos.'],
+const placeholderRoutes = [
   ['/painel/profissionais', 'Profissionais', 'Cuide da equipe do seu estúdio.'],
   ['/painel/servicos', 'Serviços', 'Organize o catálogo de serviços.'],
   ['/painel/agendamentos/novo', 'Novo agendamento', 'Reserve um horário para seu cliente.'],
@@ -49,7 +49,9 @@ export function AppRoutes({ session }: AppRoutesProps) {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/cadastro" element={<RegisterPage />} />
       <Route path="/agendar/*" element={<RoutePlaceholder eyebrow="RESERVA ONLINE" title="Agendar horário" description="Escolha seu serviço, profissional e melhor horário." />} />
-      {protectedRoutes.map(([path, title, description]) => (
+      <Route path="/painel" element={<ProtectedRoute session={session}><AdminShell title="Painel" subtitle="Visão geral do seu estúdio."><DashboardPage /></AdminShell></ProtectedRoute>} />
+      <Route path="/painel/agenda" element={<ProtectedRoute session={session}><AdminShell title="Agenda semanal" subtitle="Organize a semana de atendimentos."><WeeklyAgendaPage /></AdminShell></ProtectedRoute>} />
+      {placeholderRoutes.map(([path, title, description]) => (
         <Route
           key={path}
           path={path}
