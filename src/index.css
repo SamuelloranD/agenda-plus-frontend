@@ -77,9 +77,19 @@ button {
 }
 
 .ui-select__chevron {
+  display: inline-flex;
+  flex: 0 0 18px;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
   color: var(--terracotta);
-  font-size: 18px;
-  line-height: 1;
+}
+
+.ui-select__chevron svg {
+  display: block;
+  width: 16px;
+  height: 16px;
 }
 
 .ui-select__listbox {

@@ -86,7 +86,11 @@ export function Select({ id, name, value, options, placeholder = 'Selecione uma 
         onKeyDown={handleKeyDown}
       >
         <span>{selectedOption?.label ?? placeholder}</span>
-        <span className="ui-select__chevron" aria-hidden="true">⌄</span>
+        <span className="ui-select__chevron" aria-hidden="true">
+          <svg viewBox="0 0 20 20" focusable="false" aria-hidden="true">
+            <path d="m5 8.5 5 5 5-5" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.6" />
+          </svg>
+        </span>
       </button>
       {open && (
         <div className="ui-select__listbox" id={listboxId} role="listbox" aria-label={selectedOption?.label ?? placeholder}>

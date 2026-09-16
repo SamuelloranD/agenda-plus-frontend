@@ -20,6 +20,8 @@ describe('Select', () => {
     render(<ControlledSelect />)
 
     const trigger = screen.getByRole('combobox')
+    expect(trigger.querySelector('svg')).toBeInTheDocument()
+    expect(trigger.querySelector('path')).toHaveAttribute('stroke', 'currentColor')
     expect(trigger).toHaveTextContent('Selecione o serviço')
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
 
