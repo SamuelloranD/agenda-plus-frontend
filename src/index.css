@@ -35,6 +35,97 @@ button {
   font: inherit;
 }
 
+.ui-select {
+  position: relative;
+  width: 100%;
+}
+
+.ui-select__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 46px;
+  gap: 12px;
+  padding: 10px 12px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+  text-transform: none;
+}
+
+.ui-select__trigger--placeholder {
+  color: var(--muted-ink);
+}
+
+.ui-select__trigger:hover,
+.ui-select__trigger[aria-expanded='true'],
+.ui-select__trigger:focus-visible {
+  border-color: var(--terracotta);
+  outline: 2px solid color-mix(in srgb, var(--terracotta) 28%, transparent);
+  outline-offset: 0;
+}
+
+.ui-select__trigger:disabled {
+  cursor: not-allowed;
+  opacity: .6;
+}
+
+.ui-select__chevron {
+  color: var(--terracotta);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.ui-select__listbox {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 6px;
+  background: #fffdf9;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px -4px rgb(44 31 26 / 10%), 0 1px 3px rgb(44 31 26 / 5%);
+}
+
+.ui-select__option {
+  padding: 10px 11px;
+  color: var(--ink);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.4;
+  text-transform: none;
+}
+
+.ui-select__option:hover,
+.ui-select__option--selected {
+  background: #efe8dc;
+}
+
+.ui-select__option[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: .5;
+}
+
+.appointment-form .form-field input:not([type='hidden']),
+.catalog-form .catalog-field input,
+.catalog-form .interval-row input,
+.service-form > label input,
+.service-form .service-form__values input {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
 .route-page {
   min-height: 100svh;
   padding: 32px clamp(24px, 7vw, 104px) 28px;

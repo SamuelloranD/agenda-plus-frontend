@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
-import { useForm, useWatch } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import type { ApiError } from '../../../types/api'
+import { Select } from '../../../components/ui/Select'
 import { useClients } from '../../clients/hooks/useClients'
 import { useProfessionals } from '../../professionals/hooks/useProfessionals'
 import { useServices } from '../../services/hooks/useServices'
@@ -62,10 +63,7 @@ export function NewAppointmentForm({ onSuccess }: NewAppointmentFormProps) {
       <fieldset className="appointment-step">
         <legend><span>1</span> Cliente do ateliê</legend>
         <label className="form-field">Cliente
-          <select {...form.register('clienteId')} aria-invalid={Boolean(form.formState.errors.clienteId)}>
-            <option value="">Selecione quem receberá o atendimento</option>
-            {clients.map((client) => <option key={client.id} value={client.id}>{client.nome} · {client.email}</option>)}
-          </select>
+          <Controller control={form.control} name="clienteId" render={({ field }) => <Select id="appointment-client" value={field.value} onChange={field.onChange} onBlur={field.onBlur} invalid={Boolean(form.formState.errors.clienteId)} options={clients.map((client) => ({ value: client.id, label: `${client.nome} · ${client.email}` }))} placeholder="Selecione quem receberá o atendimento" />} />
           {form.formState.errors.clienteId && <small>{form.formState.errors.clienteId.message}</small>}
         </label>
       </fieldset>
@@ -74,17 +72,11 @@ export function NewAppointmentForm({ onSuccess }: NewAppointmentFormProps) {
         <legend><span>2</span> Serviço e profissional</legend>
         <div className="form-columns">
           <label className="form-field">Serviço
-            <select {...form.register('servicoId')} aria-invalid={Boolean(form.formState.errors.servicoId)}>
-              <option value="">Selecione o serviço</option>
-              {services.map((service) => <option key={service.id} value={service.id}>{service.nome} · {service.duracaoMinutos} min</option>)}
-            </select>
+            <Controller control={form.control} name="servicoId" render={({ field }) => <Select id="appointment-service" value={field.value} onChange={field.onChange} onBlur={field.onBlur} invalid={Boolean(form.formState.errors.servicoId)} options={services.map((service) => ({ value: service.id, label: `${service.nome} · ${service.duracaoMinutos} min` }))} placeholder="Selecione o serviço" />} />
             {form.formState.errors.servicoId && <small>{form.formState.errors.servicoId.message}</small>}
           </label>
           <label className="form-field">Profissional
-            <select {...form.register('profissionalId')} aria-invalid={Boolean(form.formState.errors.profissionalId)}>
-              <option value="">Selecione o profissional</option>
-              {professionals.map((professional) => <option key={professional.id} value={professional.id}>{professional.nome} · {professional.especialidade}</option>)}
-            </select>
+            <Controller control={form.control} name="profissionalId" render={({ field }) => <Select id="appointment-professional" value={field.value} onChange={field.onChange} onBlur={field.onBlur} invalid={Boolean(form.formState.errors.profissionalId)} options={professionals.map((professional) => ({ value: professional.id, label: `${professional.nome} · ${professional.especialidade}` }))} placeholder="Selecione o profissional" />} />
             {form.formState.errors.profissionalId && <small>{form.formState.errors.profissionalId.message}</small>}
           </label>
         </div>

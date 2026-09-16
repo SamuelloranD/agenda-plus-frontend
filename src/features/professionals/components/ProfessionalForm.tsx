@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import type { ApiError } from '../../../types/api'
+import { Select } from '../../../components/ui/Select'
 import type { ProfissionalResponse } from '../../../types/professionals'
 import { useCreateProfessional, useUpdateProfessional } from '../hooks/useProfessionals'
 import { professionalSchema, weekdays, type ProfessionalFormValues } from '../schemas/professionalSchema'
@@ -50,7 +51,7 @@ export function ProfessionalForm({ professional, onDone }: ProfessionalFormProps
       <section className="work-hours" aria-labelledby="work-hours-title">
         <div className="work-hours__heading"><div><p className="section-label">Disponibilidade</p><h4 id="work-hours-title">Jornada de trabalho</h4></div><button type="button" className="quiet-action" onClick={() => intervals.append({ diaSemana: 'MONDAY', inicio: '09:00', fim: '18:00' })}>+ Adicionar faixa</button></div>
         {intervals.fields.map((field, index) => <div className="interval-row" key={field.id}>
-          <label>Dia<select {...form.register(`horariosTrabalho.${index}.diaSemana`)}>{weekdays.map((weekday) => <option key={weekday} value={weekday}>{weekdayLabels[weekday]}</option>)}</select></label>
+          <label>Dia<Controller control={form.control} name={`horariosTrabalho.${index}.diaSemana`} render={({ field }) => <Select id={`professional-weekday-${index}`} value={field.value} onChange={field.onChange} onBlur={field.onBlur} options={weekdays.map((weekday) => ({ value: weekday, label: weekdayLabels[weekday] }))} />} /></label>
           <label>Início<input type="time" {...form.register(`horariosTrabalho.${index}.inicio`)} /></label>
           <label>Fim<input type="time" {...form.register(`horariosTrabalho.${index}.fim`)} /></label>
           <button type="button" className="remove-action" onClick={() => intervals.remove(index)} disabled={intervals.fields.length === 1} aria-label="Remover faixa de horário">×</button>
