@@ -15,7 +15,7 @@ function dateKey(date: Date) {
 export function DashboardPage() {
   const today = new Date()
   const key = dateKey(today)
-  const appointmentsQuery = useAgendamentos({ dataInicio: key, dataFim: key, tamanho: 100 })
+  const appointmentsQuery = useAgendamentos({ dataInicio: key, dataFim: key, tamanho: 100 }, { allPages: true })
 
   if (appointmentsQuery.isLoading) return <LoadingState message="Abrindo o caderno de hoje…" />
   if (appointmentsQuery.isError) return <ErrorState message="Não foi possível carregar o painel." onRetry={() => void appointmentsQuery.refetch()} />
