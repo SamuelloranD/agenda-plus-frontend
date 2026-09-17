@@ -77,6 +77,28 @@ describe('LoginForm', () => {
     })
   })
 
+  it('keeps an admin in the panel when login started from the booking wizard', async () => {
+    vi.spyOn(authApi, 'login').mockResolvedValue({
+      token: 'admin-token',
+      tokenType: 'Bearer',
+      expiresIn: 3600,
+    })
+    vi.spyOn(authApi, 'me').mockResolvedValue({
+      id: '4fc4c538-9584-47db-bf89-a572bfab4a91',
+      nome: 'Mestre Agenda',
+      email: 'mestre@agenda.plus',
+      role: 'ADMIN',
+    })
+    renderAuthForm(<LoginForm />, '/login?returnTo=%2Fagendar')
+
+    fireEvent.change(screen.getByLabelText(/e-mail/i), { target: { value: 'mestre@agenda.plus' } })
+    fireEvent.change(screen.getByLabelText(/senha/i), { target: { value: 'segredo123' } })
+    fireEvent.click(screen.getByRole('button', { name: /entrar/i }))
+
+    expect(await screen.findByRole('heading', { name: 'Painel autenticado' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Agendar público' })).not.toBeInTheDocument()
+  })
+
   it('shows a friendly generic API error inline', async () => {
     vi.spyOn(authApi, 'login').mockRejectedValue({ message: 'Serviço indisponível.' })
     renderAuthForm(<LoginForm />)
