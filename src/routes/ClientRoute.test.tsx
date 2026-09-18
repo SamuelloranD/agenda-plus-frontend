@@ -96,6 +96,21 @@ describe('ClientRoute', () => {
     expect(screen.getByRole('link', { name: 'Novo agendamento' })).toHaveClass('client-nav-link--active')
   })
 
+  it('keeps the client sidebar fixed on authenticated pages', () => {
+    const { container } = renderWithQuery(
+      <AppRoutes session={{ role: 'CLIENTE' }} />,
+      '/meus-agendamentos',
+    )
+
+    const desktopCss = Array.from(container.querySelectorAll('style'))
+      .map((style) => style.textContent ?? '')
+      .find((css) => css.includes('.client-sidebar'))
+      ?.split('@media')[0] ?? ''
+
+    expect(desktopCss).toMatch(/\.client-sidebar\{[^}]*position:fixed/)
+    expect(desktopCss).toMatch(/\.client-main\{[^}]*margin-left:250px/)
+  })
+
   it('redirects an ADMIN from the client area to the panel', () => {
     renderWithQuery(
       <AppRoutes session={{ role: 'ADMIN' }} />,
