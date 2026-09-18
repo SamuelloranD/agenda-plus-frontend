@@ -1,10 +1,14 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, describe, expect, it } from 'vitest'
 import { cleanup } from '@testing-library/react'
 import { AdminShell } from './AdminShell'
+import { authStore } from '../../store/authStore'
 
-afterEach(cleanup)
+afterEach(() => {
+  cleanup()
+  authStore.setState({ token: null, user: null })
+})
 
 describe('AdminShell responsive interaction', () => {
   it('uses the warm paper surface and accent treatment for the sidebar', () => {
@@ -90,5 +94,22 @@ describe('AdminShell responsive interaction', () => {
     expect(toggle).toHaveClass('admin-menu-button--editorial')
     expect(toggle).toHaveStyle({ width: '44px', height: '44px', borderRadius: '50%' })
     expect({ width: getComputedStyle(toggle).width, height: getComputedStyle(toggle).height }).toEqual(closedSize)
+  })
+
+  it('clears the session and redirects to login when signing out', () => {
+    authStore.setState({ token: 'admin-token', user: { id: 'admin-1', nome: 'Admin', email: 'admin@agenda.plus', role: 'ADMIN' } })
+    render(
+      <MemoryRouter initialEntries={['/painel']}>
+        <Routes>
+          <Route path="/painel" element={<AdminShell title="Painel"><p>Conteúdo</p></AdminShell>} />
+          <Route path="/login" element={<h1>Login</h1>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Sair' }))
+
+    expect(authStore.getState()).toMatchObject({ token: null, user: null })
+    expect(screen.getByRole('heading', { name: 'Login' })).toBeInTheDocument()
   })
 })

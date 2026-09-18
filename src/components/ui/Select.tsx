@@ -102,6 +102,7 @@ export function Select({ id, name, value, options, placeholder = 'Selecione uma 
               role="option"
               aria-selected={option.value === value}
               aria-disabled={option.disabled || undefined}
+              onMouseDown={(event) => event.preventDefault()}
               onClick={() => choose(option)}
             >
               {option.label}
