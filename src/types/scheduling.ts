@@ -32,9 +32,13 @@ export interface CreateAgendamentoInput {
 }
 
 export interface AgendamentosQuery {
-  dataInicio: string
-  dataFim: string
+  dataInicio?: string
+  dataFim?: string
+  clienteId?: string
   profissionalId?: string
   pagina?: number
   tamanho?: number
+  escopo?: 'admin' | 'cliente'
 }
+
+export type ClientAgendamentosQuery = Omit<AgendamentosQuery, 'clienteId' | 'escopo'>
