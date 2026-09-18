@@ -23,15 +23,41 @@ export function CancelAppointmentDialog({
   onClose,
   onConfirm,
 }: CancelAppointmentDialogProps) {
+  const dialogRef = useRef<HTMLElement>(null)
   const cancelButtonRef = useRef<HTMLButtonElement>(null)
+  const previouslyFocusedElement = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
+    previouslyFocusedElement.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
     cancelButtonRef.current?.focus()
+    return () => previouslyFocusedElement.current?.focus()
   }, [])
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape' && !isPending) onClose()
+      if (event.key !== 'Tab') return
+
+      const focusableElements = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button:not(:disabled), [href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])',
+      ) ?? [])
+      if (focusableElements.length === 0) {
+        event.preventDefault()
+        return
+      }
+
+      const firstElement = focusableElements[0]
+      const lastElement = focusableElements[focusableElements.length - 1]
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault()
+        lastElement.focus()
+      } else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault()
+        firstElement.focus()
+      } else if (!dialogRef.current?.contains(document.activeElement)) {
+        event.preventDefault()
+        firstElement.focus()
+      }
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
@@ -40,6 +66,7 @@ export function CancelAppointmentDialog({
   return (
     <div className="cancel-dialog-backdrop">
       <section
+        ref={dialogRef}
         className="cancel-dialog"
         role="dialog"
         aria-modal="true"

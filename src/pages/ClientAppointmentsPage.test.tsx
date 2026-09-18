@@ -88,6 +88,35 @@ describe('ClientAppointmentsPage', () => {
     expect(screen.getByText('Você ainda não possui agendamentos.')).toBeInTheDocument()
   })
 
+  it('navigates to the next page and renders its appointments', async () => {
+    const secondAppointment = {
+      ...appointment,
+      id: 'appointment-2',
+      servicoId: 'service-2',
+    }
+    hooks.services.mockReturnValue(loadedQuery([
+      { id: 'service-1', nome: 'Corte de Cabelo', duracaoMinutos: 45, preco: { valor: 80, moeda: 'BRL' } },
+      { id: 'service-2', nome: 'Barba', duracaoMinutos: 30, preco: { valor: 50, moeda: 'BRL' } },
+    ]))
+    hooks.appointments.mockImplementation((query: { pagina: number }) => loadedQuery({
+      conteudo: query.pagina === 0 ? [appointment] : [secondAppointment],
+      pagina: query.pagina,
+      tamanho: 20,
+      totalElementos: 21,
+      totalPaginas: 2,
+    }))
+
+    render(<ClientAppointmentsPage />)
+    expect(screen.getByText('Página 1 de 2')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Próxima página' }))
+
+    expect(await screen.findByText('Barba')).toBeInTheDocument()
+    expect(screen.getByText('Página 2 de 2')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Próxima página' })).toBeDisabled()
+    expect(hooks.appointments).toHaveBeenLastCalledWith({ clienteId: 'client-1', escopo: 'cliente', pagina: 1, tamanho: 20 })
+  })
+
   it('confirms cancellation with the selected appointment ID and closes after success', async () => {
     render(<ClientAppointmentsPage />)
 
@@ -113,5 +142,39 @@ describe('ClientAppointmentsPage', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('A janela de cancelamento já terminou.')
     expect(screen.getByRole('dialog')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Confirmar cancelamento' })).toBeEnabled()
+  })
+
+  it('traps keyboard focus in the dialog and restores focus to its opener after Escape', () => {
+    render(<ClientAppointmentsPage />)
+    const opener = screen.getByRole('button', { name: 'Cancelar' })
+
+    opener.focus()
+    fireEvent.click(opener)
+
+    const backButton = screen.getByRole('button', { name: 'Voltar' })
+    const confirmButton = screen.getByRole('button', { name: 'Confirmar cancelamento' })
+    expect(backButton).toHaveFocus()
+
+    confirmButton.focus()
+    fireEvent.keyDown(document, { key: 'Tab' })
+    expect(backButton).toHaveFocus()
+
+    fireEvent.keyDown(document, { key: 'Tab', shiftKey: true })
+    expect(confirmButton).toHaveFocus()
+
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(opener).toHaveFocus()
+  })
+
+  it('shows cancellation progress and disables dialog actions while the mutation is pending', () => {
+    const { rerender } = render(<ClientAppointmentsPage />)
+    fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
+
+    hooks.cancel.mockReturnValue({ mutateAsync: hooks.mutateAsync, isPending: true })
+    rerender(<ClientAppointmentsPage />)
+
+    expect(screen.getByRole('button', { name: 'Cancelando…' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Voltar' })).toBeDisabled()
   })
 })

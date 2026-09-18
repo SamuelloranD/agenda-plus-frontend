@@ -37,6 +37,20 @@ describe('ClientAppointmentCard', () => {
     expect(onCancel).toHaveBeenCalledTimes(1)
   })
 
+  it('shows cancellation for an eligible pending appointment', () => {
+    render(
+      <ClientAppointmentCard
+        appointment={{ ...appointment, status: 'PENDENTE' }}
+        names={{ professionalName: 'João Silva', serviceName: 'Corte de Cabelo' }}
+        now={new Date('2026-09-19T10:00:00')}
+        onCancel={() => undefined}
+      />,
+    )
+
+    expect(screen.getByText('PENDENTE')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Cancelar' })).toBeInTheDocument()
+  })
+
   it('never renders raw IDs when catalog names are missing', () => {
     render(
       <ClientAppointmentCard
