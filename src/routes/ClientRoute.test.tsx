@@ -85,6 +85,17 @@ describe('ClientRoute', () => {
     expect(screen.queryByText('Visão geral')).not.toBeInTheDocument()
   })
 
+  it('keeps the client sidebar while an authenticated CLIENTE books an appointment', () => {
+    renderWithQuery(
+      <AppRoutes session={{ role: 'CLIENTE' }} />,
+      '/agendar',
+    )
+
+    expect(document.querySelector('.client-sidebar')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Meus agendamentos' })).toHaveAttribute('href', '/meus-agendamentos')
+    expect(screen.getByRole('link', { name: 'Novo agendamento' })).toHaveClass('client-nav-link--active')
+  })
+
   it('redirects an ADMIN from the client area to the panel', () => {
     renderWithQuery(
       <AppRoutes session={{ role: 'ADMIN' }} />,
