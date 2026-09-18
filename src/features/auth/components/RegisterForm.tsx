@@ -35,7 +35,8 @@ export function RegisterForm() {
     try {
       await registration.mutateAsync(input)
       const returnTo = getPendingReturnPath(location.search)
-      navigate(mode === 'client' ? returnTo ?? '/agendar' : '/painel', { replace: true })
+      const hasReturnTo = new URLSearchParams(location.search).has('returnTo')
+      navigate(mode === 'client' ? returnTo ?? (hasReturnTo ? '/agendar' : '/meus-agendamentos') : '/painel', { replace: true })
     } catch {
       // React Query exposes the normalized failure beside the form.
     }

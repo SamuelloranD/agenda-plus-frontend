@@ -33,7 +33,8 @@ export function LoginForm() {
     try {
       const user = await login.mutateAsync(input)
       const returnTo = getPendingReturnPath(location.search)
-      navigate(user.role === 'ADMIN' ? '/painel' : returnTo ?? '/agendar', { replace: true })
+      const hasReturnTo = new URLSearchParams(location.search).has('returnTo')
+      navigate(user.role === 'ADMIN' ? '/painel' : returnTo ?? (hasReturnTo ? '/agendar' : '/meus-agendamentos'), { replace: true })
     } catch {
       // React Query exposes the normalized failure beside the form.
     }
