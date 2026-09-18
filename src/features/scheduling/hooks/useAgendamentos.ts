@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { schedulingApi } from '../../../services/api/scheduling'
-import type { AgendamentosQuery, PaginaAgendamentosResponse } from '../../../types/scheduling'
+import type { AgendamentosQuery, ClientAgendamentosQuery, PaginaAgendamentosResponse } from '../../../types/scheduling'
 
 const MAX_PAGE_SIZE = 100
 
@@ -14,27 +14,31 @@ function safePageSize(size?: number) {
 
 export const agendamentosQueryKey = (query: AgendamentosQuery, options: UseAgendamentosOptions = {}) => [
   'agendamentos',
-  query.dataInicio,
-  query.dataFim,
+  query.escopo ?? 'admin',
+  query.clienteId ?? null,
+  query.dataInicio ?? null,
+  query.dataFim ?? null,
   query.profissionalId ?? null,
   options.allPages ? 0 : query.pagina ?? 0,
   safePageSize(query.tamanho),
   Boolean(options.allPages),
 ] as const
 
-function pageQuery(query: AgendamentosQuery, pagina: number) {
-  return { ...query, pagina, tamanho: safePageSize(query.tamanho) }
+function pageQuery(query: AgendamentosQuery, pagina: number): ClientAgendamentosQuery {
+  const { escopo: _escopo, clienteId: _clienteId, ...filters } = query
+  return { ...filters, pagina, tamanho: safePageSize(query.tamanho) }
 }
 
 export async function fetchAgendamentos(query: AgendamentosQuery, options: UseAgendamentosOptions = {}): Promise<PaginaAgendamentosResponse> {
-  const firstPage = await schedulingApi.list(pageQuery(query, options.allPages ? 0 : query.pagina ?? 0))
+  const list = query.escopo === 'cliente' ? schedulingApi.listMine : schedulingApi.list
+  const firstPage = await list(pageQuery(query, options.allPages ? 0 : query.pagina ?? 0))
   if (!options.allPages || firstPage.totalPaginas <= 1) {
     return firstPage
   }
 
   const pages = [firstPage]
   for (let pagina = 1; pagina < firstPage.totalPaginas; pagina += 1) {
-    pages.push(await schedulingApi.list(pageQuery(query, pagina)))
+    pages.push(await list(pageQuery(query, pagina)))
   }
 
   return {

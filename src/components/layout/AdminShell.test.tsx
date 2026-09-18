@@ -41,6 +41,18 @@ describe('AdminShell responsive interaction', () => {
     expect(css).toMatch(/\.admin-menu-button\{[^}]*z-index:4/)
   })
 
+  it('keeps the desktop sidebar fixed while the main content scrolls', () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={['/painel']}>
+        <AdminShell title="Painel" subtitle="VisÃ£o geral"><p>ConteÃºdo</p></AdminShell>
+      </MemoryRouter>,
+    )
+
+    const desktopCss = (container.querySelector('style')?.textContent ?? '').split('@media')[0]
+    expect(desktopCss).toMatch(/\.admin-sidebar\{[^}]*position:fixed/)
+    expect(desktopCss).toMatch(/\.admin-main\{[^}]*margin-left:250px/)
+  })
+
   it('places the open transform after the mobile closed transform', () => {
     const { container } = render(
       <MemoryRouter initialEntries={['/painel']}>

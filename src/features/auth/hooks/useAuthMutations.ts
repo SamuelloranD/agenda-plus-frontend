@@ -7,7 +7,7 @@ export type RegistrationMode = 'client' | 'business'
 
 export function getPendingReturnPath(search: string) {
   const returnTo = new URLSearchParams(search).get('returnTo')
-  return returnTo === '/agendar' || returnTo?.startsWith('/agendar/') ? returnTo : null
+  return returnTo === '/meus-agendamentos' || returnTo === '/agendar' || returnTo?.startsWith('/agendar/') ? returnTo : null
 }
 
 export class RegistrationSessionError extends Error {

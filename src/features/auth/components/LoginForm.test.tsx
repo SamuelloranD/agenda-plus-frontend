@@ -7,6 +7,7 @@ import { authApi } from '../../../services/api/auth'
 import { authStore } from '../../../store/authStore'
 import { LoginForm } from './LoginForm'
 import { RegisterForm } from './RegisterForm'
+import { getPendingReturnPath } from '../hooks/useAuthMutations'
 
 function renderAuthForm(children: ReactNode, initialEntry = '/login') {
   const queryClient = new QueryClient({
@@ -22,6 +23,7 @@ function renderAuthForm(children: ReactNode, initialEntry = '/login') {
         <Routes>
           <Route path="*" element={children} />
           <Route path="/painel" element={<h1>Painel autenticado</h1>} />
+          <Route path="/meus-agendamentos" element={<h1>Meus agendamentos</h1>} />
           <Route path="/agendar/resumo" element={<h1>Resumo da reserva</h1>} />
           <Route path="/agendar" element={<h1>Agendar público</h1>} />
           <Route path="/agendar/*" element={<h1>Agendar público</h1>} />
@@ -39,6 +41,33 @@ afterEach(() => {
 })
 
 describe('LoginForm', () => {
+  it.each([
+    '/meus-agendamentos/', '/meus-agendamentos/other', '/meus-agendamentos-malformed',
+    '/meus-agendamentos?next=https://example.com', '/meus-agendamentos#other',
+    '//example.com/meus-agendamentos', 'https://example.com/meus-agendamentos',
+    '/\\example.com/meus-agendamentos', '/painel',
+  ])('rejects unsafe or non-exact appointment return destination %s', (path) => {
+    expect(getPendingReturnPath(`?returnTo=${encodeURIComponent(path)}`)).toBeNull()
+  })
+
+  it.each(['login', 'cadastro'])('returns a client to exact /meus-agendamentos after %s', async (flow) => {
+    const user = { id: 'client-1', nome: 'Cliente Agenda', email: 'cliente@agenda.plus', role: 'CLIENTE' as const }
+    vi.spyOn(authApi, 'login').mockResolvedValue({ token: 'client-token', tokenType: 'Bearer', expiresIn: 3600 })
+    vi.spyOn(authApi, 'me').mockResolvedValue(user)
+    vi.spyOn(authApi, 'registerClient').mockResolvedValue(user)
+    renderAuthForm(flow === 'login' ? <LoginForm /> : <RegisterForm />, `/${flow}?returnTo=%2Fmeus-agendamentos`)
+
+    if (flow === 'cadastro') {
+      expect(screen.getByRole('radio', { name: /cliente/i })).toBeChecked()
+      fireEvent.change(screen.getByLabelText(/nome/i), { target: { value: user.nome } })
+    }
+    fireEvent.change(screen.getByLabelText(/e-mail/i), { target: { value: user.email } })
+    fireEvent.change(screen.getByLabelText(/senha/i), { target: { value: 'segredo123' } })
+    fireEvent.click(screen.getByRole('button', { name: flow === 'login' ? /entrar/i : /criar conta/i }))
+
+    expect(await screen.findByRole('heading', { name: 'Meus agendamentos' })).toBeInTheDocument()
+  })
+
   it('renders inline validation messages for blank credentials', async () => {
     renderAuthForm(<LoginForm />)
 
@@ -77,7 +106,7 @@ describe('LoginForm', () => {
     })
   })
 
-  it('keeps an admin in the panel when login started from the booking wizard', async () => {
+  it.each(['/agendar', '/meus-agendamentos'])('keeps an admin in the panel when returning to %s', async (returnTo) => {
     vi.spyOn(authApi, 'login').mockResolvedValue({
       token: 'admin-token',
       tokenType: 'Bearer',
@@ -89,7 +118,7 @@ describe('LoginForm', () => {
       email: 'mestre@agenda.plus',
       role: 'ADMIN',
     })
-    renderAuthForm(<LoginForm />, '/login?returnTo=%2Fagendar')
+    renderAuthForm(<LoginForm />, `/login?returnTo=${encodeURIComponent(returnTo)}`)
 
     fireEvent.change(screen.getByLabelText(/e-mail/i), { target: { value: 'mestre@agenda.plus' } })
     fireEvent.change(screen.getByLabelText(/senha/i), { target: { value: 'segredo123' } })

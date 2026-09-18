@@ -9,12 +9,16 @@ import { TimeStep } from '../features/client-booking/components/TimeStep'
 import { useClientBooking } from '../features/client-booking/hooks/useClientBooking'
 import { ANY_PROFESSIONAL_ID } from '../features/client-booking/types'
 
-export function ClientBookingPage() {
+interface ClientBookingPageProps {
+  embedded?: boolean
+}
+
+export function ClientBookingPage({ embedded = false }: ClientBookingPageProps) {
   const booking = useClientBooking()
   const { selection } = booking
 
   if (booking.confirmation) {
-    return <BookingConfirmation confirmation={booking.confirmation} />
+    return <BookingConfirmation confirmation={booking.confirmation} embedded={embedded} />
   }
 
   const assignedProfessional = selection.slot?.candidates.find(({ id }) => id === selection.slot?.profissionalId)
@@ -26,14 +30,14 @@ export function ClientBookingPage() {
   const isClient = booking.session.user?.role === 'CLIENTE'
 
   return (
-    <main className="booking-page">
-      <header className="booking-public-header">
+    <main className={`booking-page${embedded ? ' booking-page--embedded' : ''}`}>
+      {!embedded && <header className="booking-public-header">
         <div className="brand-lockup" aria-label="Agenda+">
           <span className="brand-mark" aria-hidden="true">+</span>
           <span className="brand-name">Agenda<span>+</span></span>
         </div>
         {isClient ? <span className="booking-client-name">Olá, {booking.session.user?.nome}</span> : <Link to="/login?returnTo=%2Fagendar">Entrar</Link>}
-      </header>
+      </header>}
 
       <section className="booking-hero" aria-labelledby="booking-title">
         <div>
