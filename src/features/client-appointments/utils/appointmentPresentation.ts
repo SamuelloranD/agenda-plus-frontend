@@ -35,8 +35,13 @@ export function resolveClientAppointmentNames(
   }
 }
 
+function appointmentDate(value: string) {
+  // The API emits LocalDateTime without an offset and compares it with Clock.systemUTC().
+  return new Date(/(?:Z|[+-]\d{2}:\d{2})$/i.test(value) ? value : `${value}Z`)
+}
+
 export function canCancelAppointment(appointment: AgendamentoResponse, now = new Date()) {
-  const startsAt = new Date(appointment.inicio).getTime()
+  const startsAt = appointmentDate(appointment.inicio).getTime()
   return cancellableStatuses.has(appointment.status) && startsAt - now.getTime() >= CANCELLATION_WINDOW_MS
 }
 
@@ -46,12 +51,14 @@ export function formatAppointmentDate(value: string) {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
-  }).format(new Date(value))
+    timeZone: 'UTC',
+  }).format(appointmentDate(value))
 }
 
 export function formatAppointmentTimeRange(start: string, end: string) {
-  const formatter = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false })
-  return `${formatter.format(new Date(start))} — ${formatter.format(new Date(end))}`
+  // Keep the API's appointment wall-clock values, independent of the browser's timezone/DST.
+  const formatter = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' })
+  return `${formatter.format(appointmentDate(start))} — ${formatter.format(appointmentDate(end))}`
 }
 
 export function splitClientAppointments(appointments: AgendamentoResponse[], now = new Date()) {
@@ -59,13 +66,13 @@ export function splitClientAppointments(appointments: AgendamentoResponse[], now
   const history: AgendamentoResponse[] = []
 
   appointments.forEach((appointment) => {
-    const isFutureActive = new Date(appointment.inicio).getTime() >= now.getTime()
+    const isFutureActive = appointmentDate(appointment.inicio).getTime() >= now.getTime()
       && cancellableStatuses.has(appointment.status)
     ;(isFutureActive ? upcoming : history).push(appointment)
   })
 
-  upcoming.sort((left, right) => new Date(left.inicio).getTime() - new Date(right.inicio).getTime())
-  history.sort((left, right) => new Date(right.inicio).getTime() - new Date(left.inicio).getTime())
+  upcoming.sort((left, right) => appointmentDate(left.inicio).getTime() - appointmentDate(right.inicio).getTime())
+  history.sort((left, right) => appointmentDate(right.inicio).getTime() - appointmentDate(left.inicio).getTime())
 
   return { upcoming, history }
 }

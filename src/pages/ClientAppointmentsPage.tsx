@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
@@ -25,6 +25,7 @@ function cancellationErrorMessage(error: unknown) {
 }
 
 export function ClientAppointmentsPage() {
+  const sectionRef = useRef<HTMLElement>(null)
   const user = useAuthStore((state) => state.user)
   const [page, setPage] = useState(0)
   const appointments = useAgendamentos({ clienteId: user?.id, escopo: 'cliente', pagina: page, tamanho: 20 })
@@ -75,7 +76,7 @@ export function ClientAppointmentsPage() {
   ])
 
   return (
-    <section className="client-appointments-page">
+    <section ref={sectionRef} className="client-appointments-page" aria-label="Meus agendamentos" tabIndex={-1}>
       <style>{clientAppointmentsStyles}</style>
       {isLoading && <LoadingState message="Preparando seus agendamentos…" />}
       {!isLoading && isError && (
@@ -127,6 +128,7 @@ export function ClientAppointmentsPage() {
       )}
       {selectedAppointment && selectedNames && (
         <CancelAppointmentDialog
+          focusFallbackRef={sectionRef}
           appointment={selectedAppointment}
           names={selectedNames}
           isPending={cancel.isPending}

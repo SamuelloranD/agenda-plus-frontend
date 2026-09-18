@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AgendamentoResponse } from '../types/scheduling'
 import { useAuthStore } from '../store/authStore'
@@ -120,7 +120,9 @@ describe('ClientAppointmentsPage', () => {
   it('confirms cancellation with the selected appointment ID and closes after success', async () => {
     render(<ClientAppointmentsPage />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
+    const opener = screen.getByRole('button', { name: 'Cancelar' })
+    opener.focus()
+    fireEvent.click(opener)
     const dialog = screen.getByRole('dialog', { name: 'Cancelar agendamento' })
     expect(dialog).toHaveTextContent('Corte de Cabelo')
     expect(dialog).toHaveTextContent('João Silva')
@@ -130,6 +132,7 @@ describe('ClientAppointmentsPage', () => {
     await waitFor(() => expect(hooks.mutateAsync).toHaveBeenCalledWith('appointment-1'))
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
     expect(screen.getByText('Corte de Cabelo')).toBeInTheDocument()
+    expect(opener).toHaveFocus()
   })
 
   it('keeps the dialog recoverable and shows actionable feedback after cancellation fails', async () => {
@@ -142,6 +145,28 @@ describe('ClientAppointmentsPage', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('A janela de cancelamento já terminou.')
     expect(screen.getByRole('dialog')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Confirmar cancelamento' })).toBeEnabled()
+  })
+
+  it.each(['history', 'empty', 'error'])('restores focus to a stable section after refetch removes the trigger (%s)', async (state) => {
+    let completeCancellation!: (value: AgendamentoResponse) => void
+    hooks.mutateAsync.mockReturnValue(new Promise<AgendamentoResponse>((resolve) => { completeCancellation = resolve }))
+    const { rerender } = render(<ClientAppointmentsPage />)
+    const opener = screen.getByRole('button', { name: 'Cancelar' })
+    opener.focus()
+    fireEvent.click(opener)
+    fireEvent.click(screen.getByRole('button', { name: 'Confirmar cancelamento' }))
+
+    const cancelled = { ...appointment, status: 'CANCELADO' as const }
+    hooks.appointments.mockReturnValue({
+      ...loadedQuery({ conteudo: state === 'history' ? [cancelled] : [], pagina: 0, tamanho: 20, totalElementos: state === 'history' ? 1 : 0, totalPaginas: state === 'history' ? 1 : 0 }),
+      isError: state === 'error',
+    })
+    rerender(<ClientAppointmentsPage />)
+    expect(opener.isConnected).toBe(false)
+    await act(async () => { completeCancellation(cancelled) })
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(screen.getByRole('region', { name: 'Meus agendamentos' })).toHaveFocus()
   })
 
   it('traps keyboard focus in the dialog and restores focus to its opener after Escape', () => {

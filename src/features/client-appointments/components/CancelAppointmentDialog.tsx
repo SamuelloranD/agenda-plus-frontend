@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type RefObject } from 'react'
 import type { AgendamentoResponse } from '../../../types/scheduling'
 import {
   formatAppointmentDate,
@@ -13,6 +13,7 @@ interface CancelAppointmentDialogProps {
   errorMessage: string | null
   onClose: () => void
   onConfirm: () => void
+  focusFallbackRef: RefObject<HTMLElement | null>
 }
 
 export function CancelAppointmentDialog({
@@ -22,16 +23,20 @@ export function CancelAppointmentDialog({
   errorMessage,
   onClose,
   onConfirm,
+  focusFallbackRef,
 }: CancelAppointmentDialogProps) {
   const dialogRef = useRef<HTMLElement>(null)
   const cancelButtonRef = useRef<HTMLButtonElement>(null)
-  const previouslyFocusedElement = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
-    previouslyFocusedElement.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    const fallback = focusFallbackRef.current
     cancelButtonRef.current?.focus()
-    return () => previouslyFocusedElement.current?.focus()
-  }, [])
+    return () => {
+      const target = opener?.isConnected ? opener : fallback
+      if (target?.isConnected) target.focus()
+    }
+  }, [focusFallbackRef])
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {

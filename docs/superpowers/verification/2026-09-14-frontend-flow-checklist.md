@@ -48,4 +48,4 @@ banco local:
 - Cliente nao possui suporte a walk-in: a confirmacao exige cadastro/login completo via `/auth/cadastro` ou login existente.
 - A grade usa slots fixos derivados da duracao do servico; nao ha suporte a horarios intermediarios desalinhados.
 - `Qualquer profissional` dispara N requisicoes de disponibilidade, uma por profissional cadastrado. Em escala maior, o backend deveria oferecer disponibilidade agregada.
-- Nao existe tela de `Meus agendamentos` para o cliente nesta entrega; a funcionalidade esta registrada no backlog futuro do plano.
+- Na entrega original deste fluxo, `Meus agendamentos` ficou no backlog. A feature foi implementada depois em `feat/client-appointments`; as verificacoes automatizadas estao concluidas e o aceite manual em navegador permanece pendente. Veja a [verificacao da rodada final](2026-09-18-client-appointments-final-fix.md).

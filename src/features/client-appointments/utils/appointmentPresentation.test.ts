@@ -20,6 +20,21 @@ const appointment: AgendamentoResponse = {
 }
 
 describe('appointment presentation', () => {
+  it.each([
+    ['2026-09-19T13:59:59.999Z', true],
+    ['2026-09-19T14:00:00.000Z', true],
+    ['2026-09-19T14:00:00.001Z', false],
+    ['2026-09-19T11:00:00.000-03:00', true],
+    ['2026-09-19T11:00:00.001-03:00', false],
+  ])('uses the backend UTC clock for cancellation at %s', (now, expected) => {
+    expect(canCancelAppointment(appointment, new Date(now))).toBe(expected)
+  })
+
+  it('moves a no-offset active appointment into history immediately after its UTC start', () => {
+    expect(splitClientAppointments([appointment], new Date('2026-09-20T14:00:00Z')).upcoming).toEqual([appointment])
+    expect(splitClientAppointments([appointment], new Date('2026-09-20T14:00:00.001Z')).history).toEqual([appointment])
+  })
+
   it('resolves service and professional IDs to catalog names', () => {
     const names = buildAppointmentNameMaps(
       [{ id: 'professional-1', nome: 'João Silva', especialidade: 'Cabeleireiro', horariosTrabalho: [] }],
@@ -47,14 +62,14 @@ describe('appointment presentation', () => {
   })
 
   it.each(['PENDENTE', 'CONFIRMADO'] as const)('allows cancellation for a %s appointment at least 24 hours away', (status) => {
-    expect(canCancelAppointment({ ...appointment, status }, new Date('2026-09-19T13:59:00'))).toBe(true)
+    expect(canCancelAppointment({ ...appointment, status }, new Date('2026-09-19T13:59:00Z'))).toBe(true)
   })
 
   it.each([
-    ['CANCELADO', '2026-09-19T10:00:00'],
-    ['CONCLUIDO', '2026-09-19T10:00:00'],
-    ['CONFIRMADO', '2026-09-20T14:01:00'],
-    ['PENDENTE', '2026-09-19T15:00:00'],
+    ['CANCELADO', '2026-09-19T10:00:00Z'],
+    ['CONCLUIDO', '2026-09-19T10:00:00Z'],
+    ['CONFIRMADO', '2026-09-20T14:01:00Z'],
+    ['PENDENTE', '2026-09-19T15:00:00Z'],
   ] as const)('does not allow cancellation for status %s at reference time %s', (status, now) => {
     expect(canCancelAppointment({ ...appointment, status }, new Date(now))).toBe(false)
   })
@@ -62,6 +77,12 @@ describe('appointment presentation', () => {
   it('formats date and time in pt-BR without exposing the raw timestamp', () => {
     expect(formatAppointmentDate(appointment.inicio)).toMatch(/domingo, 20 de setembro de 2026/i)
     expect(formatAppointmentTimeRange(appointment.inicio, appointment.fim)).toBe('14:00 — 14:45')
+  })
+
+  it('preserves wall-clock dates near midnight and times in a browser DST gap', () => {
+    expect(formatAppointmentDate('2026-09-20T00:15:00')).toMatch(/domingo, 20 de setembro de 2026/i)
+    expect(formatAppointmentTimeRange('2026-09-20T00:15:00', '2026-09-20T00:45:00')).toBe('00:15 — 00:45')
+    expect(formatAppointmentTimeRange('2026-03-08T02:15:00', '2026-03-08T02:45:00')).toBe('02:15 — 02:45')
   })
 
   it('separates active future appointments from history and sorts both groups', () => {
