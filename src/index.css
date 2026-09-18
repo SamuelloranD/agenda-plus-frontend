@@ -127,6 +127,137 @@ button {
   opacity: .5;
 }
 
+.ui-date-picker {
+  position: relative;
+  width: 100%;
+}
+
+.ui-date-picker__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 46px;
+  gap: 12px;
+  padding: 10px 12px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.ui-date-picker__trigger--placeholder {
+  color: var(--muted-ink);
+}
+
+.ui-date-picker__trigger:hover,
+.ui-date-picker__trigger[aria-expanded='true'],
+.ui-date-picker__trigger:focus-visible {
+  border-color: var(--terracotta);
+  outline: 2px solid color-mix(in srgb, var(--terracotta) 28%, transparent);
+  outline-offset: 0;
+}
+
+.ui-date-picker__trigger:disabled {
+  cursor: not-allowed;
+  opacity: .6;
+}
+
+.ui-date-picker__icon {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--terracotta);
+}
+
+.ui-date-picker__popover {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 286px;
+  padding: 12px;
+  background: #fffdf9;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px -4px rgb(44 31 26 / 10%), 0 1px 3px rgb(44 31 26 / 5%);
+}
+
+.ui-date-picker__header,
+.ui-date-picker__weekdays,
+.ui-date-picker__days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  align-items: center;
+  gap: 4px;
+}
+
+.ui-date-picker__header {
+  grid-template-columns: 32px 1fr 32px;
+  margin-bottom: 12px;
+}
+
+.ui-date-picker__header strong {
+  color: var(--ink);
+  font-size: 13px;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.ui-date-picker__header button,
+.ui-date-picker__day {
+  display: grid;
+  place-items: center;
+  min-height: 32px;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ui-date-picker__header button {
+  color: var(--terracotta);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.ui-date-picker__header button:hover:not(:disabled),
+.ui-date-picker__day:hover:not(:disabled) {
+  background: #efe8dc;
+  border-color: var(--line);
+}
+
+.ui-date-picker__header button:disabled,
+.ui-date-picker__day:disabled {
+  cursor: not-allowed;
+  opacity: .35;
+}
+
+.ui-date-picker__weekdays {
+  margin-bottom: 4px;
+  color: var(--muted-ink);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-align: center;
+}
+
+.ui-date-picker__day {
+  font-size: 12px;
+}
+
+.ui-date-picker__day--selected {
+  color: var(--paper);
+  background: var(--terracotta);
+  border-color: var(--terracotta);
+  font-weight: 700;
+}
+
 .appointment-form .form-field input:not([type='hidden']),
 .catalog-form .catalog-field input,
 .catalog-form .interval-row input,

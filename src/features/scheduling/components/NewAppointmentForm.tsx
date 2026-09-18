@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import type { ApiError } from '../../../types/api'
+import { DatePicker } from '../../../components/ui/DatePicker'
 import { Select } from '../../../components/ui/Select'
 import { useClients } from '../../clients/hooks/useClients'
 import { useProfessionals } from '../../professionals/hooks/useProfessionals'
@@ -85,7 +86,7 @@ export function NewAppointmentForm({ onSuccess }: NewAppointmentFormProps) {
       <fieldset className="appointment-step">
         <legend><span>3</span> Data e horário</legend>
         <label className="form-field form-field--date">Data do atendimento
-          <input type="date" value={data} min={todayKey()} onChange={(event) => setData(event.target.value)} />
+          <DatePicker id="appointment-date" value={data} min={todayKey()} onChange={setData} />
         </label>
         {!profissionalId || !servicoId ? <p className="form-hint">Escolha o serviço e o profissional para consultar os horários livres.</p> : null}
         {horariosQuery.isLoading && <p className="form-hint" role="status">Consultando a agenda disponível…</p>}

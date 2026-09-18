@@ -1,7 +1,9 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Select } from './Select'
+
+afterEach(cleanup)
 
 const options = [
   { value: 'service-1', label: 'Corte clássico' },
@@ -30,6 +32,15 @@ describe('Select', () => {
 
     expect(onChange).toHaveBeenCalledWith('service-1')
     expect(trigger).toHaveTextContent('Corte clássico')
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+  })
+
+  it('closes as soon as a pointer starts selecting an option', () => {
+    render(<Select id="service" value="" onChange={vi.fn()} options={options} />)
+
+    fireEvent.click(screen.getByRole('combobox'))
+    fireEvent.pointerDown(screen.getByRole('option', { name: 'Corte clássico' }))
+
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
   })
 })
