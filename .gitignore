@@ -23,3 +23,18 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Repository policy: keep only README documentation and favicons
+*.md
+!README.md
+!**/README.md
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.avif
+*.bmp
+*.ico
+*.svg
+!**/favicon.*
