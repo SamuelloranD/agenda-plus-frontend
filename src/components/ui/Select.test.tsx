@@ -36,11 +36,13 @@ describe('Select', () => {
   })
 
   it('closes as soon as a pointer starts selecting an option', () => {
-    render(<Select id="service" value="" onChange={vi.fn()} options={options} />)
+    const onChange = vi.fn()
+    render(<Select id="service" value="" onChange={onChange} options={options} />)
 
     fireEvent.click(screen.getByRole('combobox'))
     fireEvent.pointerDown(screen.getByRole('option', { name: 'Corte clássico' }))
 
+    expect(onChange).toHaveBeenCalledWith('service-1')
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
   })
 })
