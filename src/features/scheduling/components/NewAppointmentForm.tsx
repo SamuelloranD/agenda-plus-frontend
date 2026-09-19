@@ -3,9 +3,6 @@ import { useEffect, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import type { ApiError } from '../../../types/api'
 import { DatePicker } from '../../../components/ui/DatePicker'
-import { EmptyState } from '../../../components/ui/EmptyState'
-import { ErrorState } from '../../../components/ui/ErrorState'
-import { LoadingState } from '../../../components/ui/LoadingState'
 import { Select } from '../../../components/ui/Select'
 import { useClients } from '../../clients/hooks/useClients'
 import { useProfessionals } from '../../professionals/hooks/useProfessionals'
@@ -27,11 +24,6 @@ function appointmentErrorMessage(error: unknown) {
   const apiError = error as ApiError
   if (apiError.status === 409) return 'Este horário acabou de ser reservado. Escolha outro horário disponível.'
   return apiError.message ?? 'Não foi possível criar o agendamento. Tente novamente.'
-}
-
-function formatMissingCatalogs(catalogs: string[]) {
-  if (catalogs.length === 1) return catalogs[0]
-  return `${catalogs.slice(0, -1).join(', ')} e ${catalogs.at(-1)}`
 }
 
 export function NewAppointmentForm({ onSuccess }: NewAppointmentFormProps) {
@@ -57,21 +49,12 @@ export function NewAppointmentForm({ onSuccess }: NewAppointmentFormProps) {
   const catalogError = clientsQuery.isError || professionalsQuery.isError || servicesQuery.isError
   const selectedStart = useWatch({ control: form.control, name: 'inicio' })
 
-  if (isLoadingCatalog) return <LoadingState message="Abrindo os registros do ateliê…" />
-  if (catalogError) return <ErrorState message="Não foi possível abrir os dados necessários para este agendamento." onRetry={() => void Promise.all([clientsQuery.refetch(), professionalsQuery.refetch(), servicesQuery.refetch()])} />
+  if (isLoadingCatalog) return <p className="form-state" role="status">Abrindo os registros do ateliê…</p>
+  if (catalogError) return <p className="form-state form-state--error" role="alert">Não foi possível abrir os dados necessários para este agendamento.</p>
 
   const clients = (clientsQuery.data ?? []).filter((client) => client.role === 'CLIENTE')
   const professionals = professionalsQuery.data ?? []
   const services = servicesQuery.data ?? []
-  const missingCatalogs = [
-    clients.length === 0 ? 'um cliente' : null,
-    professionals.length === 0 ? 'um profissional' : null,
-    services.length === 0 ? 'um serviço' : null,
-  ].filter((catalog): catalog is string => catalog !== null)
-
-  if (missingCatalogs.length > 0) {
-    return <EmptyState message={`Cadastre ${formatMissingCatalogs(missingCatalogs)} antes de criar um agendamento.`} />
-  }
 
   return (
     <form className="appointment-form" onSubmit={form.handleSubmit((values) => createAppointment.mutate(values, { onSuccess }))} noValidate>
