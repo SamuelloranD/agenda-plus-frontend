@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode, type TouchEvent } from 'react'
 import { ClientSidebar } from './ClientSidebar'
 import { Header } from './Header'
 
@@ -10,7 +10,18 @@ interface ClientShellProps {
 
 export function ClientShell({ children, title, subtitle }: ClientShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const touchStartX = useRef<number | null>(null)
   const closeSidebar = () => setSidebarOpen(false)
+
+  function handleTouchStart(event: TouchEvent) {
+    if (sidebarOpen) touchStartX.current = event.changedTouches[0]?.clientX ?? null
+  }
+
+  function handleTouchEnd(event: TouchEvent) {
+    const start = touchStartX.current
+    touchStartX.current = null
+    if (sidebarOpen && start !== null && start - (event.changedTouches[0]?.clientX ?? start) > 50) closeSidebar()
+  }
 
   useEffect(() => {
     if (!sidebarOpen) return
@@ -22,7 +33,7 @@ export function ClientShell({ children, title, subtitle }: ClientShellProps) {
   }, [sidebarOpen])
 
   return (
-    <div className={`client-shell${sidebarOpen ? ' sidebar-open' : ''}`}>
+    <div className={`client-shell${sidebarOpen ? ' sidebar-open' : ''}`} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
     <style>{clientShellStyles}</style><style>{reducedMotionStyles}</style>
       <ClientSidebar />
       {sidebarOpen && (

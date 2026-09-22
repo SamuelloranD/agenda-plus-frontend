@@ -7,7 +7,7 @@ describe('getProfessionalTone', () => {
   })
 
   it('keeps tones within the curated visual palette', () => {
-    const tones = new Set(['clay', 'sage', 'ochre', 'rose', 'forest', 'sand', 'rust', 'moss', 'wheat'])
+    const tones = new Set(['slate', 'indigo', 'teal', 'denim', 'plum', 'petrol', 'stone', 'bluegray', 'lilac'])
     expect(tones.has(getProfessionalTone('professional-42'))).toBe(true)
   })
 })

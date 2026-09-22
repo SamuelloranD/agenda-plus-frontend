@@ -23,8 +23,7 @@ export function TodayAppointments({ appointments, directory }: TodayAppointments
               <strong>Cliente {labels.clientName}</strong>
               <span>Serviço {labels.serviceName} · Profissional {labels.professionalName}</span>
             </div>
-            <StatusBadge status={appointment.status} />
-            <AppointmentActions appointment={appointment} />
+            <div className="appointment-status-row"><StatusBadge status={appointment.status} /><AppointmentActions appointment={appointment} serviceName={labels.serviceName} professionalName={labels.professionalName} /></div>
           </li>
         )
       })}

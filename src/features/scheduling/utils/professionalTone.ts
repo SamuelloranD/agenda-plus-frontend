@@ -1,8 +1,8 @@
-export type ProfessionalTone = 'clay' | 'sage' | 'ochre' | 'rose' | 'forest' | 'sand' | 'rust' | 'moss' | 'wheat'
+export type ProfessionalTone = 'slate' | 'indigo' | 'teal' | 'denim' | 'plum' | 'petrol' | 'stone' | 'bluegray' | 'lilac'
 
-const tones: ProfessionalTone[] = ['clay', 'sage', 'ochre', 'rose', 'forest', 'sand', 'rust', 'moss', 'wheat']
+const tones: ProfessionalTone[] = ['slate', 'indigo', 'teal', 'denim', 'plum', 'petrol', 'stone', 'bluegray', 'lilac']
 export const professionalToneColors: Record<ProfessionalTone, string> = {
-  clay: '#9d5c43', sage: '#71836c', ochre: '#b18432', rose: '#a96b68', forest: '#4d6855', sand: '#9a8061', rust: '#a95f46', moss: '#667354', wheat: '#b79a62',
+  slate: '#58677a', indigo: '#665b86', teal: '#3e7773', denim: '#4f6f89', plum: '#76566f', petrol: '#356b6b', stone: '#81786e', bluegray: '#465b6f', lilac: '#877998',
 }
 
 export function getProfessionalTone(professionalId: string): ProfessionalTone {

@@ -1,10 +1,21 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode, type TouchEvent } from 'react'
 import { Header } from './Header'
 import { Sidebar } from './Sidebar'
 
 export function AdminShell({ children, title, subtitle }: { children: ReactNode; title?: string; subtitle?: string }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const touchStartX = useRef<number | null>(null)
   const closeSidebar = () => setSidebarOpen(false)
+
+  function handleTouchStart(event: TouchEvent) {
+    if (sidebarOpen) touchStartX.current = event.changedTouches[0]?.clientX ?? null
+  }
+
+  function handleTouchEnd(event: TouchEvent) {
+    const start = touchStartX.current
+    touchStartX.current = null
+    if (sidebarOpen && start !== null && start - (event.changedTouches[0]?.clientX ?? start) > 50) closeSidebar()
+  }
 
   useEffect(() => {
     if (!sidebarOpen) return
@@ -15,7 +26,7 @@ export function AdminShell({ children, title, subtitle }: { children: ReactNode;
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [sidebarOpen])
 
-  return <div className={`admin-shell${sidebarOpen ? ' sidebar-open' : ''}`}>
+  return <div className={`admin-shell${sidebarOpen ? ' sidebar-open' : ''}`} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
     <style>{adminShellStyles}</style><style>{reducedMotionStyles}</style>
     <Sidebar />
     {sidebarOpen && <button className="sidebar-overlay" data-testid="sidebar-overlay" type="button" aria-label="Fechar navegação" onClick={closeSidebar} />}
