@@ -31,7 +31,7 @@ export function DashboardPage() {
       <style>{dashboardStyles}</style>
       <header className="dashboard-lead">
         <p className="section-label">{formattedDate} · caderno diário</p>
-        <h2>O ritmo do ateliê, <em>em uma só folha.</em></h2>
+        <h2>O ritmo do seu negócio, <em>em uma só folha.</em></h2>
       </header>
       <div className="metric-grid" aria-label="Resumo dos agendamentos">
         <MetricCard label="Atendimentos hoje" value={metrics.todayCount} tone="terracotta" note="volume do dia" />

@@ -49,7 +49,7 @@ export function ProfessionalForm({ professional, onDone }: ProfessionalFormProps
         {form.formState.errors.especialidade && <small>{form.formState.errors.especialidade.message}</small>}
       </label>
       <section className="work-hours" aria-labelledby="work-hours-title">
-        <div className="work-hours__heading"><div><p className="section-label">Disponibilidade</p><h4 id="work-hours-title">Jornada de trabalho</h4></div><button type="button" className="quiet-action" onClick={() => intervals.append({ diaSemana: 'MONDAY', inicio: '09:00', fim: '18:00' })}>+ Adicionar faixa</button></div>
+        <div className="work-hours__heading"><div><p className="section-label">Disponibilidade</p><h4 id="work-hours-title">Jornada de trabalho</h4></div><button type="button" className="quiet-action" onClick={() => intervals.append({ diaSemana: 'MONDAY', inicio: '09:00', fim: '18:00' })}>Adicionar faixa</button></div>
         {intervals.fields.map((field, index) => <div className="interval-row" key={field.id}>
           <label>Dia<Controller control={form.control} name={`horariosTrabalho.${index}.diaSemana`} render={({ field }) => <Select id={`professional-weekday-${index}`} value={field.value} onChange={field.onChange} onBlur={field.onBlur} options={weekdays.map((weekday) => ({ value: weekday, label: weekdayLabels[weekday] }))} />} /></label>
           <label>Início<input type="time" {...form.register(`horariosTrabalho.${index}.inicio`)} /></label>

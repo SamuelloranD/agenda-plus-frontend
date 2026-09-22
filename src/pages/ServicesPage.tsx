@@ -22,7 +22,7 @@ export function ServicesPage() {
   if (servicesQuery.isError) return <ErrorState message="Não foi possível carregar os serviços." onRetry={() => void servicesQuery.refetch()} />
 
   const services = servicesQuery.data ?? []
-  return <section className="services-page"><style>{servicesStyles}</style><header className="services-page__lead"><div><p className="section-label">Ofício & carta de cuidados</p><h2>Menu de rituais <em>& serviços.</em></h2><p>Defina apenas o que sua agenda precisa saber: nome, duração e valor de cada atendimento.</p></div><button className="primary-action" type="button" onClick={() => { setNotice(null); setEditor('new') }}>+ Novo serviço</button></header>
+  return <section className="services-page"><style>{servicesStyles}</style><header className="services-page__lead"><div><p className="section-label">Ofício & carta de cuidados</p><h2>Menu de <em>serviços.</em></h2><p>Defina apenas o que sua agenda precisa saber: nome, duração e valor de cada atendimento.</p></div><button className="primary-action" type="button" onClick={() => { setNotice(null); setEditor('new') }}>Novo serviço</button></header>
     {notice && <p className="success-notice" role="status">{notice}</p>}
     {deleteService.isError && <p className="form-error" role="alert">Não foi possível excluir este serviço.</p>}
     {editor && <ServiceForm service={editor === 'new' ? null : editor} onDone={() => { setEditor(null); setNotice(editor === 'new' ? 'Serviço cadastrado com sucesso.' : 'Serviço atualizado com sucesso.') }} />}

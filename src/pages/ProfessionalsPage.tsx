@@ -22,7 +22,7 @@ export function ProfessionalsPage() {
   if (professionalsQuery.isError) return <ErrorState message="Não foi possível carregar os profissionais." onRetry={() => void professionalsQuery.refetch()} />
 
   const professionals = professionalsQuery.data ?? []
-  return <section className="catalog-page"><style>{catalogStyles}</style><header className="catalog-page__lead"><div><p className="section-label">Corpo técnico & cadeiras</p><h2>Mestres e especialistas <em>da casa.</em></h2><p>Cadastre a equipe e registre apenas as especialidades e jornadas disponíveis para os atendimentos.</p></div><button className="primary-action" type="button" onClick={() => { setNotice(null); setEditor('new') }}>+ Novo profissional</button></header>
+  return <section className="catalog-page"><style>{catalogStyles}</style><header className="catalog-page__lead"><div><p className="section-label">Corpo técnico & cadeiras</p><h2>Mestres e especialistas <em>da casa.</em></h2><p>Cadastre a equipe e registre apenas as especialidades e jornadas disponíveis para os atendimentos.</p></div><button className="primary-action" type="button" onClick={() => { setNotice(null); setEditor('new') }}>Novo profissional</button></header>
     {notice && <p className="success-notice" role="status">{notice}</p>}
     {deleteProfessional.isError && <p className="form-error" role="alert">Não foi possível excluir este profissional.</p>}
     {editor && <ProfessionalForm professional={editor === 'new' ? null : editor} onDone={() => { setEditor(null); setNotice(editor === 'new' ? 'Profissional cadastrado com sucesso.' : 'Cadastro atualizado com sucesso.') }} />}

@@ -25,7 +25,6 @@ export function AuthLayout({ children }: AuthLayoutProps) {
               ATELIÊS &amp; CASAS DE OFÍCIO
             </div>
             <blockquote>“O tempo bem cuidado é a arte suprema do seu negócio.”</blockquote>
-            <cite>— Notas de Ateliê, Edição de Mestres</cite>
           </div>
           <div className="auth-editorial-bottom">
             <div className="auth-proof">

@@ -37,7 +37,7 @@ export function WeeklyAgendaPage() {
     <section className="weekly-page">
       <style>{weeklyStyles}</style>
       <header className="weekly-toolbar">
-        <div><p>Volume semanal · agenda do ateliê</p><h2>Semana de {rangeLabel}</h2></div>
+        <div><p>Volume semanal · agenda</p><h2>Semana de {rangeLabel}</h2></div>
         <div className="week-controls" aria-label="Navegação da semana">
           <button type="button" aria-label="Semana anterior" onClick={() => setWeekStart((current) => addDays(current, -7))}>‹</button>
           <button type="button" onClick={() => setWeekStart(startOfWeek(new Date()))}>Hoje</button>
