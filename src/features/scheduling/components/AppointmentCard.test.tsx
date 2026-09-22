@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { describe, expect, it } from 'vitest'
 import { AppointmentCard } from './AppointmentCard'
 import type { AgendamentoResponse } from '../../../types/scheduling'
@@ -16,15 +17,16 @@ const appointment: AgendamentoResponse = {
 
 describe('AppointmentCard', () => {
   it('renders resolved names and does not expose IDs in the weekly card', () => {
+    const queryClient = new QueryClient()
     render(
-      <AppointmentCard
+      <QueryClientProvider client={queryClient}><AppointmentCard
         appointment={appointment}
         directory={createAppointmentDirectory({
           clients: [{ id: 'client-1', nome: 'Maria Souza', email: 'maria@example.com', role: 'CLIENTE' }],
           professionals: [{ id: 'professional-1', nome: 'João Silva', especialidade: 'Cabeleireiro', horariosTrabalho: [] }],
           services: [{ id: 'service-1', nome: 'Corte de Cabelo', duracaoMinutos: 45, preco: { valor: 80, moeda: 'BRL' } }],
         })}
-      />,
+      /></QueryClientProvider>,
     )
 
     expect(screen.getByText('Cliente Maria Souza')).toBeInTheDocument()

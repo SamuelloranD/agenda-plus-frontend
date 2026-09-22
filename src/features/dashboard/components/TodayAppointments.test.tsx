@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { describe, expect, it } from 'vitest'
 import { TodayAppointments } from './TodayAppointments'
 import type { AgendamentoResponse } from '../../../types/scheduling'
@@ -16,15 +17,16 @@ const appointment: AgendamentoResponse = {
 
 describe('TodayAppointments', () => {
   it('renders catalog names instead of shortened IDs', () => {
+    const queryClient = new QueryClient()
     render(
-      <TodayAppointments
+      <QueryClientProvider client={queryClient}><TodayAppointments
         appointments={[appointment]}
         directory={createAppointmentDirectory({
           clients: [{ id: 'client-1', nome: 'Maria Souza', email: 'maria@example.com', role: 'CLIENTE' }],
           professionals: [{ id: 'professional-1', nome: 'João Silva', especialidade: 'Cabeleireiro', horariosTrabalho: [] }],
           services: [{ id: 'service-1', nome: 'Corte de Cabelo', duracaoMinutos: 45, preco: { valor: 80, moeda: 'BRL' } }],
         })}
-      />,
+      /></QueryClientProvider>,
     )
 
     expect(screen.getByText('Cliente Maria Souza')).toBeInTheDocument()
@@ -33,11 +35,12 @@ describe('TodayAppointments', () => {
   })
 
   it('renders friendly fallback labels when names are unavailable', () => {
+    const queryClient = new QueryClient()
     render(
-      <TodayAppointments
+      <QueryClientProvider client={queryClient}><TodayAppointments
         appointments={[appointment]}
         directory={createAppointmentDirectory({ clients: [], professionals: [], services: [] })}
-      />,
+      /></QueryClientProvider>,
     )
 
     expect(screen.getByText('Cliente Cliente não identificado')).toBeInTheDocument()

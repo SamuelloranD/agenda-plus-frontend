@@ -2,6 +2,7 @@ import { EmptyState } from '../../../components/ui/EmptyState'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { resolveAppointmentLabels, type AppointmentDirectory } from '../../../features/scheduling/utils/appointmentDirectory'
 import type { AgendamentoResponse } from '../../../types/scheduling'
+import { AppointmentActions } from '../../scheduling/components/AppointmentActions'
 
 interface TodayAppointmentsProps {
   appointments: AgendamentoResponse[]
@@ -23,6 +24,7 @@ export function TodayAppointments({ appointments, directory }: TodayAppointments
               <span>Serviço {labels.serviceName} · Profissional {labels.professionalName}</span>
             </div>
             <StatusBadge status={appointment.status} />
+            <AppointmentActions appointment={appointment} />
           </li>
         )
       })}

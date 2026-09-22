@@ -12,6 +12,7 @@ export interface AppointmentDirectory {
   clients: ReadonlyMap<string, string>
   professionals: ReadonlyMap<string, string>
   services: ReadonlyMap<string, string>
+  servicePrices: ReadonlyMap<string, number>
 }
 
 export interface AppointmentLabels {
@@ -25,6 +26,7 @@ export function createAppointmentDirectory({ clients, professionals, services }:
     clients: new Map(clients.map(({ id, nome }) => [id, nome])),
     professionals: new Map(professionals.map(({ id, nome }) => [id, nome])),
     services: new Map(services.map(({ id, nome }) => [id, nome])),
+    servicePrices: new Map(services.map(({ id, preco }) => [id, preco.valor])),
   }
 }
 

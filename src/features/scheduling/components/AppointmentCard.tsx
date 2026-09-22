@@ -2,6 +2,7 @@ import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { resolveAppointmentLabels, type AppointmentDirectory } from '../utils/appointmentDirectory'
 import type { AgendamentoResponse } from '../../../types/scheduling'
 import { getProfessionalTone } from '../utils/professionalTone'
+import { AppointmentActions } from './AppointmentActions'
 
 interface AppointmentCardProps {
   appointment: AgendamentoResponse
@@ -18,6 +19,7 @@ export function AppointmentCard({ appointment, directory }: AppointmentCardProps
       <span>Serviço {labels.serviceName}</span>
       <small>Profissional {labels.professionalName}</small>
       <StatusBadge status={appointment.status} />
+      <AppointmentActions appointment={appointment} />
     </article>
   )
 }
