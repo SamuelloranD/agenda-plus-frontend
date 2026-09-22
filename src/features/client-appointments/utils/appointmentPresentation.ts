@@ -41,8 +41,12 @@ function appointmentDate(value: string) {
 }
 
 export function canCancelAppointment(appointment: AgendamentoResponse, now = new Date()) {
+  return cancellableStatuses.has(appointment.status) && !isWithinCancellationWindow(appointment, now)
+}
+
+export function isWithinCancellationWindow(appointment: Pick<AgendamentoResponse, 'status' | 'inicio'>, now = new Date()) {
   const startsAt = appointmentDate(appointment.inicio).getTime()
-  return cancellableStatuses.has(appointment.status) && startsAt - now.getTime() >= CANCELLATION_WINDOW_MS
+  return cancellableStatuses.has(appointment.status) && startsAt - now.getTime() < CANCELLATION_WINDOW_MS
 }
 
 export function formatAppointmentDate(value: string) {
