@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect } from 'react'
+import { Trash2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import type { ApiError } from '../../../types/api'
 import { Select } from '../../../components/ui/Select'
@@ -23,12 +24,30 @@ function emptyValues(): ProfessionalFormValues {
 export function ProfessionalForm({ professional, onDone }: ProfessionalFormProps) {
   const form = useForm<ProfessionalFormValues>({ resolver: zodResolver(professionalSchema), defaultValues: emptyValues() })
   const intervals = useFieldArray({ control: form.control, name: 'horariosTrabalho' })
+  const [isAddingInterval, setIsAddingInterval] = useState(false)
+  const [selectedDays, setSelectedDays] = useState<(typeof weekdays)[number][]>(['MONDAY'])
+  const [newStart, setNewStart] = useState('09:00')
+  const [newEnd, setNewEnd] = useState('18:00')
   const createProfessional = useCreateProfessional()
   const updateProfessional = useUpdateProfessional()
 
   useEffect(() => {
     form.reset(professional ? { nome: professional.nome, especialidade: professional.especialidade, horariosTrabalho: professional.horariosTrabalho.map(({ diaSemana, inicio, fim }) => ({ diaSemana: diaSemana as (typeof weekdays)[number], inicio, fim })) } : emptyValues())
   }, [professional, form])
+
+  function toggleDay(day: (typeof weekdays)[number]) {
+    setSelectedDays((current) => current.includes(day) ? current.filter((selected) => selected !== day) : [...current, day])
+  }
+
+  function addIntervalGroup() {
+    const existing = form.getValues('horariosTrabalho')
+    const newIntervals = selectedDays
+      .filter((day) => !existing.some((interval) => interval.diaSemana === day && interval.inicio === newStart && interval.fim === newEnd))
+      .map((diaSemana) => ({ diaSemana, inicio: newStart, fim: newEnd }))
+    if (newIntervals.length === 0) return
+    intervals.append(newIntervals)
+    setIsAddingInterval(false)
+  }
 
   const submit = (values: ProfessionalFormValues) => {
     if (professional) updateProfessional.mutate({ id: professional.id, input: values }, { onSuccess: onDone })
@@ -49,12 +68,13 @@ export function ProfessionalForm({ professional, onDone }: ProfessionalFormProps
         {form.formState.errors.especialidade && <small>{form.formState.errors.especialidade.message}</small>}
       </label>
       <section className="work-hours" aria-labelledby="work-hours-title">
-        <div className="work-hours__heading"><div><p className="section-label">Disponibilidade</p><h4 id="work-hours-title">Jornada de trabalho</h4></div><button type="button" className="quiet-action" onClick={() => intervals.append({ diaSemana: 'MONDAY', inicio: '09:00', fim: '18:00' })}>Adicionar faixa</button></div>
+        <div className="work-hours__heading"><div><p className="section-label">Disponibilidade</p><h4 id="work-hours-title">Jornada de trabalho</h4></div><button type="button" className="quiet-action" onClick={() => setIsAddingInterval((current) => !current)}>{isAddingInterval ? 'Fechar intervalo' : 'Adicionar intervalo diferente'}</button></div>
+        {isAddingInterval && <div className="interval-builder"><p className="section-label">Aplicar o mesmo horário</p><fieldset><legend>Dias da semana</legend><div className="weekday-checkboxes">{weekdays.map((weekday) => <label key={weekday}><input type="checkbox" checked={selectedDays.includes(weekday)} onChange={() => toggleDay(weekday)} />{weekdayLabels[weekday]}</label>)}</div></fieldset><div className="interval-builder__times"><label>Início<input type="time" value={newStart} onChange={(event) => setNewStart(event.target.value)} /></label><label>Fim<input type="time" value={newEnd} onChange={(event) => setNewEnd(event.target.value)} /></label></div><button type="button" className="primary-action" onClick={addIntervalGroup} disabled={selectedDays.length === 0}>Aplicar aos dias selecionados</button></div>}
         {intervals.fields.map((field, index) => <div className="interval-row" key={field.id}>
           <label>Dia<Controller control={form.control} name={`horariosTrabalho.${index}.diaSemana`} render={({ field }) => <Select id={`professional-weekday-${index}`} value={field.value} onChange={field.onChange} onBlur={field.onBlur} options={weekdays.map((weekday) => ({ value: weekday, label: weekdayLabels[weekday] }))} />} /></label>
           <label>Início<input type="time" {...form.register(`horariosTrabalho.${index}.inicio`)} /></label>
           <label>Fim<input type="time" {...form.register(`horariosTrabalho.${index}.fim`)} /></label>
-          <button type="button" className="remove-action" onClick={() => intervals.remove(index)} disabled={intervals.fields.length === 1} aria-label="Remover faixa de horário">×</button>
+          <button type="button" className="remove-action" onClick={() => intervals.remove(index)} disabled={intervals.fields.length === 1} aria-label="Remover faixa de horário"><Trash2 size={17} strokeWidth={1.8} aria-hidden="true" /></button>
           {form.formState.errors.horariosTrabalho?.[index]?.fim && <small className="interval-error">{form.formState.errors.horariosTrabalho[index]?.fim?.message}</small>}
         </div>)}
         {form.formState.errors.horariosTrabalho?.message && <small className="field-error">{form.formState.errors.horariosTrabalho.message}</small>}
