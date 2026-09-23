@@ -219,3 +219,61 @@ textarea {
   .auth-editorial { display: none; }
   .auth-shell { width: min(100%, 560px); min-height: calc(100svh - 24px); grid-template-columns: 1fr; }
 }
+
+/* Agenda e reservas mantem o overflow dentro do componente responsavel. */
+.calendar-scroll {
+  max-width: 100%;
+  overscroll-behavior-x: contain;
+}
+
+.booking-layout,
+.booking-workspace,
+.booking-sidebar,
+.booking-card-grid,
+.booking-time-grid,
+.client-appointment-card,
+.cancel-dialog {
+  min-width: 0;
+}
+
+@media (max-width: 1023px) {
+  .booking-layout { grid-template-columns: minmax(0, 1fr) !important; }
+  .booking-sidebar {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 639px) {
+  .booking-sidebar,
+  .booking-card-grid { grid-template-columns: minmax(0, 1fr) !important; }
+
+  .booking-stepper button { min-height: 60px; }
+
+  .booking-summary dl div,
+  .booking-confirmation dl div { grid-template-columns: 1fr; gap: 4px; }
+
+  .client-appointment-card__status {
+    justify-items: start !important;
+    white-space: normal !important;
+  }
+
+  .client-appointment-card__cancel {
+    justify-self: stretch !important;
+    width: 100%;
+  }
+}
+
+.cancel-dialog-backdrop {
+  padding-inline: max(16px, calc(16px + var(--safe-inline-start))) max(16px, calc(16px + var(--safe-inline-end)));
+  padding-block: max(16px, var(--safe-block-start)) max(16px, calc(16px + var(--safe-block-end)));
+}
+
+.cancel-dialog {
+  max-height: calc(100svh - 2rem);
+  overflow-y: auto;
+}
+
+@media (max-height: 600px) {
+  .cancel-dialog { max-height: calc(100svh - 1rem); }
+}
