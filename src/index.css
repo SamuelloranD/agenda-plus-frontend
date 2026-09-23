@@ -91,7 +91,7 @@ button {
   border: 1px solid var(--line);
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.4;
   text-align: left;
   text-transform: none;
@@ -146,11 +146,14 @@ button {
 }
 
 .ui-select__option {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
   padding: 10px 11px;
   color: var(--ink);
   border-radius: 3px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.4;
   text-transform: none;
 }
@@ -183,7 +186,7 @@ button {
   border: 1px solid var(--line);
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.4;
   text-align: left;
 }
@@ -217,7 +220,8 @@ button {
   z-index: 10;
   top: calc(100% + 6px);
   left: 0;
-  width: 286px;
+  width: min(286px, calc(100vw - 32px));
+  max-width: 100%;
   padding: 12px;
   background: #fffdf9;
   border: 1px solid var(--line);
@@ -235,7 +239,7 @@ button {
 }
 
 .ui-date-picker__header {
-  grid-template-columns: 32px 1fr 32px;
+  grid-template-columns: 44px 1fr 44px;
   margin-bottom: 12px;
 }
 
@@ -250,7 +254,8 @@ button {
 .ui-date-picker__day {
   display: grid;
   place-items: center;
-  min-height: 32px;
+  min-width: 44px;
+  min-height: 44px;
   color: var(--ink);
   background: transparent;
   border: 1px solid transparent;
@@ -297,11 +302,13 @@ button {
 }
 
 .appointment-form .form-field input:not([type='hidden']),
+.appointment-form .form-field select,
 .catalog-form .catalog-field input,
+.catalog-form .interval-row select,
 .catalog-form .interval-row input,
 .service-form > label input,
 .service-form .service-form__values input {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.4;
 }
 
@@ -722,8 +729,8 @@ h1 {
   right: 12px;
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   color: #57423b;
   background: transparent;
@@ -836,7 +843,8 @@ h1 {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 11px;
+  min-height: 44px;
+  padding: 10px 11px;
   color: #57423b;
   background: #faf6ee;
   border: 1px solid transparent;
