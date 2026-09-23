@@ -1,0 +1,140 @@
+/* Breakpoints canônicos: 480, 640, 768, 1024, 1280 e 1536px. */
+/* Telas grandes: 1920, 2560 e 3840px. Alturas baixas: 800 e 600px. */
+:root {
+  --touch-target: 44px;
+  --content-max: 90rem;
+  --content-max-wide: 110rem;
+  --page-gutter: clamp(1rem, 3vw, 4.5rem);
+  --shell-sidebar-width: clamp(15.625rem, 16vw, 18rem);
+  --safe-inline-start: env(safe-area-inset-left);
+  --safe-inline-end: env(safe-area-inset-right);
+  --safe-block-start: env(safe-area-inset-top);
+  --safe-block-end: env(safe-area-inset-bottom);
+}
+
+html {
+  font-size: 16px;
+  min-width: 320px;
+}
+
+body,
+#root,
+.app-root,
+.app-content {
+  min-width: 0;
+}
+
+#root,
+.app-root {
+  min-height: 100svh;
+}
+
+body {
+  overflow-x: clip;
+}
+
+img,
+svg,
+video,
+canvas,
+iframe {
+  max-width: 100%;
+}
+
+button,
+[role='button'],
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline-color: var(--mustard, #e3a857);
+}
+
+.platform-footer {
+  padding-inline-start: max(20px, calc(20px + var(--safe-inline-start)));
+  padding-inline-end: max(20px, calc(20px + var(--safe-inline-end)));
+  padding-block-end: max(12px, calc(12px + var(--safe-block-end)));
+}
+
+.content-container {
+  width: min(100%, var(--content-max));
+  margin-inline: auto;
+}
+
+@media (max-width: 1023px) {
+  .content-container {
+    width: 100%;
+  }
+}
+
+@media (max-height: 800px) {
+  .platform-footer {
+    padding-block: 8px;
+  }
+
+  .admin-main,
+  .client-main {
+    padding-block-start: max(16px, var(--safe-block-start));
+    padding-block-end: max(24px, var(--safe-block-end));
+  }
+}
+
+@media (max-height: 600px) {
+  .platform-footer {
+    display: none;
+  }
+
+  .admin-main,
+  .client-main {
+    padding-block-start: max(12px, var(--safe-block-start));
+  }
+}
+
+@media (min-width: 1536px) {
+  :root {
+    --page-gutter: clamp(2rem, 3vw, 5rem);
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --content-max: 96rem;
+    --content-max-wide: 120rem;
+  }
+}
+
+@media (min-width: 2560px) {
+  html {
+    font-size: 18px;
+  }
+
+  :root {
+    --content-max: 100rem;
+    --content-max-wide: 132rem;
+  }
+}
+
+@media (min-width: 3840px) {
+  html {
+    font-size: 20px;
+  }
+
+  :root {
+    --content-max: 108rem;
+    --content-max-wide: 144rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
