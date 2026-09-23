@@ -23,6 +23,7 @@ describe('ClientAppointmentCard', () => {
         appointment={appointment}
         names={{ professionalName: 'João Silva', serviceName: 'Corte de Cabelo' }}
         now={new Date('2026-09-19T10:00:00')}
+        price={80}
         onCancel={onCancel}
       />,
     )
@@ -32,6 +33,7 @@ describe('ClientAppointmentCard', () => {
     expect(screen.getByText(/domingo, 20 de setembro de 2026/i)).toBeInTheDocument()
     expect(screen.getByText('14:00 — 14:45')).toBeInTheDocument()
     expect(screen.getByText('CONFIRMADO')).toBeInTheDocument()
+    expect(screen.getByText('R$ 80,00')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
     expect(onCancel).toHaveBeenCalledTimes(1)

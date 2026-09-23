@@ -3,6 +3,7 @@ import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { resolveAppointmentLabels, type AppointmentDirectory } from '../../../features/scheduling/utils/appointmentDirectory'
 import type { AgendamentoResponse } from '../../../types/scheduling'
 import { AppointmentActions } from '../../scheduling/components/AppointmentActions'
+import { formatServicePrice } from '../../client-appointments/utils/appointmentPresentation'
 
 interface TodayAppointmentsProps {
   appointments: AgendamentoResponse[]
@@ -23,7 +24,13 @@ export function TodayAppointments({ appointments, directory }: TodayAppointments
               <strong>Cliente {labels.clientName}</strong>
               <span>Serviço {labels.serviceName} · Profissional {labels.professionalName}</span>
             </div>
-            <div className="appointment-status-row"><StatusBadge status={appointment.status} /><AppointmentActions appointment={appointment} serviceName={labels.serviceName} professionalName={labels.professionalName} /></div>
+            <div className="today-item__footer">
+              <div className="appointment-status-row">
+                <StatusBadge status={appointment.status} />
+                <span className="today-item__price">{formatServicePrice(directory.servicePrices.get(appointment.servicoId))}</span>
+              </div>
+              <AppointmentActions appointment={appointment} serviceName={labels.serviceName} professionalName={labels.professionalName} />
+            </div>
           </li>
         )
       })}

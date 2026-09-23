@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import { TodayAppointments } from './TodayAppointments'
 import type { AgendamentoResponse } from '../../../types/scheduling'
 import { createAppointmentDirectory } from '../../scheduling/utils/appointmentDirectory'
@@ -14,6 +14,8 @@ const appointment: AgendamentoResponse = {
   servicoId: 'service-1',
   status: 'PENDENTE',
 }
+
+afterEach(cleanup)
 
 describe('TodayAppointments', () => {
   it('renders catalog names instead of shortened IDs', () => {
@@ -32,6 +34,7 @@ describe('TodayAppointments', () => {
     expect(screen.getByText('Cliente Maria Souza')).toBeInTheDocument()
     expect(screen.getByText('Serviço Corte de Cabelo · Profissional João Silva')).toBeInTheDocument()
     expect(screen.queryByText(/client-1|service-1|professional-1/)).not.toBeInTheDocument()
+    expect(screen.getByText('R$ 80,00')).toBeInTheDocument()
   })
 
   it('renders friendly fallback labels when names are unavailable', () => {
@@ -46,5 +49,17 @@ describe('TodayAppointments', () => {
     expect(screen.getByText('Cliente Cliente não identificado')).toBeInTheDocument()
     expect(screen.getByText('Serviço Serviço não identificado · Profissional Profissional não identificado')).toBeInTheDocument()
     expect(screen.queryByText(/professional-1|client-1|service-1/)).not.toBeInTheDocument()
+  })
+
+  it('shows a safe fallback when the service price is unavailable', () => {
+    const queryClient = new QueryClient()
+    render(
+      <QueryClientProvider client={queryClient}><TodayAppointments
+        appointments={[appointment]}
+        directory={createAppointmentDirectory({ clients: [], professionals: [], services: [] })}
+      /></QueryClientProvider>,
+    )
+
+    expect(screen.getByText('Preço não informado')).toBeInTheDocument()
   })
 })

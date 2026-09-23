@@ -15,6 +15,11 @@ export interface ClientAppointmentNames {
   serviceName: string
 }
 
+export function formatServicePrice(price: number | undefined) {
+  if (price === undefined) return 'Preço não informado'
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(price)
+}
+
 export function buildAppointmentNameMaps(
   professionals: ProfissionalResponse[],
   services: ServicoResponse[],

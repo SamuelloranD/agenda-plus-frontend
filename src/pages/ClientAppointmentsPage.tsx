@@ -39,6 +39,10 @@ export function ClientAppointmentsPage() {
     () => buildAppointmentNameMaps(professionals.data ?? [], services.data ?? []),
     [professionals.data, services.data],
   )
+  const servicePrices = useMemo(
+    () => new Map((services.data ?? []).map(({ id, preco }) => [id, preco.valor])),
+    [services.data],
+  )
   const groupedAppointments = useMemo(
     () => splitClientAppointments(appointments.data?.conteudo ?? []),
     [appointments.data?.conteudo],
@@ -93,6 +97,7 @@ export function ClientAppointmentsPage() {
             appointments={groupedAppointments.upcoming}
             emptyMessage="Nenhum próximo agendamento."
             names={names}
+            servicePrices={servicePrices}
             onCancel={openCancelDialog}
           />
           <AppointmentSection
@@ -101,6 +106,7 @@ export function ClientAppointmentsPage() {
             appointments={groupedAppointments.history}
             emptyMessage="Seu histórico ainda está vazio."
             names={names}
+            servicePrices={servicePrices}
             onCancel={openCancelDialog}
           />
           {appointments.data.totalPaginas > 1 && (
@@ -147,10 +153,11 @@ interface AppointmentSectionProps {
   appointments: AgendamentoResponse[]
   emptyMessage: string
   names: ReturnType<typeof buildAppointmentNameMaps>
+  servicePrices: ReadonlyMap<string, number>
   onCancel: (appointment: AgendamentoResponse) => void
 }
 
-function AppointmentSection({ title, subtitle, appointments, emptyMessage, names, onCancel }: AppointmentSectionProps) {
+function AppointmentSection({ title, subtitle, appointments, emptyMessage, names, servicePrices, onCancel }: AppointmentSectionProps) {
   return (
     <section className="client-appointments-section" aria-labelledby={`section-${title.replaceAll(' ', '-').toLowerCase()}`}>
       <header>
@@ -169,6 +176,7 @@ function AppointmentSection({ title, subtitle, appointments, emptyMessage, names
               key={appointment.id}
               appointment={appointment}
               names={resolveClientAppointmentNames(appointment, names)}
+              price={servicePrices.get(appointment.servicoId)}
               onCancel={() => onCancel(appointment)}
             />
           ))}

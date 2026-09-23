@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
@@ -20,6 +21,7 @@ function registerErrorMessage(error: unknown) {
 export function RegisterForm() {
   const location = useLocation()
   const [mode, setMode] = useState<RegistrationMode>(() => getPendingReturnPath(location.search) ? 'client' : 'business')
+  const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
   const registration = useRegisterMutation(mode)
   const {
@@ -103,33 +105,42 @@ export function RegisterForm() {
         </div>
         <div className="auth-field">
           <label htmlFor="register-password">SENHA</label>
-          <input
-            id="register-password"
-            type="password"
-            autoComplete="new-password"
-            placeholder="Crie uma chave segura"
-            aria-invalid={Boolean(errors.senha)}
-            aria-describedby={errors.senha ? 'register-password-error' : undefined}
-            {...register('senha')}
-          />
+          <div className="password-input-wrap">
+            <input
+              id="register-password"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="new-password"
+              placeholder="Crie uma chave segura"
+              aria-invalid={Boolean(errors.senha)}
+              aria-describedby={errors.senha ? 'register-password-error' : undefined}
+              {...register('senha')}
+            />
+            <button
+              className="password-visibility-toggle"
+              type="button"
+              aria-label={showPassword ? 'Ocultar caracteres' : 'Mostrar caracteres'}
+              onClick={() => setShowPassword((visible) => !visible)}
+            >
+              {showPassword ? <EyeOff aria-hidden="true" size={18} /> : <Eye aria-hidden="true" size={18} />}
+            </button>
+          </div>
           {errors.senha && <span className="field-error" id="register-password-error">{errors.senha.message}</span>}
         </div>
         {registration.isError && (
           registration.error instanceof RegistrationSessionError ? (
             <div className="form-error" role="alert">
               <p>Sua conta foi criada, mas não foi possível entrar automaticamente.</p>
-              <Link to={{ pathname: '/login', search: location.search }}>Entre com seus dados →</Link>
+              <Link to={{ pathname: '/login', search: location.search }}>Entre com seus dados</Link>
             </div>
           ) : <p className="form-error" role="alert">{registerErrorMessage(registration.error)}</p>
         )}
         <button className="auth-submit" type="submit" disabled={registration.isPending}>
           {registration.isPending ? 'Preparando sua agenda…' : 'Criar conta'}
-          <span aria-hidden="true">→</span>
         </button>
       </form>
       <div className="auth-switch">
         <span>Já possui uma conta?</span>
-        <Link to={{ pathname: '/login', search: location.search }}>Entre no Estúdio →</Link>
+        <Link to={{ pathname: '/login', search: location.search }}>Entre no Estúdio</Link>
       </div>
     </div>
   )

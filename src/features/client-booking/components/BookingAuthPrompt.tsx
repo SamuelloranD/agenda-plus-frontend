@@ -25,7 +25,7 @@ export function BookingAuthPrompt({ role, isLoading, onSwitchAccount }: BookingA
         <button type="button" onClick={() => {
           onSwitchAccount()
           navigate(`/login${authSearch}`)
-        }}>Trocar de conta →</button>
+        }}>Trocar de conta</button>
       </section>
     )
   }

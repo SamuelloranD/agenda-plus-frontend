@@ -36,7 +36,6 @@ export function BookingSummary({ selection, professionalLabel, canConfirm, isPen
       {canConfirm && (
         <button className="booking-confirm" type="button" disabled={isPending} onClick={onConfirm}>
           {isPending ? 'Confirmando…' : 'Confirmar agendamento'}
-          <span aria-hidden="true">→</span>
         </button>
       )}
       <small className="booking-summary__note">O horário será registrado como pendente até a confirmação do estabelecimento.</small>

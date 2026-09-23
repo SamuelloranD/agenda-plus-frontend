@@ -57,6 +57,12 @@ export function NewAppointmentForm({ onSuccess }: NewAppointmentFormProps) {
   const catalogError = clientsQuery.isError || professionalsQuery.isError || servicesQuery.isError
   const selectedStart = useWatch({ control: form.control, name: 'inicio' })
 
+  function handleSuccessfulCreate() {
+    form.reset()
+    setData(todayKey())
+    onSuccess()
+  }
+
   if (isLoadingCatalog) return <LoadingState message="Abrindo os registros do ateliê…" />
   if (catalogError) return <ErrorState message="Não foi possível abrir os dados necessários para este agendamento." onRetry={() => void Promise.all([clientsQuery.refetch(), professionalsQuery.refetch(), servicesQuery.refetch()])} />
 
@@ -74,7 +80,7 @@ export function NewAppointmentForm({ onSuccess }: NewAppointmentFormProps) {
   }
 
   return (
-    <form className="appointment-form" onSubmit={form.handleSubmit((values) => createAppointment.mutate(values, { onSuccess }))} noValidate>
+    <form className="appointment-form" onSubmit={form.handleSubmit((values) => createAppointment.mutate(values, { onSuccess: handleSuccessfulCreate }))} noValidate>
       <input type="hidden" {...form.register('inicio')} />
       <input type="hidden" {...form.register('fim')} />
 

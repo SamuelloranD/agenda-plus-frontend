@@ -41,6 +41,17 @@ afterEach(() => {
 })
 
 describe('LoginForm', () => {
+  it('toggles the login password visibility', () => {
+    renderAuthForm(<LoginForm />)
+
+    const password = screen.getByLabelText(/senha/i)
+    expect(password).toHaveAttribute('type', 'password')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mostrar caracteres' }))
+    expect(password).toHaveAttribute('type', 'text')
+    expect(screen.getByRole('button', { name: 'Ocultar caracteres' })).toBeInTheDocument()
+  })
+
   it.each([
     '/meus-agendamentos/', '/meus-agendamentos/other', '/meus-agendamentos-malformed',
     '/meus-agendamentos?next=https://example.com', '/meus-agendamentos#other',
@@ -158,6 +169,17 @@ describe('LoginForm', () => {
 })
 
 describe('RegisterForm', () => {
+  it('toggles the registration password visibility', () => {
+    renderAuthForm(<RegisterForm />)
+
+    const password = screen.getByLabelText(/senha/i)
+    expect(password).toHaveAttribute('type', 'password')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mostrar caracteres' }))
+    expect(password).toHaveAttribute('type', 'text')
+    expect(screen.getByRole('button', { name: 'Ocultar caracteres' })).toBeInTheDocument()
+  })
+
   it('defaults to client registration when returning to a pending booking', () => {
     renderAuthForm(<RegisterForm />, '/cadastro?returnTo=%2Fagendar')
 

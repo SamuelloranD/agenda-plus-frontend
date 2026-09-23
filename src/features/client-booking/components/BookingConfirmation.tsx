@@ -20,11 +20,14 @@ export function BookingConfirmation({ confirmation, embedded = false }: BookingC
         </div>
         <span className="edition-label">RESERVA CONFIRMADA</span>
       </header>}
+      {embedded && <header className="booking-confirmation-heading">
+        <h1>Agendamento confirmado!</h1>
+      </header>}
       <section className="booking-confirmation" aria-labelledby="confirmation-title">
         <span className="booking-confirmation__seal" aria-hidden="true">✓</span>
         <p className="eyebrow">TUDO CERTO</p>
         <h1 id="confirmation-title">Seu horário está reservado.</h1>
-        <p>Guarde os detalhes deste encontro. O estabelecimento seguirá com a confirmação final.</p>
+        <p>Guarde os detalhes deste agendamento. O estabelecimento seguirá com a confirmação final.</p>
         <dl>
           <div><dt>Data</dt><dd>{dateLabel(appointment.inicio)}</dd></div>
           <div><dt>Horário</dt><dd>{appointment.inicio.slice(11, 16)}–{appointment.fim.slice(11, 16)}</dd></div>

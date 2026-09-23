@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { NewAppointmentForm } from './NewAppointmentForm'
 
@@ -16,9 +16,9 @@ vi.mock('../../services/hooks/useServices', () => ({ useServices: hooks.services
 vi.mock('../hooks/useHorariosDisponiveis', () => ({ useHorariosDisponiveis: hooks.availability }))
 vi.mock('../hooks/useCreateAgendamento', () => ({ useCreateAgendamento: hooks.createAppointment }))
 
-const client = { id: 'client-1', nome: 'Maria Souza', email: 'maria@example.com', role: 'CLIENTE' as const }
-const professional = { id: 'professional-1', nome: 'Joao Silva', especialidade: 'Cabeleireiro', horariosTrabalho: [] }
-const service = { id: 'service-1', nome: 'Corte', duracaoMinutos: 45, preco: { valor: 80, moeda: 'BRL' } }
+const client = { id: '11111111-1111-4111-8111-111111111111', nome: 'Maria Souza', email: 'maria@example.com', role: 'CLIENTE' as const }
+const professional = { id: '22222222-2222-4222-8222-222222222222', nome: 'Joao Silva', especialidade: 'Cabeleireiro', horariosTrabalho: [] }
+const service = { id: '33333333-3333-4333-8333-333333333333', nome: 'Corte', duracaoMinutos: 45, preco: { valor: 80, moeda: 'BRL' } }
 
 function loadedQuery(data: unknown) {
   return { data, isLoading: false, isError: false, refetch: vi.fn() }
@@ -73,5 +73,35 @@ describe('NewAppointmentForm catalog states', () => {
 
     expect(screen.getByText('Cadastre um cliente antes de criar um agendamento.')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Confirmar agendamento' })).not.toBeInTheDocument()
+  })
+})
+
+describe('NewAppointmentForm success flow', () => {
+  it('resets the selected fields after a successful appointment creation', async () => {
+    const mutate = vi.fn((_values: unknown, options: { onSuccess: () => void }) => options.onSuccess())
+    hooks.createAppointment.mockReturnValue({ mutate, isPending: false, isError: false, error: null })
+    hooks.availability.mockReturnValue(loadedQuery([{
+      inicio: '2099-12-20T10:00:00',
+      fim: '2099-12-20T10:45:00',
+    }]))
+
+    render(<NewAppointmentForm onSuccess={vi.fn()} />)
+
+    const comboboxes = screen.getAllByRole('combobox')
+    fireEvent.click(comboboxes[0])
+    fireEvent.click(screen.getByRole('option', { name: /Maria Souza/ }))
+    fireEvent.click(comboboxes[1])
+    fireEvent.click(screen.getByRole('option', { name: /Corte/ }))
+    fireEvent.click(comboboxes[2])
+    fireEvent.click(screen.getByRole('option', { name: /Joao Silva/ }))
+    fireEvent.click(screen.getByRole('button', { name: /10:00/ }))
+    fireEvent.change(document.querySelector('input[name="inicio"]')!, { target: { value: '2099-12-20T10:00:00' } })
+    fireEvent.change(document.querySelector('input[name="fim"]')!, { target: { value: '2099-12-20T10:45:00' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Confirmar agendamento' }))
+    await waitFor(() => expect(mutate).toHaveBeenCalledTimes(1))
+    expect(comboboxes[0]).toHaveTextContent(/Selecione quem receber/)
+    expect(comboboxes[1]).toHaveTextContent(/Selecione o servi/)
+    expect(comboboxes[2]).toHaveTextContent(/Selecione o profissional/)
+    expect(screen.queryByRole('button', { name: /10:00/ })).not.toHaveClass('time-option--selected')
   })
 })

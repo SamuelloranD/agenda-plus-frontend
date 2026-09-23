@@ -39,10 +39,18 @@ export function ProfessionalForm({ professional, onDone }: ProfessionalFormProps
     setSelectedDays((current) => current.includes(day) ? current.filter((selected) => selected !== day) : [...current, day])
   }
 
+  function toggleIntervalBuilder() {
+    if (!isAddingInterval) {
+      const existingDays = new Set(form.getValues('horariosTrabalho').map((interval) => interval.diaSemana))
+      setSelectedDays(weekdays.filter((day) => !existingDays.has(day)))
+    }
+    setIsAddingInterval((current) => !current)
+  }
+
   function addIntervalGroup() {
     const existing = form.getValues('horariosTrabalho')
     const newIntervals = selectedDays
-      .filter((day) => !existing.some((interval) => interval.diaSemana === day && interval.inicio === newStart && interval.fim === newEnd))
+      .filter((day) => !existing.some((interval) => interval.diaSemana === day))
       .map((diaSemana) => ({ diaSemana, inicio: newStart, fim: newEnd }))
     if (newIntervals.length === 0) return
     intervals.append(newIntervals)
@@ -68,8 +76,8 @@ export function ProfessionalForm({ professional, onDone }: ProfessionalFormProps
         {form.formState.errors.especialidade && <small>{form.formState.errors.especialidade.message}</small>}
       </label>
       <section className="work-hours" aria-labelledby="work-hours-title">
-        <div className="work-hours__heading"><div><p className="section-label">Disponibilidade</p><h4 id="work-hours-title">Jornada de trabalho</h4></div><button type="button" className="quiet-action" onClick={() => setIsAddingInterval((current) => !current)}>{isAddingInterval ? 'Fechar intervalo' : 'Adicionar intervalo diferente'}</button></div>
-        {isAddingInterval && <div className="interval-builder"><p className="section-label">Aplicar o mesmo horário</p><fieldset><legend>Dias da semana</legend><div className="weekday-checkboxes">{weekdays.map((weekday) => <label key={weekday}><input type="checkbox" checked={selectedDays.includes(weekday)} onChange={() => toggleDay(weekday)} />{weekdayLabels[weekday]}</label>)}</div></fieldset><div className="interval-builder__times"><label>Início<input type="time" value={newStart} onChange={(event) => setNewStart(event.target.value)} /></label><label>Fim<input type="time" value={newEnd} onChange={(event) => setNewEnd(event.target.value)} /></label></div><button type="button" className="primary-action" onClick={addIntervalGroup} disabled={selectedDays.length === 0}>Aplicar aos dias selecionados</button></div>}
+        <div className="work-hours__heading"><div><p className="section-label">Disponibilidade</p><h4 id="work-hours-title">Jornada de trabalho</h4></div><button type="button" className="quiet-action" onClick={toggleIntervalBuilder}>{isAddingInterval ? 'Fechar intervalo' : 'Adicionar intervalo diferente'}</button></div>
+        {isAddingInterval && <div className="interval-builder"><p className="section-label">Aplicar o mesmo horário</p><fieldset><legend>Dias da semana</legend><div className="weekday-checkboxes">{weekdays.map((weekday) => { const occupied = form.getValues('horariosTrabalho').some((interval) => interval.diaSemana === weekday); return <label key={weekday}><input type="checkbox" checked={selectedDays.includes(weekday)} disabled={occupied} onChange={() => toggleDay(weekday)} />{weekdayLabels[weekday]}{occupied && <small>já cadastrada</small>}</label> })}</div></fieldset><div className="interval-builder__times"><label>Início<input type="time" value={newStart} onChange={(event) => setNewStart(event.target.value)} /></label><label>Fim<input type="time" value={newEnd} onChange={(event) => setNewEnd(event.target.value)} /></label></div><button type="button" className="primary-action" onClick={addIntervalGroup} disabled={selectedDays.length === 0}>Aplicar aos dias selecionados</button></div>}
         {intervals.fields.map((field, index) => <div className="interval-row" key={field.id}>
           <label>Dia<Controller control={form.control} name={`horariosTrabalho.${index}.diaSemana`} render={({ field }) => <Select id={`professional-weekday-${index}`} value={field.value} onChange={field.onChange} onBlur={field.onBlur} options={weekdays.map((weekday) => ({ value: weekday, label: weekdayLabels[weekday] }))} />} /></label>
           <label>Início<input type="time" {...form.register(`horariosTrabalho.${index}.inicio`)} /></label>
