@@ -14,6 +14,10 @@ export const schedulingApi = {
     const { data } = await apiClient.post<AgendamentoResponse>('/agendamentos', input)
     return data
   },
+  async confirm(id: string): Promise<AgendamentoResponse> {
+    const { data } = await apiClient.patch<AgendamentoResponse>(`/agendamentos/${id}/confirmar`)
+    return data
+  },
   async cancel(id: string): Promise<AgendamentoResponse> {
     const { data } = await apiClient.patch<AgendamentoResponse>(`/agendamentos/${id}/cancelar`)
     return data

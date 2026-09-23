@@ -15,6 +15,11 @@ export interface ClientAppointmentNames {
   serviceName: string
 }
 
+export function formatServicePrice(price: number | undefined) {
+  if (price === undefined) return 'Preço não informado'
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(price)
+}
+
 export function buildAppointmentNameMaps(
   professionals: ProfissionalResponse[],
   services: ServicoResponse[],
@@ -41,8 +46,12 @@ function appointmentDate(value: string) {
 }
 
 export function canCancelAppointment(appointment: AgendamentoResponse, now = new Date()) {
+  return cancellableStatuses.has(appointment.status) && !isWithinCancellationWindow(appointment, now)
+}
+
+export function isWithinCancellationWindow(appointment: Pick<AgendamentoResponse, 'status' | 'inicio'>, now = new Date()) {
   const startsAt = appointmentDate(appointment.inicio).getTime()
-  return cancellableStatuses.has(appointment.status) && startsAt - now.getTime() >= CANCELLATION_WINDOW_MS
+  return cancellableStatuses.has(appointment.status) && startsAt - now.getTime() < CANCELLATION_WINDOW_MS
 }
 
 export function formatAppointmentDate(value: string) {

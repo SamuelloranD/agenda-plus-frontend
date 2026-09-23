@@ -5,6 +5,7 @@ import {
   canCancelAppointment,
   formatAppointmentDate,
   formatAppointmentTimeRange,
+  isWithinCancellationWindow,
   resolveClientAppointmentNames,
   splitClientAppointments,
 } from './appointmentPresentation'
@@ -20,6 +21,11 @@ const appointment: AgendamentoResponse = {
 }
 
 describe('appointment presentation', () => {
+  it('detects when an active appointment is inside the 24-hour window', () => {
+    expect(isWithinCancellationWindow(appointment, new Date('2026-09-20T10:00:00Z'))).toBe(true)
+    expect(isWithinCancellationWindow(appointment, new Date('2026-09-19T13:59:59.999Z'))).toBe(false)
+  })
+
   it.each([
     ['2026-09-19T13:59:59.999Z', true],
     ['2026-09-19T14:00:00.000Z', true],

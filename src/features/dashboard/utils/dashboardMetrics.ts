@@ -29,3 +29,9 @@ export function deriveDashboardMetrics(appointments: AgendamentoResponse[], toda
     todayAppointments,
   }
 }
+
+export function calculateExpectedBilling(appointments: AgendamentoResponse[], servicePrices: ReadonlyMap<string, number>) {
+  return appointments
+    .filter(({ status }) => status === 'PENDENTE' || status === 'CONFIRMADO' || status === 'CONCLUIDO')
+    .reduce((total, appointment) => total + (servicePrices.get(appointment.servicoId) ?? 0), 0)
+}

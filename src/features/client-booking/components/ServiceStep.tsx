@@ -25,7 +25,7 @@ export function ServiceStep({ services, selectedId, isLoading, isError, onRetry,
       <header className="booking-step__header">
         <p className="eyebrow">PRIMEIRO GESTO</p>
         <h2 id="service-step-title">O que você deseja agendar?</h2>
-        <p>Escolha o cuidado que melhor combina com este momento.</p>
+        <p>Escolha o serviço que melhor atende às suas necessidades.</p>
       </header>
       {isLoading && <LoadingState message="Abrindo o caderno de serviços…" />}
       {isError && <ErrorState message="Não foi possível carregar os serviços." onRetry={onRetry} />}
@@ -42,7 +42,7 @@ export function ServiceStep({ services, selectedId, isLoading, isError, onRetry,
             <span className="booking-choice__mark" aria-hidden="true">✦</span>
             <strong>{service.nome}</strong>
             <span>{service.duracaoMinutos} min · {formatPrice(service)}</span>
-            <small>Selecionar serviço →</small>
+            <small>Selecionar serviço</small>
           </button>
         ))}
       </div>

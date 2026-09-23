@@ -152,7 +152,7 @@ describe('ClientRoute', () => {
     expect(screen.getByLabelText('Localização atual')).toHaveTextContent('/login')
   })
 
-  it('keeps the mobile toggle accessible while the opaque overlay is open', () => {
+  it('removes the close toggle while the opaque overlay is open', () => {
     const { container } = renderWithQuery(
       <AppRoutes session={{ role: 'CLIENTE' }} />,
       '/meus-agendamentos',
@@ -162,13 +162,12 @@ describe('ClientRoute', () => {
     expect(toggle).toHaveAttribute('aria-label', 'Abrir navegação')
     fireEvent.click(toggle)
 
-    expect(toggle).toHaveAttribute('aria-label', 'Fechar navegação')
-    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+    expect(container.querySelector('.admin-menu-button')).toBeNull()
     expect(screen.getByTestId('client-sidebar-overlay')).toHaveClass('client-sidebar-overlay--opaque')
     expect(container.querySelector('.client-shell')).toHaveClass('sidebar-open')
 
     fireEvent.click(screen.getByTestId('client-sidebar-overlay'))
-    expect(toggle).toHaveAttribute('aria-label', 'Abrir navegação')
+    expect(container.querySelector('.admin-menu-button')).toHaveAttribute('aria-label', 'Abrir navegação')
   })
 })
 

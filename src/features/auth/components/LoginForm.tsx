@@ -1,5 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Eye, EyeOff } from 'lucide-react'
 import { useForm } from 'react-hook-form'
+import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import type { ZodType } from 'zod'
 import type { ApiError } from '../../../types/api'
@@ -19,6 +21,7 @@ function loginErrorMessage(error: unknown) {
 export function LoginForm() {
   const navigate = useNavigate()
   const location = useLocation()
+  const [showPassword, setShowPassword] = useState(false)
   const login = useLoginMutation()
   const {
     register,
@@ -66,28 +69,36 @@ export function LoginForm() {
         </div>
         <div className="auth-field">
           <label htmlFor="login-password">CHAVE SECRETA (SENHA)</label>
-          <input
-            id="login-password"
-            type="password"
-            autoComplete="current-password"
-            placeholder="••••••••••••"
-            aria-invalid={Boolean(errors.senha)}
-            aria-describedby={errors.senha ? 'login-password-error' : undefined}
-            {...register('senha')}
-          />
+          <div className="password-input-wrap">
+            <input
+              id="login-password"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="current-password"
+              placeholder="••••••••••••"
+              aria-invalid={Boolean(errors.senha)}
+              aria-describedby={errors.senha ? 'login-password-error' : undefined}
+              {...register('senha')}
+            />
+            <button
+              className="password-visibility-toggle"
+              type="button"
+              aria-label={showPassword ? 'Ocultar caracteres' : 'Mostrar caracteres'}
+              onClick={() => setShowPassword((visible) => !visible)}
+            >
+              {showPassword ? <EyeOff aria-hidden="true" size={18} /> : <Eye aria-hidden="true" size={18} />}
+            </button>
+          </div>
           {errors.senha && <span className="field-error" id="login-password-error">{errors.senha.message}</span>}
         </div>
         {login.isError && <p className="form-error" role="alert">{loginErrorMessage(login.error)}</p>}
         <button className="auth-submit" type="submit" disabled={login.isPending}>
-          <span aria-hidden="true">▥</span>
           {login.isPending ? 'Abrindo o Estúdio…' : 'Entrar no Estúdio'}
-          <span aria-hidden="true">→</span>
         </button>
       </form>
       <div className="auth-switch">
         <span>Ainda não possui sua bancada digital?</span>
         <Link to={{ pathname: '/cadastro', search: location.search }}>
-          Crie sua conta em poucos minutos →
+          Crie sua conta em poucos minutos
         </Link>
       </div>
     </div>

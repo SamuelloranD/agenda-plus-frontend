@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { AgendamentoResponse, AgendamentoStatus } from '../../../types/scheduling'
-import { deriveDashboardMetrics } from './dashboardMetrics'
+import { calculateExpectedBilling, deriveDashboardMetrics } from './dashboardMetrics'
 
 function appointment(id: string, inicio: string, status: AgendamentoStatus): AgendamentoResponse {
   return {
@@ -43,5 +43,19 @@ describe('deriveDashboardMetrics', () => {
     expect(metrics.pendingCount).toBe(2)
     expect(metrics.confirmedCount).toBe(1)
     expect(metrics.cancelledCount).toBe(1)
+  })
+})
+
+describe('calculateExpectedBilling', () => {
+  it('sums pending, confirmed, and completed services while excluding cancelled appointments', () => {
+    const appointments = [
+      appointment('pending', '2026-09-16T09:00:00', 'PENDENTE'),
+      appointment('confirmed', '2026-09-16T10:00:00', 'CONFIRMADO'),
+      appointment('completed', '2026-09-16T11:00:00', 'CONCLUIDO'),
+      appointment('cancelled', '2026-09-16T12:00:00', 'CANCELADO'),
+    ]
+    const prices = new Map([['service-pending', 80], ['service-confirmed', 120], ['service-completed', 150], ['service-cancelled', 999]])
+
+    expect(calculateExpectedBilling(appointments, prices)).toBe(350)
   })
 })

@@ -1,5 +1,6 @@
-import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { cleanup, render, screen } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { afterEach, describe, expect, it } from 'vitest'
 import { TodayAppointments } from './TodayAppointments'
 import type { AgendamentoResponse } from '../../../types/scheduling'
 import { createAppointmentDirectory } from '../../scheduling/utils/appointmentDirectory'
@@ -14,34 +15,51 @@ const appointment: AgendamentoResponse = {
   status: 'PENDENTE',
 }
 
+afterEach(cleanup)
+
 describe('TodayAppointments', () => {
   it('renders catalog names instead of shortened IDs', () => {
+    const queryClient = new QueryClient()
     render(
-      <TodayAppointments
+      <QueryClientProvider client={queryClient}><TodayAppointments
         appointments={[appointment]}
         directory={createAppointmentDirectory({
           clients: [{ id: 'client-1', nome: 'Maria Souza', email: 'maria@example.com', role: 'CLIENTE' }],
           professionals: [{ id: 'professional-1', nome: 'João Silva', especialidade: 'Cabeleireiro', horariosTrabalho: [] }],
           services: [{ id: 'service-1', nome: 'Corte de Cabelo', duracaoMinutos: 45, preco: { valor: 80, moeda: 'BRL' } }],
         })}
-      />,
+      /></QueryClientProvider>,
     )
 
     expect(screen.getByText('Cliente Maria Souza')).toBeInTheDocument()
     expect(screen.getByText('Serviço Corte de Cabelo · Profissional João Silva')).toBeInTheDocument()
     expect(screen.queryByText(/client-1|service-1|professional-1/)).not.toBeInTheDocument()
+    expect(screen.getByText('R$ 80,00')).toBeInTheDocument()
   })
 
   it('renders friendly fallback labels when names are unavailable', () => {
+    const queryClient = new QueryClient()
     render(
-      <TodayAppointments
+      <QueryClientProvider client={queryClient}><TodayAppointments
         appointments={[appointment]}
         directory={createAppointmentDirectory({ clients: [], professionals: [], services: [] })}
-      />,
+      /></QueryClientProvider>,
     )
 
     expect(screen.getByText('Cliente Cliente não identificado')).toBeInTheDocument()
     expect(screen.getByText('Serviço Serviço não identificado · Profissional Profissional não identificado')).toBeInTheDocument()
     expect(screen.queryByText(/professional-1|client-1|service-1/)).not.toBeInTheDocument()
+  })
+
+  it('shows a safe fallback when the service price is unavailable', () => {
+    const queryClient = new QueryClient()
+    render(
+      <QueryClientProvider client={queryClient}><TodayAppointments
+        appointments={[appointment]}
+        directory={createAppointmentDirectory({ clients: [], professionals: [], services: [] })}
+      /></QueryClientProvider>,
+    )
+
+    expect(screen.getByText('Preço não informado')).toBeInTheDocument()
   })
 })
