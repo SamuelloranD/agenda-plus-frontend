@@ -1,0 +1,80 @@
+.admin-shell,
+.client-shell { min-height: 100svh; display: block; color: var(--ink); background: var(--paper); }
+.admin-sidebar,
+.client-sidebar { position: fixed; inset: 0 auto 0 0; z-index: 3; width: var(--shell-sidebar-width); box-sizing: border-box; overflow-y: auto; overscroll-behavior-y: contain; padding: max(28px, var(--safe-block-start)) 20px max(24px, var(--safe-block-end)) max(20px, calc(20px + var(--safe-inline-start))); background: var(--paper); border-right: 1px solid var(--line); transition: transform .2s ease; }
+.admin-sidebar-brand,
+.client-sidebar-brand { display: flex; align-items: center; gap: 10px; margin: 0 10px 28px; }
+.admin-sidebar .brand-mark,
+.client-sidebar .brand-mark { color: var(--paper); background: var(--terracotta); border-color: var(--terracotta); }
+.admin-sidebar .brand-name span,
+.client-sidebar .brand-name span { color: var(--terracotta); }
+.admin-new-appointment,
+.client-new-appointment { display: block; margin: 0 0 22px; padding: 12px 14px; color: #fff !important; background: var(--terracotta); border: 1px solid var(--terracotta) !important; border-radius: 4px; text-align: center !important; font-size: 13px; line-height: 1.4; text-decoration: none; font-weight: 700 !important; }
+.admin-new-appointment:hover,
+.client-new-appointment:hover { background: #a6472e !important; }
+.admin-sidebar nav,
+.client-sidebar nav { display: grid; gap: 7px; }
+.admin-sidebar nav a,
+.client-sidebar nav a { display: flex; align-items: center; gap: 10px; min-height: var(--touch-target); padding: 10px 14px; color: var(--muted-ink); text-decoration: none; border: 1px solid transparent; border-radius: 4px; font-size: 13px; }
+.admin-sidebar nav a:hover,
+.client-sidebar nav a:hover { background: color-mix(in srgb, var(--paper) 75%, var(--line)); border-color: var(--line); }
+.admin-sidebar nav a.admin-nav-link--active,
+.client-sidebar nav a.client-nav-link--active,
+.client-sidebar .client-new-appointment--active { color: var(--olive); background: color-mix(in srgb, var(--paper) 82%, var(--mustard)); border-color: var(--line); box-shadow: inset 3px 0 var(--terracotta); font-weight: 700; }
+.admin-logout,
+.client-logout { display: flex; align-items: center; gap: 10px; width: 100%; min-height: var(--touch-target); margin-top: 28px; padding: 10px 14px; color: var(--muted-ink); background: transparent; border: 1px solid var(--line); border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-align: left; text-transform: uppercase; }
+.admin-logout:hover,
+.client-logout:hover { color: var(--terracotta); border-color: var(--terracotta); background: color-mix(in srgb, var(--paper) 82%, var(--terracotta)); }
+.admin-main,
+.client-main { position: relative; width: min(calc(100% - var(--shell-sidebar-width)), var(--content-max-wide)); max-width: calc(var(--content-max-wide) + var(--shell-sidebar-width)); min-width: 0; min-height: 100svh; margin-left: var(--shell-sidebar-width); margin-right: auto; padding: max(32px, var(--safe-block-start)) var(--page-gutter) max(40px, var(--safe-block-end)); }
+.admin-header,
+.client-shell .admin-header { position: relative; z-index: auto; display: flex; align-items: flex-start; gap: 18px; margin-bottom: 42px; }
+.admin-header h1,
+.client-shell .admin-header h1 { max-width: 100%; overflow-wrap: anywhere; font-size: clamp(38px, 5vw, 64px); }
+.admin-header p,
+.client-shell .admin-header p { margin: 8px 0 0; color: var(--muted-ink); }
+.admin-eyebrow,
+.client-shell .admin-eyebrow { color: var(--terracotta) !important; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; font-weight: 700; }
+.admin-menu-button,
+.client-shell .admin-menu-button { position: relative; z-index: 4; display: none; align-items: center; justify-content: center; min-width: var(--touch-target); width: var(--touch-target); min-height: var(--touch-target); height: var(--touch-target); flex: 0 0 var(--touch-target); padding: 0; color: var(--terracotta); background: var(--paper); border: 1px solid var(--line); border-radius: 4px; box-shadow: none; cursor: pointer; line-height: 1; }
+.sidebar-overlay,
+.client-sidebar-overlay { position: fixed; inset: 0; z-index: 2; display: none; border: 0; background: rgb(31 31 30 / 40%); }
+
+@media (max-width: 1023px) {
+  .admin-sidebar,
+  .client-sidebar { transform: translateX(-100%); }
+  .admin-main,
+  .client-main { width: 100%; max-width: none; margin-left: 0; padding: max(24px, var(--safe-block-start)) max(20px, calc(20px + var(--safe-inline-end))) max(32px, var(--safe-block-end)) max(20px, calc(20px + var(--safe-inline-start))); }
+  .admin-menu-button,
+  .client-shell .admin-menu-button { display: inline-flex; }
+  .sidebar-overlay,
+  .client-sidebar-overlay { display: block; }
+  .admin-shell.sidebar-open .admin-sidebar,
+  .client-shell.sidebar-open .client-sidebar { transform: translateX(0); }
+}
+
+@media (max-width: 639px) {
+  .admin-header,
+  .client-shell .admin-header { gap: 12px; margin-bottom: 28px; }
+  .admin-header h1,
+  .client-shell .admin-header h1 { font-size: clamp(32px, 10vw, 42px); }
+}
+
+@media (max-height: 800px) {
+  .admin-sidebar,
+  .client-sidebar { padding-block-start: max(16px, var(--safe-block-start)); }
+  .admin-sidebar-brand,
+  .client-sidebar-brand { margin-bottom: 18px; }
+  .admin-header,
+  .client-shell .admin-header { margin-bottom: 24px; }
+}
+
+@media (max-height: 600px) {
+  .admin-header,
+  .client-shell .admin-header { margin-bottom: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-sidebar,
+  .client-sidebar { transition: none; }
+}
