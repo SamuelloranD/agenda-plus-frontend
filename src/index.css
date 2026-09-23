@@ -428,18 +428,19 @@ h1 {
 }
 
 .auth-page {
-  min-height: 100dvh;
+  min-height: 100svh;
   display: grid;
   place-items: center;
   padding: clamp(8px, 2dvh, 64px) clamp(16px, 4vw, 64px);
   background: #f8f5f2;
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: auto;
 }
 
 .auth-shell {
   width: min(100%, 1020px);
-  height: min(790px, 86dvh);
-  min-height: 0;
+  min-height: min(790px, 86dvh);
+  height: auto;
   display: grid;
   grid-template-columns: minmax(0, 7fr) minmax(420px, 5fr);
   grid-template-rows: minmax(0, 1fr);
@@ -702,6 +703,7 @@ h1 {
   border-radius: 6px;
   outline: none;
   font: inherit;
+  font-size: 16px;
   transition: border-color .15s, box-shadow .15s, background .15s;
 }
 

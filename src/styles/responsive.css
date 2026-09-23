@@ -138,3 +138,84 @@ textarea {
     transition-duration: .01ms !important;
   }
 }
+
+/* Regras compartilhadas aplicadas também aos estilos de página carregados sob demanda. */
+.auth-page,
+.auth-shell,
+.dashboard-page,
+.services-page,
+.catalog-page,
+.weekly-page,
+.new-appointment-page,
+.client-appointments-page { min-width: 0; }
+
+.dashboard-page,
+.services-page,
+.catalog-page,
+.weekly-page,
+.new-appointment-page,
+.client-appointments-page { width: min(100%, var(--content-max)); margin-inline: auto; }
+
+:where(.auth-field input,
+  .form-field input,
+  .form-field select,
+  .catalog-field input,
+  .interval-row input,
+  .interval-row select,
+  .service-form input,
+  .appointment-form input,
+  .appointment-form select) { font-size: 16px !important; }
+
+:where(.primary-action,
+  .quiet-action,
+  .danger-action,
+  .remove-action,
+  .appointment-action,
+  .week-controls button,
+  .client-appointment-card__cancel,
+  .password-visibility-toggle) { min-width: var(--touch-target); min-height: var(--touch-target); }
+
+@media (max-width: 1023px) {
+  .services-page__lead,
+  .catalog-page__lead,
+  .weekly-toolbar,
+  .appointment-folio__header { align-items: flex-start; flex-direction: column; }
+
+  .services-page__lead .primary-action,
+  .catalog-page__lead .primary-action,
+  .appointment-folio__header .primary-action { width: 100%; }
+
+  .new-appointment-page { grid-template-columns: 1fr !important; }
+  .weekly-toolbar .week-controls { width: 100%; }
+  .weekly-toolbar .week-controls button { flex: 1; }
+}
+
+@media (max-width: 639px) {
+  .service-form__values,
+  .form-columns,
+  .interval-builder__times { grid-template-columns: 1fr !important; }
+
+  .service-form footer,
+  .catalog-form__footer,
+  .appointment-submit-row { align-items: stretch; flex-direction: column; }
+
+  .service-form footer > *,
+  .catalog-form__footer > *,
+  .appointment-submit-row > .primary-action { width: 100%; }
+
+  .appointment-folio__header,
+  .appointment-form { padding-inline: 20px; }
+}
+
+@media (max-height: 800px) and (min-width: 961px) {
+  .auth-page { place-items: start center; }
+  .auth-shell { margin-block: 16px; }
+  .auth-editorial,
+  .auth-content { padding-block: 22px; }
+  .auth-editorial blockquote { margin-bottom: 12px; font-size: clamp(28px, 4.5dvh, 42px); }
+}
+
+@media (max-height: 600px) and (min-width: 961px) {
+  .auth-editorial { display: none; }
+  .auth-shell { width: min(100%, 560px); min-height: calc(100svh - 24px); grid-template-columns: 1fr; }
+}
