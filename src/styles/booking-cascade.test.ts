@@ -25,16 +25,16 @@ describe('booking cascade', () => {
     const indexStyles = source('src/index.css')
 
     expect(indexStyles).toContain('grid-template-columns: repeat(3, minmax(0, 1fr));')
-    expect(indexStyles).toContain('@container (min-width: 720px)')
-    expect(indexStyles).toContain('grid-template-columns: minmax(0, 1fr) minmax(300px, 32cqi);')
-    expect(indexStyles).toContain('@container (max-width: 719px)')
+    expect(indexStyles).toContain('@container booking-page (min-width: 720px)')
+    expect(indexStyles).toContain('grid-template-columns: minmax(0, 1fr) minmax(300px, clamp(300px, 32cqi, 340px));')
+    expect(indexStyles).toContain('@container booking-page (max-width: 719px)')
     expect(indexStyles).toContain('grid-template-columns: 1fr;')
   })
 
   it('uses the real booking container instead of viewport width for composition', () => {
     const indexStyles = source('src/index.css').replaceAll('\r\n', '\n')
 
-    expect(indexStyles).toContain('@container (min-width: 720px)')
+    expect(indexStyles).toContain('@container booking-page (min-width: 720px)')
     expect(indexStyles).toContain('@container app-content (min-width: 1180px)')
     expect(indexStyles).toContain('minmax(clamp(280px, 20cqi, 380px), 1fr) minmax(520px, clamp(520px, 20.3vw, 580px)) minmax(300px, clamp(300px, 11.7cqi, 340px))')
     expect(indexStyles).toContain('grid-column: 2;')

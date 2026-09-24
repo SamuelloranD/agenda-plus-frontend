@@ -69,4 +69,25 @@ describe('responsive agenda and booking', () => {
     expect(indexStyles).toContain('.booking-page:not(.booking-page--embedded) .booking-inline-brand')
     expect(indexStyles).toContain('grid-row: 3;')
   })
+
+  it('gives the public booking page its own responsive container', () => {
+    const indexStyles = source('src/index.css').replaceAll('\r\n', '\n')
+
+    expect(indexStyles).toContain('container: booking-page / inline-size;')
+    expect(indexStyles).toContain('@container booking-page (min-width: 720px)')
+    expect(indexStyles).toContain('@container booking-page (max-width: 719px)')
+  })
+
+  it('calculates the public flow columns from the flow width', () => {
+    const indexStyles = source('src/index.css').replaceAll('\r\n', '\n')
+
+    expect(indexStyles).toContain('container: booking-flow / inline-size;')
+    expect(indexStyles).toContain('minmax(300px, clamp(300px, 32cqi, 340px))')
+  })
+
+  it('shares the booking max width token with the large-screen layout', () => {
+    const indexStyles = source('src/index.css').replaceAll('\r\n', '\n')
+
+    expect(indexStyles).toContain('width: min(100%, var(--content-max-booking));')
+  })
 })

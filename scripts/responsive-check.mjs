@@ -407,6 +407,44 @@ async function inspectPage(page, routePath, width, height, expectedBookingChoice
       if (publicBrand && publicLabel && box(publicLabel).top - box(publicBrand).bottom > 32) {
         failures.push(`booking publico: distancia entre Agenda+ e introducao excede 32px (${Math.round(box(publicLabel).top - box(publicBrand).bottom)}px)`)
       }
+
+      const publicPage = document.querySelector('.booking-page:not(.booking-page--embedded)')
+      const publicFlow = document.querySelector('.booking-page:not(.booking-page--embedded) .booking-flow')
+      const publicLayout = document.querySelector('.booking-page:not(.booking-page--embedded) .booking-layout')
+      const publicWorkspace = document.querySelector('.booking-page:not(.booking-page--embedded) .booking-workspace')
+      const publicSidebar = document.querySelector('.booking-page:not(.booking-page--embedded) .booking-sidebar')
+      const publicPageStyle = publicPage ? getComputedStyle(publicPage) : null
+      const publicLayoutStyle = publicLayout ? getComputedStyle(publicLayout) : null
+      const publicFlowStyle = publicFlow ? getComputedStyle(publicFlow) : null
+      const publicFlowColumns = publicFlowStyle?.gridTemplateColumns.split(/\s+/).filter(Boolean) ?? []
+      const publicLayoutColumns = publicLayoutStyle?.gridTemplateColumns.split(/\s+/).filter(Boolean) ?? []
+
+      if (publicPageStyle && publicPageStyle.containerName !== 'booking-page') {
+        failures.push('booking publico: container responsivo nomeado ausente')
+      }
+      if (publicEditorial && publicFlow && intersection(box(publicEditorial), box(publicFlow)) > 0) {
+        failures.push('booking publico: blocos principais sobrepostos')
+      }
+      if (publicWorkspace && publicSidebar && intersection(box(publicWorkspace), box(publicSidebar)) > 0) {
+        failures.push('booking publico: workspace e sidebar sobrepostos')
+      }
+      if (width >= 720 && (publicFlowStyle?.display !== 'grid' || publicFlowColumns.length !== 2 || publicLayoutColumns.length !== 2)) {
+        failures.push(`booking publico: layout de duas colunas esperado (flow ${publicFlowColumns.length}, layout ${publicLayoutColumns.length})`)
+      }
+    }
+
+    if (routePath === '/agendar' && !document.querySelector('.client-main') && width < 720) {
+      const publicLayout = document.querySelector('.booking-page:not(.booking-page--embedded) .booking-layout')
+      const publicWorkspace = document.querySelector('.booking-page:not(.booking-page--embedded) .booking-workspace')
+      const publicSidebar = document.querySelector('.booking-page:not(.booking-page--embedded) .booking-sidebar')
+      const publicLayoutStyle = publicLayout ? getComputedStyle(publicLayout) : null
+      const publicLayoutColumns = publicLayoutStyle?.gridTemplateColumns.split(/\s+/).filter(Boolean) ?? []
+      if (publicLayoutStyle?.display !== 'grid' || publicLayoutColumns.length !== 1) {
+        failures.push(`booking publico: layout empilhado esperado (${publicLayoutColumns.length} colunas)`)
+      }
+      if (publicWorkspace && publicSidebar && intersection(box(publicWorkspace), box(publicSidebar)) > 0) {
+        failures.push('booking publico: workspace e sidebar sobrepostos')
+      }
     }
 
     if (routePath === '/painel/agendamentos/novo' && width >= 1180) {

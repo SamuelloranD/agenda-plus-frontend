@@ -66,4 +66,10 @@ describe('responsive browser checker', () => {
     expect(script).toContain('inspectBookingTimeState')
     expect(script).toContain('RESPONSIVE_BOOKING_PUBLIC')
   })
+
+  it('checks public booking composition at both stacked and split widths', () => {
+    expect(script).toContain('booking publico: blocos principais sobrepostos')
+    expect(script).toContain('booking publico: layout de duas colunas esperado')
+    expect(script).toContain('booking publico: layout empilhado esperado')
+  })
 })

@@ -1531,13 +1531,14 @@ h1 {
 
 /* O wizard usa a largura real do container, não a viewport nem a altura disponível. */
 .booking-page {
+  container: booking-page / inline-size;
   min-width: 0;
   min-height: 0;
   padding: clamp(1.25rem, 3cqi, 3rem) max(0px, var(--safe-inline-start)) clamp(2rem, 5cqi, 4rem) max(0px, var(--safe-inline-end));
 }
 
 .booking-intro-layout {
-  width: min(100%, 1320px);
+  width: min(100%, var(--content-max-booking));
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-items: start;
@@ -1580,6 +1581,10 @@ h1 {
   min-width: 0;
 }
 
+.booking-flow {
+  container: booking-flow / inline-size;
+}
+
 .client-main > .booking-page { padding-inline: 0; }
 .booking-flow .booking-stepper { width: 100%; margin-top: 0; }
 .booking-flow .booking-layout {
@@ -1587,7 +1592,7 @@ h1 {
   gap: clamp(1rem, 2.5cqi, 2rem);
 }
 
-@container (min-width: 720px) {
+@container booking-page (min-width: 720px) {
   .booking-editorial {
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(220px, .85fr);
@@ -1608,7 +1613,7 @@ h1 {
 
   .booking-flow {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 32cqi);
+    grid-template-columns: minmax(0, 1fr) minmax(300px, clamp(300px, 32cqi, 340px));
     gap: clamp(1rem, 2.5cqi, 2rem);
     align-items: start;
   }
@@ -1622,7 +1627,7 @@ h1 {
   .booking-flow > .booking-layout {
     grid-column: 1 / -1;
     width: 100%;
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 32cqi);
+    grid-template-columns: minmax(0, 1fr) minmax(300px, clamp(300px, 32cqi, 340px));
     margin: 0;
   }
 
@@ -1780,7 +1785,7 @@ h1 {
   .client-main:has(.booking-intro-layout) > .admin-header { display: flex; }
 }
 
-@container (max-width: 719px) {
+@container booking-page (max-width: 719px) {
   .booking-page { padding-inline: 0; }
 
   .booking-editorial { gap: 0; }
