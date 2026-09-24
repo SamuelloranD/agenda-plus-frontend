@@ -625,11 +625,6 @@ async function main() {
       await page.goto(`${baseUrl}/agendar`, { waitUntil: 'domcontentloaded' })
       await page.waitForTimeout(150)
       await page.locator('.booking-card-grid .booking-choice').first().waitFor({ state: 'visible', timeout: 3000 })
-      if (EXACT_BOOKING_VIEWPORTS.has(`${width}x${height}`)) {
-        const exactInspection = await inspectPage(page, '/agendar', width, height)
-        failures.push(...exactInspection.failures.map((failure) => `/agendar @ ${width}x${height}: ${failure}`))
-        failures.push(...await inspectBookingTimeState(page, width, height))
-      }
       const screenshotPath = path.join(screenshotDirectory, `booking-${width}x${height}.png`)
       await page.screenshot({ path: screenshotPath, fullPage: false })
       if (width === 2560 && height === 1440) {
@@ -643,6 +638,11 @@ async function main() {
         } catch (error) {
           screenshotComparisons.push({ baseline: BASELINE_SCREENSHOT, skipped: error.code === 'ENOENT' ? 'baseline ausente' : error.message })
         }
+      }
+      if (EXACT_BOOKING_VIEWPORTS.has(`${width}x${height}`)) {
+        const exactInspection = await inspectPage(page, '/agendar', width, height)
+        failures.push(...exactInspection.failures.map((failure) => `/agendar @ ${width}x${height}: ${failure}`))
+        failures.push(...await inspectBookingTimeState(page, width, height))
       }
     }
   } finally {
