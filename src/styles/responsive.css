@@ -4,6 +4,12 @@
   --touch-target: 44px;
   --content-max: 90rem;
   --content-max-wide: 110rem;
+  --content-max-dashboard: 108rem;
+  --content-max-calendar: 144rem;
+  --content-max-catalog: 104rem;
+  --content-max-manual: 96rem;
+  --content-max-booking: 82rem;
+  --content-max-appointments: 108rem;
   --space-page: clamp(1rem, 2.4vw, 3rem);
   --space-section: clamp(1.25rem, 2.5cqi, 2.5rem);
   --space-card: clamp(1rem, 1.8cqi, 1.75rem);
@@ -137,6 +143,12 @@ textarea {
   :root {
     --content-max: 108rem;
     --content-max-wide: 144rem;
+    --content-max-dashboard: 120rem;
+    --content-max-calendar: 156rem;
+    --content-max-catalog: 116rem;
+    --content-max-manual: 108rem;
+    --content-max-booking: 82rem;
+    --content-max-appointments: 120rem;
   }
 }
 

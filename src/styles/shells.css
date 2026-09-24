@@ -40,6 +40,24 @@
 .sidebar-overlay,
 .client-sidebar-overlay { position: fixed; inset: 0; z-index: 2; display: none; border: 0; background: rgb(31 31 30 / 40%); }
 
+@media (min-width: 1180px) {
+  .admin-main,
+  .client-main {
+    --shell-content-max: var(--content-max-dashboard);
+    width: min(calc(100% - var(--shell-sidebar-width)), var(--shell-content-max));
+    max-width: var(--shell-content-max);
+    margin-inline-start: calc(var(--shell-sidebar-width) + max(0px, (100% - var(--shell-sidebar-width) - var(--shell-content-max)) / 2));
+    margin-inline-end: 0;
+  }
+
+  .admin-main:has(.weekly-page) { --shell-content-max: var(--content-max-calendar); }
+  .admin-main:has(.services-page),
+  .admin-main:has(.catalog-page) { --shell-content-max: var(--content-max-catalog); }
+  .admin-main:has(.new-appointment-page) { --shell-content-max: var(--content-max-manual); }
+  .client-main { --shell-content-max: var(--content-max-appointments); }
+  .client-main:has(.booking-intro-layout) { --shell-content-max: var(--content-max-booking); }
+}
+
 @media (max-width: 1023px) {
   .admin-sidebar,
   .client-sidebar { transform: translateX(-100%); }
