@@ -200,6 +200,60 @@
 @media (max-width: 1023px) { .new-appointment-page { grid-template-columns: 1fr; } .appointment-context { padding: 0; } .appointment-context > p:last-child { max-width: 600px; } }
 @media (max-width: 639px) { .appointment-folio__header, .appointment-form { padding-inline: 20px; } .appointment-folio__header { align-items: start; flex-direction: column; } .form-columns { grid-template-columns: 1fr; } .appointment-submit-row { align-items: stretch; flex-direction: column; } .primary-action { width: 100%; } }
 
+@media (min-width: 1180px) {
+  .admin-main:has(.new-appointment-page) {
+    --admin-new-left: clamp(280px, 24cqi, 380px);
+    --admin-new-gap: clamp(1.5rem, 2cqi, 2.5rem);
+    display: grid;
+    grid-template-columns: var(--admin-new-left) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: var(--admin-new-gap);
+    row-gap: clamp(1rem, 2cqi, 2rem);
+    align-content: start;
+    background-image: radial-gradient(#d9cfc0 .6px, transparent .6px);
+    background-size: 18px 18px;
+  }
+
+  .admin-main:has(.new-appointment-page) > .admin-header {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+    align-self: start;
+    margin-bottom: 0;
+  }
+
+  .admin-main:has(.new-appointment-page) > .admin-header > div {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .admin-main:has(.new-appointment-page) .admin-header h1 {
+    max-width: 100%;
+    font-size: clamp(2.5rem, 4.3cqi, 4rem);
+    line-height: 1;
+  }
+
+  .admin-main:has(.new-appointment-page) > .new-appointment-page {
+    display: contents;
+  }
+
+  .admin-main:has(.new-appointment-page) .appointment-context {
+    grid-column: 1;
+    grid-row: 2;
+    min-width: 0;
+    padding: 0 10px;
+  }
+
+  .admin-main:has(.new-appointment-page) .appointment-folio {
+    position: absolute;
+    inset-block-start: calc(max(32px, var(--safe-block-start)) + 1.25rem);
+    inset-inline-start: calc(var(--admin-new-left) + var(--admin-new-gap) + var(--page-gutter) + var(--admin-new-gap) + 1.5rem);
+    inset-inline-end: var(--page-gutter);
+    min-width: 0;
+    width: auto;
+  }
+}
+
 .weekly-page { padding: 2px 0 48px; }
 .weekly-toolbar { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
 .weekly-toolbar p { margin: 0 0 8px; color: var(--terracotta); font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }

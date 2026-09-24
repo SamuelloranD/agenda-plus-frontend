@@ -409,6 +409,24 @@ async function inspectPage(page, routePath, width, height, expectedBookingChoice
       }
     }
 
+    if (routePath === '/painel/agendamentos/novo' && width >= 1180) {
+      const adminTitle = document.querySelector('.admin-main > .admin-header h1')
+      const appointmentFolio = document.querySelector('.appointment-folio')
+      if (adminTitle && appointmentFolio) {
+        const titleBox = box(adminTitle)
+        const folioBox = box(appointmentFolio)
+        if (Math.abs(titleBox.top - folioBox.top) > 4) {
+          failures.push(`novo agendamento: topo do titulo e da folha divergem ${Math.round(Math.abs(titleBox.top - folioBox.top))}px`)
+        }
+        if (lineCount(adminTitle) !== 2) {
+          failures.push(`novo agendamento: titulo ocupa ${lineCount(adminTitle)} linhas; esperado 2`)
+        }
+        if (folioBox.left <= titleBox.right) {
+          failures.push('novo agendamento: folha nao esta ao lado do titulo')
+        }
+      }
+    }
+
     let composition = null
     if (width >= 1180 && contentSelector) {
       const main = document.querySelector('.admin-main, .client-main')

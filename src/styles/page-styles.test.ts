@@ -28,4 +28,16 @@ describe('shared page styles', () => {
       expect(readFileSync(resolve(process.cwd(), file), 'utf8')).not.toContain('<style>')
     }
   })
+
+  it('composes the admin new appointment title beside the appointment folio on wide screens', () => {
+    const shellStyles = readFileSync(resolve(process.cwd(), 'src/styles/shells.css'), 'utf8').replaceAll('\r\n', '\n')
+    const pageStyles = readFileSync(resolve(process.cwd(), 'src/styles/pages.css'), 'utf8').replaceAll('\r\n', '\n')
+
+    expect(shellStyles).toContain('.admin-main:has(.new-appointment-page)')
+    expect(pageStyles).toContain('@media (min-width: 1180px)')
+    expect(pageStyles).toContain('.admin-main:has(.new-appointment-page) > .admin-header')
+    expect(pageStyles).toContain('.admin-main:has(.new-appointment-page) > .new-appointment-page')
+    expect(pageStyles).toContain('position: absolute;')
+    expect(pageStyles).toContain('inset-inline-start: calc(var(--admin-new-left)')
+  })
 })

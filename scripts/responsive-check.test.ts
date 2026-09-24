@@ -44,6 +44,8 @@ describe('responsive browser checker', () => {
     expect(script).toContain('compositionByRoute')
     expect(script).toContain('pixelDifferenceRatio')
     expect(script).toContain('`booking-${width}x${height}.png`')
+    expect(script).toContain('new-appointment-page')
+    expect(script).toContain('appointment-folio')
   })
 
   it('checks shell centering and compact booking composition', () => {
