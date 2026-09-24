@@ -11,6 +11,7 @@ const WIDTHS = Array.from({ length: Math.floor((2560 - 320) / 40) + 1 }, (_, ind
 const ALL_WIDTHS = [...WIDTHS, 3840]
 const HEIGHTS = [720, 900]
 const SCREENSHOT_SIZES = [[3840, 2160], [2560, 1440], [1920, 1080], [1536, 864], [1440, 900], [1366, 768], [1280, 720], [1200, 800], [1097, 617], [1024, 768], [820, 1180], [390, 844]]
+const EXACT_BOOKING_VIEWPORTS = new Set(['1920x1080', '1536x864', '1440x900', '1366x768'])
 const ROUTES = ['/login', '/cadastro', '/painel', '/painel/agenda', '/painel/profissionais', '/painel/servicos', '/painel/agendamentos/novo', '/agendar', '/meus-agendamentos']
 const COMPOSITION_ROUTES = ['/painel', '/painel/agenda', '/painel/profissionais', '/painel/servicos', '/painel/agendamentos/novo', '/agendar', '/meus-agendamentos']
 const COMPOSITION_WIDTHS = [2560, 3840]
@@ -514,6 +515,32 @@ async function inspectPage(page, routePath, width, height, expectedBookingChoice
   })
 }
 
+async function inspectBookingTimeState(page, width, height) {
+  const failures = []
+  try {
+    const currentStep = page.locator('.booking-stepper button[aria-current="step"]')
+    const currentStepLabel = (await currentStep.first().textContent().catch(() => '')) ?? ''
+    if (await currentStep.count() && !/Servi/.test(currentStepLabel)) {
+      await page.locator('.booking-stepper button').first().click()
+    }
+    await page.locator('.booking-card-grid .booking-choice').first().waitFor({ state: 'visible', timeout: 3000 })
+    const bookingChoiceGrid = page.locator('.booking-card-grid').first()
+    const bookingChoiceColumns = await bookingChoiceGrid.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(/\s+/).filter(Boolean).length)
+    const expectedBookingChoiceWidth = bookingChoiceColumns === 2
+      ? await page.locator('.booking-card-grid .booking-choice').first().evaluate((element) => element.getBoundingClientRect().width)
+      : null
+    await page.getByRole('button', { name: /Corte de cabelo/ }).first().click()
+    await page.getByRole('button', { name: /Qualquer profissional/ }).waitFor({ state: 'visible', timeout: 3000 })
+    await page.getByRole('button', { name: /Qualquer profissional/ }).click()
+    await page.waitForTimeout(100)
+    const timeInspection = await inspectPage(page, '/agendar', width, height, expectedBookingChoiceWidth)
+    failures.push(...timeInspection.failures.map((failure) => `/agendar @ ${width}x${height} (horarios): ${failure}`))
+  } catch (error) {
+    failures.push(`/agendar @ ${width}x${height}: nao foi possivel chegar ao estado de horarios: ${error.message}`)
+  }
+  return failures
+}
+
 async function main() {
   const { baseUrl, process: serverProcess } = await ensureServer()
   const browser = await chromium.launch({ channel: process.env.RESPONSIVE_BROWSER ?? 'chrome', headless: true })
@@ -561,27 +588,7 @@ async function main() {
             compositionByRoute[routePath][width] = inspection.composition
           }
           if (routePath === '/agendar' && BOOKING_STATE_WIDTHS.has(width)) {
-            try {
-              const currentStep = page.locator('.booking-stepper button[aria-current="step"]')
-              const currentStepLabel = (await currentStep.first().textContent().catch(() => '')) ?? ''
-              if (await currentStep.count() && !/Servi/.test(currentStepLabel)) {
-                await page.locator('.booking-stepper button').first().click()
-              }
-              await page.locator('.booking-card-grid .booking-choice').first().waitFor({ state: 'visible', timeout: 3000 })
-              const bookingChoiceGrid = page.locator('.booking-card-grid').first()
-              const bookingChoiceColumns = await bookingChoiceGrid.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(/\s+/).filter(Boolean).length)
-              const expectedBookingChoiceWidth = bookingChoiceColumns === 2
-                ? await page.locator('.booking-card-grid .booking-choice').first().evaluate((element) => element.getBoundingClientRect().width)
-                : null
-              await page.getByRole('button', { name: /Corte de cabelo/ }).first().click()
-              await page.getByRole('button', { name: /Qualquer profissional/ }).waitFor({ state: 'visible', timeout: 3000 })
-              await page.getByRole('button', { name: /Qualquer profissional/ }).click()
-              await page.waitForTimeout(100)
-              const timeInspection = await inspectPage(page, routePath, width, height, expectedBookingChoiceWidth)
-              for (const failure of timeInspection.failures) failures.push(`${routePath} @ ${width}x${height} (horarios): ${failure}`)
-            } catch (error) {
-              failures.push(`${routePath} @ ${width}x${height}: nao foi possivel chegar ao estado de horarios: ${error.message}`)
-            }
+            failures.push(...await inspectBookingTimeState(page, width, height))
           }
           for (const error of runtimeErrors.splice(0)) failures.push(`${routePath} @ ${width}x${height}: erro de runtime: ${error}`)
         }
@@ -617,7 +624,12 @@ async function main() {
       await page.evaluate(() => sessionStorage.removeItem('agenda-plus:client-booking-draft')).catch(() => {})
       await page.goto(`${baseUrl}/agendar`, { waitUntil: 'domcontentloaded' })
       await page.waitForTimeout(150)
-      await page.locator('.booking-card-grid .booking-choice').first().waitFor({ state: 'visible', timeout: 3000 }).catch(() => {})
+      await page.locator('.booking-card-grid .booking-choice').first().waitFor({ state: 'visible', timeout: 3000 })
+      if (EXACT_BOOKING_VIEWPORTS.has(`${width}x${height}`)) {
+        const exactInspection = await inspectPage(page, '/agendar', width, height)
+        failures.push(...exactInspection.failures.map((failure) => `/agendar @ ${width}x${height}: ${failure}`))
+        failures.push(...await inspectBookingTimeState(page, width, height))
+      }
       const screenshotPath = path.join(screenshotDirectory, `booking-${width}x${height}.png`)
       await page.screenshot({ path: screenshotPath, fullPage: false })
       if (width === 2560 && height === 1440) {

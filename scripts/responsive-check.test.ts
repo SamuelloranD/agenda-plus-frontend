@@ -60,5 +60,7 @@ describe('responsive browser checker', () => {
     expect(script).toContain('altura do stepper')
     expect(script).toContain('profissionais livres')
     expect(script).toContain('valores do resumo')
+    expect(script).toContain('EXACT_BOOKING_VIEWPORTS')
+    expect(script).toContain('inspectBookingTimeState')
   })
 })
