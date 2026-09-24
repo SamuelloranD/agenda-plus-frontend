@@ -4,7 +4,15 @@
   --touch-target: 44px;
   --content-max: 90rem;
   --content-max-wide: 110rem;
-  --page-gutter: clamp(1rem, 3vw, 4.5rem);
+  --space-page: clamp(1rem, 2.4vw, 3rem);
+  --space-section: clamp(1.25rem, 2.5cqi, 2.5rem);
+  --space-card: clamp(1rem, 1.8cqi, 1.75rem);
+  --control-height: 44px;
+  --radius-control: 4px;
+  --radius-panel: clamp(4px, .5cqi, 12px);
+  --type-body: clamp(1rem, .95rem + .2vw, 1.125rem);
+  --type-label: clamp(.625rem, .58rem + .08vw, .75rem);
+  --page-gutter: var(--space-page);
   --shell-sidebar-width: clamp(15.625rem, 16vw, 18rem);
   --safe-inline-start: env(safe-area-inset-left);
   --safe-inline-end: env(safe-area-inset-right);
@@ -22,6 +30,10 @@ body,
 .app-root,
 .app-content {
   min-width: 0;
+}
+
+.app-content {
+  container: app-content / inline-size;
 }
 
 #root,
@@ -155,6 +167,15 @@ textarea {
 .weekly-page,
 .new-appointment-page,
 .client-appointments-page { width: min(100%, var(--content-max)); margin-inline: auto; }
+
+@container (min-width: 1180px) {
+  .dashboard-page,
+  .services-page,
+  .catalog-page,
+  .weekly-page,
+  .new-appointment-page,
+  .client-appointments-page { width: 100%; max-width: none; margin-inline: 0; }
+}
 
 :where(.primary-action,
   .quiet-action,

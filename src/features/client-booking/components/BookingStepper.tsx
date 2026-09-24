@@ -23,8 +23,8 @@ export function BookingStepper({ currentStep, hasService, hasProfessional, onSte
           return (
             <li className={index <= currentIndex ? 'booking-stepper__item booking-stepper__item--active' : 'booking-stepper__item'} key={step.id}>
               <button type="button" disabled={disabled} onClick={() => onStepChange(step.id)} aria-current={step.id === currentStep ? 'step' : undefined}>
-                <span>{String(index + 1).padStart(2, '0')}</span>
-                {step.label}
+                <span className="booking-stepper__number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                <span className="booking-stepper__label">{step.label}</span>
               </button>
             </li>
           )
