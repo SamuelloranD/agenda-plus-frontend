@@ -52,7 +52,7 @@
   color: var(--terracotta);
 }
 
-@media (max-width: 560px) {
+@media (max-width: 639px) {
   .platform-footer {
     align-items: flex-start;
     flex-direction: column;
@@ -421,7 +421,7 @@ h1 {
   to { opacity: 1; transform: translateY(0); }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .route-page { padding: 24px 20px; }
   .edition-label { display: none; }
   .route-sheet { margin: 96px 0 80px; }
@@ -866,7 +866,7 @@ h1 {
   accent-color: #506350;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1023px) {
   .auth-page {
     display: block;
     padding: 0;
@@ -904,7 +904,7 @@ h1 {
   }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 639px) {
   .auth-editorial {
     min-height: 320px;
     padding: 25px 22px 32px;
@@ -1778,7 +1778,7 @@ h1 {
 .today-item__price { white-space: nowrap; font-weight: 700; }
 .today-item__footer .appointment-actions { grid-column: auto; justify-content: flex-end; }
 
-@media (max-width: 600px) {
+@media (max-width: 639px) {
   .today-item { min-height: 148px; }
   .today-item__footer { align-items: flex-start; flex-direction: column; }
   .today-item__footer .appointment-actions { justify-content: flex-start; }
@@ -1806,7 +1806,7 @@ h1 {
 .client-appointment-card__details { margin-top: 16px; }
 .client-appointment-card__cancel { justify-self: start; }
 
-@media (max-width: 1100px) {
+@media (max-width: 1023px) {
   .client-appointments-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 639px) {

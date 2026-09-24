@@ -10,9 +10,9 @@ function source(path: string) {
 
 describe('responsive agenda and booking', () => {
   it('contains calendar overflow inside the calendar surface', () => {
-    const weeklyPage = source('src/pages/WeeklyAgendaPage.tsx')
-    expect(weeklyPage).toContain('.calendar-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;')
-    expect(weeklyPage).toContain('@media(max-width:1023px)')
+    const pageStyles = source('src/styles/pages.css')
+    expect(pageStyles).toContain('.calendar-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain;')
+    expect(pageStyles).toContain('@media (max-width: 1023px)')
   })
 
   it('avoids desktop-only booking height locks on tablets', () => {
