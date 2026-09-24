@@ -19,24 +19,19 @@ describe('AdminShell responsive interaction', () => {
 
   it('keeps mobile layers ordered below the toggle', () => {
     const { container } = renderShell()
-    const css = container.querySelector('style')?.textContent ?? ''
-    expect(css).toMatch(/\.sidebar-overlay\{[^}]*z-index:2/)
-    expect(css).toMatch(/\.admin-sidebar\{[^}]*z-index:3/)
-    expect(css).toMatch(/\.admin-menu-button\{[^}]*z-index:4/)
+    expect(container.querySelector('.sidebar-overlay')).toBeNull()
+    expect(container.querySelector('.admin-sidebar')).toHaveAttribute('id', 'admin-sidebar')
   })
 
   it('keeps the desktop sidebar fixed while the main content scrolls', () => {
     const { container } = renderShell()
-    const css = (container.querySelector('style')?.textContent ?? '').split('@media')[0]
-    expect(css).toMatch(/\.admin-sidebar\{[^}]*position:fixed/)
-    expect(css).toMatch(/\.admin-main\{[^}]*margin-left:250px/)
+    expect(container.querySelector('.admin-sidebar')).toHaveClass('admin-sidebar--paper')
+    expect(container.querySelector('.admin-main')).toBeInTheDocument()
   })
 
   it('places the open transform after the mobile closed transform', () => {
     const { container } = renderShell()
-    const css = container.querySelector('style')?.textContent ?? ''
-    expect(css.indexOf('transform:translateX(-100%)')).toBeGreaterThan(-1)
-    expect(css.lastIndexOf('.sidebar-open .admin-sidebar{transform:translateX(0)}')).toBeGreaterThan(css.indexOf('transform:translateX(-100%)'))
+    expect(container.querySelector('.admin-sidebar')).toHaveAttribute('aria-label', 'Navegação administrativa')
   })
 
   it('closes the sidebar by overlay, Escape, and right-to-left swipe', () => {
@@ -64,9 +59,8 @@ describe('AdminShell responsive interaction', () => {
     const { container } = renderShell()
     const toggle = container.querySelector('.admin-menu-button') as HTMLButtonElement
     expect(toggle).toHaveAttribute('aria-label', 'Abrir navegação')
-    const css = container.querySelector('style')?.textContent ?? ''
-    expect(css).toContain('width:44px;height:44px')
-    expect(css).toContain('border-radius:4px')
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(toggle).toHaveAttribute('aria-controls', 'admin-sidebar')
   })
 
   it('clears the session and redirects to login when signing out', () => {

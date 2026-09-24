@@ -20,6 +20,7 @@ export function Sidebar() {
   return (
     <aside
       className="admin-sidebar admin-sidebar--paper"
+      id="admin-sidebar"
       aria-label={"Navega\u00e7\u00e3o administrativa"}
       style={{
         backgroundColor: "var(--paper)",

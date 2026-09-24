@@ -51,7 +51,7 @@ export function TimeStep({ date, slots, selectedSlot, isLoading, isError, onRetr
             >
               <strong>{timeLabel(slot.inicio)}</strong>
               <span>até {timeLabel(slot.fim)}</span>
-              {slot.candidates.length > 1 && <small>{slot.candidates.length} profissionais livres</small>}
+              <small>{slot.candidates.length} profissional{slot.candidates.length === 1 ? '' : 'is'} livre{slot.candidates.length === 1 ? '' : 's'}</small>
             </button>
           ))}
         </div>

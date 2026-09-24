@@ -13,7 +13,7 @@ export function ClientSidebar() {
   }
 
   return (
-    <aside className="client-sidebar" aria-label="Navegação do cliente">
+    <aside className="client-sidebar" id="client-sidebar" aria-label="Navegação do cliente">
       <div className="client-sidebar-brand" aria-label="Agenda+">
         <span className="brand-mark" aria-hidden="true">+</span>
         <span className="brand-name">Agenda<span>+</span></span>

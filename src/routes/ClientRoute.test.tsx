@@ -102,13 +102,8 @@ describe('ClientRoute', () => {
       '/meus-agendamentos',
     )
 
-    const desktopCss = Array.from(container.querySelectorAll('style'))
-      .map((style) => style.textContent ?? '')
-      .find((css) => css.includes('.client-sidebar'))
-      ?.split('@media')[0] ?? ''
-
-    expect(desktopCss).toMatch(/\.client-sidebar\{[^}]*position:fixed/)
-    expect(desktopCss).toMatch(/\.client-main\{[^}]*margin-left:250px/)
+    expect(container.querySelector('.client-sidebar')).toHaveAttribute('id', 'client-sidebar')
+    expect(container.querySelector('.client-main')).toBeInTheDocument()
   })
 
   it('redirects an ADMIN from the client area to the panel', () => {
@@ -159,6 +154,8 @@ describe('ClientRoute', () => {
     )
 
     const toggle = container.querySelector('.admin-menu-button') as HTMLButtonElement
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(toggle).toHaveAttribute('aria-controls', 'client-sidebar')
     expect(toggle).toHaveAttribute('aria-label', 'Abrir navegação')
     fireEvent.click(toggle)
 

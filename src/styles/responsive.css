@@ -1,0 +1,274 @@
+/* Breakpoints canônicos: 480, 640, 768, 1024, 1280 e 1536px. */
+/* Telas grandes: 1920, 2560 e 3840px. Alturas baixas: 800 e 600px. */
+:root {
+  --touch-target: 44px;
+  --content-max: 90rem;
+  --content-max-wide: 110rem;
+  --content-max-dashboard: 108rem;
+  --content-max-calendar: 144rem;
+  --content-max-catalog: 104rem;
+  --content-max-manual: 96rem;
+  --content-max-booking: 82rem;
+  --content-max-appointments: 108rem;
+  --space-page: clamp(1rem, 2.4vw, 3rem);
+  --space-section: clamp(1.25rem, 2.5cqi, 2.5rem);
+  --space-card: clamp(1rem, 1.8cqi, 1.75rem);
+  --control-height: 44px;
+  --radius-control: 4px;
+  --radius-panel: clamp(4px, .5cqi, 12px);
+  --type-body: clamp(1rem, .95rem + .2vw, 1.125rem);
+  --type-label: clamp(.625rem, .58rem + .08vw, .75rem);
+  --page-gutter: var(--space-page);
+  --shell-sidebar-width: clamp(15.625rem, 16vw, 18rem);
+  --safe-inline-start: env(safe-area-inset-left);
+  --safe-inline-end: env(safe-area-inset-right);
+  --safe-block-start: env(safe-area-inset-top);
+  --safe-block-end: env(safe-area-inset-bottom);
+}
+
+html {
+  font-size: 16px;
+  min-width: 320px;
+}
+
+body,
+#root,
+.app-root,
+.app-content {
+  min-width: 0;
+}
+
+.app-content {
+  container: app-content / inline-size;
+}
+
+#root,
+.app-root {
+  min-height: 100svh;
+}
+
+body {
+  overflow-x: clip;
+}
+
+img,
+svg,
+video,
+canvas,
+iframe {
+  max-width: 100%;
+}
+
+button,
+[role='button'],
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline-color: var(--mustard, #e3a857);
+}
+
+.platform-footer {
+  padding-inline-start: max(20px, calc(20px + var(--safe-inline-start)));
+  padding-inline-end: max(20px, calc(20px + var(--safe-inline-end)));
+  padding-block-end: max(12px, calc(12px + var(--safe-block-end)));
+}
+
+.content-container {
+  width: min(100%, var(--content-max));
+  margin-inline: auto;
+}
+
+@media (max-width: 1023px) {
+  .content-container {
+    width: 100%;
+  }
+}
+
+@media (max-height: 800px) {
+  .platform-footer {
+    padding-block: 8px;
+  }
+
+  .admin-main,
+  .client-main {
+    padding-block-start: max(16px, var(--safe-block-start));
+    padding-block-end: max(24px, var(--safe-block-end));
+  }
+}
+
+@media (max-height: 600px) {
+  .platform-footer {
+    display: none;
+  }
+
+  .admin-main,
+  .client-main {
+    padding-block-start: max(12px, var(--safe-block-start));
+  }
+}
+
+@media (min-width: 1536px) {
+  :root {
+    --page-gutter: clamp(2rem, 3vw, 5rem);
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --content-max: 96rem;
+    --content-max-wide: 120rem;
+  }
+}
+
+@media (min-width: 2560px) {
+  html {
+    font-size: 18px;
+  }
+
+  :root {
+    --content-max: 100rem;
+    --content-max-wide: 132rem;
+  }
+}
+
+@media (min-width: 3840px) {
+  html {
+    font-size: 20px;
+  }
+
+  :root {
+    --content-max: 108rem;
+    --content-max-wide: 144rem;
+    --content-max-dashboard: 120rem;
+    --content-max-calendar: 156rem;
+    --content-max-catalog: 116rem;
+    --content-max-manual: 108rem;
+    --content-max-booking: 82rem;
+    --content-max-appointments: 120rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* Regras compartilhadas aplicadas também aos estilos de página carregados sob demanda. */
+.auth-page,
+.auth-shell,
+.dashboard-page,
+.services-page,
+.catalog-page,
+.weekly-page,
+.new-appointment-page,
+.client-appointments-page { min-width: 0; }
+
+.dashboard-page,
+.services-page,
+.catalog-page,
+.weekly-page,
+.new-appointment-page,
+.client-appointments-page { width: min(100%, var(--content-max)); margin-inline: auto; }
+
+@container (min-width: 1180px) {
+  .dashboard-page,
+  .services-page,
+  .catalog-page,
+  .weekly-page,
+  .new-appointment-page,
+  .client-appointments-page { width: 100%; max-width: none; margin-inline: 0; }
+}
+
+:where(.primary-action,
+  .quiet-action,
+  .danger-action,
+  .remove-action,
+  .appointment-action,
+  .week-controls button,
+  .client-appointment-card__cancel,
+  .password-visibility-toggle) { min-width: var(--touch-target); min-height: var(--touch-target); }
+
+@media (max-width: 1023px) {
+  .services-page__lead,
+  .catalog-page__lead,
+  .weekly-toolbar,
+  .appointment-folio__header { align-items: flex-start; flex-direction: column; }
+
+  .services-page__lead .primary-action,
+  .catalog-page__lead .primary-action,
+  .appointment-folio__header .primary-action { width: 100%; }
+
+  .weekly-toolbar .week-controls { width: 100%; }
+  .weekly-toolbar .week-controls button { flex: 1; }
+}
+
+@media (max-width: 639px) {
+  .service-form footer,
+  .catalog-form__footer,
+  .appointment-submit-row { align-items: stretch; flex-direction: column; }
+
+  .service-form footer > *,
+  .catalog-form__footer > *,
+  .appointment-submit-row > .primary-action { width: 100%; }
+
+  .appointment-folio__header,
+  .appointment-form { padding-inline: 20px; }
+}
+
+@media (max-height: 800px) and (min-width: 961px) {
+  .auth-page { place-items: start center; }
+  .auth-shell { margin-block: 16px; }
+  .auth-editorial,
+  .auth-content { padding-block: 22px; }
+  .auth-editorial blockquote { margin-bottom: 12px; font-size: clamp(28px, 4.5dvh, 42px); }
+}
+
+@media (max-height: 600px) and (min-width: 961px) {
+  .auth-editorial { display: none; }
+  .auth-shell { width: min(100%, 560px); min-height: calc(100svh - 24px); grid-template-columns: 1fr; }
+}
+
+/* Agenda e reservas mantem o overflow dentro do componente responsavel. */
+.calendar-scroll {
+  max-width: 100%;
+  overscroll-behavior-x: contain;
+}
+
+.booking-layout,
+.booking-workspace,
+.booking-sidebar,
+.booking-card-grid,
+.booking-time-grid,
+.client-appointment-card,
+.cancel-dialog {
+  min-width: 0;
+}
+
+@media (max-width: 639px) {
+  .booking-summary dl div,
+  .booking-confirmation dl div { grid-template-columns: 1fr; gap: 4px; }
+}
+
+.cancel-dialog-backdrop {
+  padding-inline: max(16px, calc(16px + var(--safe-inline-start))) max(16px, calc(16px + var(--safe-inline-end)));
+  padding-block: max(16px, var(--safe-block-start)) max(16px, calc(16px + var(--safe-block-end)));
+}
+
+.cancel-dialog {
+  max-height: calc(100svh - 2rem);
+  overflow-y: auto;
+}
+
+@media (max-height: 600px) {
+  .cancel-dialog { max-height: calc(100svh - 1rem); }
+}

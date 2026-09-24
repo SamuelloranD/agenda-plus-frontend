@@ -31,7 +31,14 @@ export function ClientBookingPage({ embedded = false }: ClientBookingPageProps) 
   return (
     <main className={`booking-page${embedded ? ' booking-page--embedded' : ''}`}>
       <div className="booking-intro-layout">
-        <section className="booking-editorial" aria-labelledby="booking-title">
+        <div className="booking-copy">
+          {embedded && (
+            <header className="booking-page-heading" aria-labelledby="booking-page-title">
+              <p className="admin-eyebrow">Agenda+</p>
+              <h1 id="booking-page-title">Novo agendamento</h1>
+            </header>
+          )}
+          <section className="booking-editorial" aria-labelledby="booking-title">
           {!embedded && <div className="booking-inline-brand">
             <div className="brand-lockup" aria-label="Agenda+">
               <span className="brand-mark" aria-hidden="true">+</span>
@@ -42,7 +49,8 @@ export function ClientBookingPage({ embedded = false }: ClientBookingPageProps) 
           <p className="section-label">Reserva online · caderno de atendimento</p>
           <h1 id="booking-title">Encontre um tempo <em>para você.</em></h1>
           <p>Escolha o serviço, quem irá cuidar de você e o melhor momento.</p>
-        </section>
+          </section>
+        </div>
 
         <div className="booking-flow">
           <BookingStepper
