@@ -36,11 +36,11 @@ describe('booking cascade', () => {
 
     expect(indexStyles).toContain('@container (min-width: 720px)')
     expect(indexStyles).toContain('@container app-content (min-width: 1180px)')
-    expect(indexStyles).toContain('minmax(280px, 1fr) minmax(520px, clamp(520px, 20.3vw, 580px)) minmax(280px, clamp(280px, 11.7vw, 340px))')
+    expect(indexStyles).toContain('minmax(clamp(280px, 20cqi, 380px), 1fr) minmax(520px, clamp(520px, 20.3vw, 580px)) minmax(300px, clamp(300px, 11.7cqi, 340px))')
     expect(indexStyles).toContain('grid-column: 2;')
     expect(indexStyles).toContain('grid-row: 2;')
     expect(indexStyles).toContain('max-width: 580px')
-    expect(indexStyles).toContain('max-width: 340px')
+    expect(indexStyles).toContain('max-width: clamp(300px, 11.7cqi, 340px)')
     expect(indexStyles).toContain("font: 500 clamp(2rem, 4.5cqi, 3.5rem)")
   })
 
@@ -48,7 +48,7 @@ describe('booking cascade', () => {
     const indexStyles = source('src/index.css').replaceAll('\r\n', '\n')
 
     expect(indexStyles).toContain('display: contents;')
-    expect(indexStyles).toContain('grid-template-columns: minmax(280px, 1fr) minmax(520px, clamp(520px, 20.3vw, 580px)) minmax(280px, clamp(280px, 11.7vw, 340px));')
+    expect(indexStyles).toContain('grid-template-columns: minmax(clamp(280px, 20cqi, 380px), 1fr) minmax(520px, clamp(520px, 20.3vw, 580px)) minmax(300px, clamp(300px, 11.7cqi, 340px));')
     expect(indexStyles).toContain('grid-column: 2;')
     expect(indexStyles).toContain('grid-column: 3;')
     expect(indexStyles).toContain('max-width: 580px')
@@ -59,7 +59,7 @@ describe('booking cascade', () => {
 
     expect(indexStyles).toContain('grid-template-columns: repeat(2, minmax(0, 1fr));')
     expect(indexStyles).toContain('max-height: min(55dvh, 38rem)')
-    expect(indexStyles).toContain('min-height: clamp(56px, 4cqi, 64px)')
+    expect(indexStyles).toContain('min-height: clamp(80px, 8cqi, 96px)')
   })
 
   it('lets booking cards grow intrinsically and keeps the stepper compact on narrow screens', () => {

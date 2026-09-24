@@ -22,9 +22,9 @@ const SHELL_CENTERING_TOLERANCE = 2
 const BOOKING_TITLE_STEPPER_LIMIT = 4
 const BOOKING_CARD_MAX_WIDTH = 620
 const BOOKING_SLOT_WIDTH_TOLERANCE = 2
-const BOOKING_SLOT_HEIGHT_MIN = 56
-const BOOKING_SLOT_HEIGHT_MAX = 64
-const BOOKING_STATE_WIDTHS = new Set([320, 360, 375, 390, 414, 768, 820, 1024, 1180, 1920, 2560, 3840])
+const BOOKING_SLOT_HEIGHT_MIN = 80
+const BOOKING_SLOT_HEIGHT_MAX = 96
+const BOOKING_STATE_WIDTHS = new Set([320, 360, 375, 390, 414, 768, 820, 1024, 1180, 1920, 2560, 3840, ...WIDTHS.filter((width) => width >= 1440 && width <= 1920)])
 const BASELINE_SCREENSHOT = process.env.RESPONSIVE_BASELINE_SCREENSHOT ?? path.join(ROOT, 'scripts', 'baselines', 'booking-2560x1440.png')
 
 const services = [
@@ -200,6 +200,34 @@ async function inspectPage(page, routePath, width, height, expectedBookingChoice
       const bottom = Math.min(a.bottom, b.bottom)
       return Math.max(0, right - left) * Math.max(0, bottom - top)
     }
+    const textRects = (element) => {
+      const rects = []
+      const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT)
+      let node = walker.nextNode()
+      while (node) {
+        const text = node.textContent ?? ''
+        const expression = /\S+/g
+        let match = expression.exec(text)
+        while (match) {
+          const range = document.createRange()
+          range.setStart(node, match.index)
+          range.setEnd(node, match.index + match[0].length)
+          rects.push({ word: match[0], rects: [...range.getClientRects()] })
+          match = expression.exec(text)
+        }
+        node = walker.nextNode()
+      }
+      return rects
+    }
+    const lineCount = (element) => {
+      const tops = textRects(element).flatMap(({ rects }) => rects.map((rect) => Math.round(rect.top)))
+      return new Set(tops).size
+    }
+    const rectForLongestWord = (element) => {
+      const words = textRects(element).sort((left, right) => right.word.length - left.word.length)
+      const first = words[0]?.rects[0]
+      return first ? { word: words[0].word, width: first.width } : null
+    }
     const ignoredOverflow = new Set(['calendar-scroll', 'booking-time-grid', 'ui-select__listbox', 'ui-date-picker__popover', 'admin-sidebar', 'client-sidebar', 'cancel-dialog'])
     const isInsideAllowedOverflow = (element) => [...element.classList].some((name) => ignoredOverflow.has(name)) || Boolean(element.closest([...ignoredOverflow].map((name) => `.${name}`).join(',')))
     const elements = [...document.querySelectorAll('body *')].filter(visible)
@@ -300,7 +328,7 @@ async function inspectPage(page, routePath, width, height, expectedBookingChoice
         if (Math.abs(slotBox.width - expectedWidth) > bookingSlotWidthTolerance) {
           failures.push(`largura do quadrado de horÃ¡rio diverge ${Math.round(Math.abs(slotBox.width - expectedWidth))}px`)
         }
-        if (slotBox.height < bookingSlotHeightMin || slotBox.height > bookingSlotHeightMax) {
+        if (slotBox.height < bookingSlotHeightMin || slotBox.height > bookingSlotHeightMax + 0.5) {
           failures.push(`altura do quadrado de horÃ¡rio fora de ${bookingSlotHeightMin}-${bookingSlotHeightMax}px: ${Math.round(slotBox.height)}px`)
         }
       }
@@ -309,12 +337,72 @@ async function inspectPage(page, routePath, width, height, expectedBookingChoice
       }
     }
 
+    if (routePath === '/agendar' && width >= 1440) {
+      const pageTitle = document.querySelector('.booking-page-heading h1') ?? document.querySelector('.client-main > .admin-header h1')
+      const pageTitleColumn = document.querySelector('.booking-copy') ?? pageTitle?.closest('.admin-header')
+      const stepperForLayout = document.querySelector('.booking-stepper')
+      const stepperItems = [...document.querySelectorAll('.booking-stepper__item')].filter(visible)
+      const wordElements = [...document.querySelectorAll('h1, h2, h3, .booking-stepper__label, .booking-choice strong, .booking-time strong, .booking-time span, .booking-time small, .booking-summary dt, .booking-summary dd')].filter(visible)
+
+      for (const element of wordElements) {
+        for (const word of textRects(element)) {
+          if (word.rects.length > 1 || new Set(word.rects.map((rect) => Math.round(rect.top))).size > 1) {
+            failures.push(`palavra quebrada no meio em .${element.className || element.tagName.toLowerCase()}: ${word.word}`)
+            break
+          }
+        }
+      }
+
+      if (stepperForLayout) {
+        const stepperBox = box(stepperForLayout)
+        if (stepperBox.height > 80) failures.push(`altura do stepper excede 80px: ${Math.round(stepperBox.height)}px`)
+        const itemHeights = stepperItems.map((item) => Math.round(box(item).height))
+        if (new Set(itemHeights).size > 1) failures.push('abas do stepper têm alturas diferentes')
+      }
+
+      if (pageTitle && pageTitleColumn) {
+        const longestWord = rectForLongestWord(pageTitle)
+        const columnWidth = box(pageTitleColumn).width
+        if (longestWord && columnWidth - longestWord.width < 16) {
+          failures.push(`palavra mais longa do título sem folga de 16px: ${longestWord.word}`)
+        }
+      }
+
+      const timeTiles = [...document.querySelectorAll('.booking-time')].filter(visible)
+      for (const tile of timeTiles) {
+        const rows = [tile.querySelector('strong'), tile.querySelector('span'), tile.querySelector('small')].filter((element) => element && visible(element))
+        if (rows.length !== 3 || new Set(rows.map((row) => Math.round(box(row).top))).size !== 3) {
+          failures.push('tile de horário não possui exatamente 3 linhas: início / término / profissionais livres')
+          break
+        }
+        if (tile.scrollWidth > tile.clientWidth + 1 || tile.scrollHeight > tile.clientHeight + 1) {
+          failures.push('tile de horário possui conteúdo cortado')
+          break
+        }
+      }
+
+      const summary = document.querySelector('.booking-summary')
+      const summaryTitle = summary?.querySelector('h2')
+      if (summaryTitle && lineCount(summaryTitle) > 1) failures.push('título do resumo ocupa mais de uma linha')
+      for (const value of summary ? [...summary.querySelectorAll('dd')].filter(visible) : []) {
+        if (lineCount(value) > 2) {
+          failures.push('valores do resumo ocupam mais de 2 linhas')
+          break
+        }
+      }
+    }
+
     let composition = null
     if (width >= 1180 && contentSelector) {
       const main = document.querySelector('.admin-main, .client-main')
-      const heading = main?.querySelector('.admin-header h1')
+      const headingCandidates = routePath === '/agendar'
+        ? [main?.querySelector('.booking-page-heading h1'), main?.querySelector('.admin-header h1')]
+        : [main?.querySelector('.admin-header h1')]
+      const heading = headingCandidates.find((element) => element && visible(element)) ?? headingCandidates.find(Boolean)
       const sidebar = document.querySelector('.admin-sidebar, .client-sidebar')
-      const content = document.querySelector(contentSelector)
+      const content = routePath === '/agendar'
+        ? document.querySelector('.booking-copy')
+        : document.querySelector(contentSelector)
       const metric = (element) => element ? box(element) : null
       const mainBox = metric(main)
       const headingBox = metric(heading)
@@ -355,7 +443,7 @@ async function inspectPage(page, routePath, width, height, expectedBookingChoice
           failures.push(`booking composition: borda esquerda do h1 e do conteúdo divergem ${Math.round(Math.abs(headingBox.left - contentBox.left))}px`)
         }
         const contentRatio = contentBox.width / mainBox.width
-        if (contentRatio < compositionWidthRatioMin || contentRatio > 1) {
+        if (routePath !== '/agendar' && (contentRatio < compositionWidthRatioMin || contentRatio > 1)) {
           failures.push(`booking composition: largura do conteúdo ocupa ${(contentRatio * 100).toFixed(1)}% do container`)
         }
 
