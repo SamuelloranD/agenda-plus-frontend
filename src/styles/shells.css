@@ -30,7 +30,7 @@
 .admin-header,
 .client-shell .admin-header { position: relative; z-index: auto; display: flex; align-items: flex-start; gap: 18px; margin-bottom: 42px; }
 .admin-header h1,
-.client-shell .admin-header h1 { max-width: 100%; overflow-wrap: anywhere; font-size: clamp(38px, 5vw, 64px); }
+.client-shell .admin-header h1 { max-width: 100%; overflow-wrap: normal; word-break: normal; font-size: clamp(38px, 5vw, 64px); }
 .admin-header p,
 .client-shell .admin-header p { margin: 8px 0 0; color: var(--muted-ink); }
 .admin-eyebrow,

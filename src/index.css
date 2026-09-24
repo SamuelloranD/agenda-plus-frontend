@@ -1051,7 +1051,8 @@ h1 {
 
 .booking-stepper__label {
   min-width: 0;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .booking-stepper button[aria-current='step'] {
@@ -1117,7 +1118,8 @@ h1 {
   margin: 0;
   font: 400 clamp(1.75rem, 4cqi, 2.75rem)/1.08 'Newsreader', Georgia, serif;
   letter-spacing: -.02em;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .booking-step__header > p:last-child,
@@ -1265,17 +1267,16 @@ h1 {
 }
 
 .booking-time {
-  min-height: clamp(56px, 4cqi, 64px);
-  height: clamp(56px, 4cqi, 64px);
+  min-height: clamp(80px, 8cqi, 96px);
+  height: auto;
   display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-rows: 1fr auto;
-  grid-template-areas: 'time until' 'meta meta';
-  align-items: center;
-  justify-content: center;
-  column-gap: 6px;
-  row-gap: 0;
-  padding: 6px 8px;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(3, auto);
+  grid-template-areas: 'time' 'until' 'meta';
+  align-content: center;
+  justify-items: center;
+  gap: 2px;
+  padding: 10px 8px;
   color: var(--ink);
   background: #fbf7ef;
   border: 1px solid var(--line);
@@ -1299,6 +1300,8 @@ h1 {
 .booking-time small {
   margin-top: 0;
   font-size: 10px;
+  white-space: normal;
+  word-break: normal;
 }
 
 .booking-time span { grid-area: until; }
@@ -1324,6 +1327,8 @@ h1 {
   min-width: 0;
   padding: 28px;
 }
+
+.booking-summary { container-type: inline-size; }
 
 .booking-summary h2 {
   font-size: 32px;
@@ -1356,7 +1361,8 @@ h1 {
 .booking-confirmation dd {
   margin: 0;
   font: 600 15px/1.35 'Newsreader', Georgia, serif;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .booking-confirm {
@@ -1536,6 +1542,8 @@ h1 {
   margin: 0 auto;
 }
 
+.booking-page-heading { display: none; }
+
 .booking-editorial {
   min-width: 0;
   padding: 0;
@@ -1545,7 +1553,8 @@ h1 {
   margin: 0;
   font: 500 clamp(2rem, 4.5cqi, 3.5rem)/1.05 'Newsreader', Georgia, serif;
   letter-spacing: -.025em;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .booking-editorial h1 em {
@@ -1621,18 +1630,15 @@ h1 {
 @container app-content (min-width: 1180px) {
   .client-main:has(.booking-intro-layout) {
     display: grid;
-    grid-template-columns: minmax(280px, 1fr) minmax(520px, clamp(520px, 20.3vw, 580px)) minmax(280px, clamp(280px, 11.7vw, 340px));
-    grid-template-rows: auto auto;
+    grid-template-columns: minmax(clamp(280px, 20cqi, 380px), 1fr) minmax(520px, clamp(520px, 20.3vw, 580px)) minmax(300px, clamp(300px, 11.7cqi, 340px));
+    grid-template-rows: 64px auto;
     column-gap: clamp(1rem, 1.5cqi, 1.5rem);
     row-gap: clamp(1rem, 1.5cqi, 1.5rem);
     align-content: start;
   }
 
   .client-main:has(.booking-intro-layout) > .admin-header {
-    grid-column: 1;
-    grid-row: 1;
-    margin: 0;
-    align-self: start;
+    display: none;
   }
 
   .client-main:has(.booking-intro-layout) > .booking-page,
@@ -1644,13 +1650,38 @@ h1 {
 
   .client-main:has(.booking-intro-layout) .booking-editorial {
     display: block;
-    grid-column: 1;
-    grid-row: 2;
-    padding-block: clamp(.5rem, 1.5cqi, 1.25rem);
+    padding-block: 0;
   }
 
-  .client-main:has(.booking-intro-layout) .admin-header h1 {
-    font-size: 64px;
+  .client-main:has(.booking-intro-layout) .booking-copy {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    align-self: start;
+    min-width: 0;
+    display: grid;
+    grid-template-rows: auto auto;
+    gap: clamp(1rem, 2cqi, 1.5rem);
+    container-type: inline-size;
+  }
+
+  .client-main:has(.booking-intro-layout) .booking-page-heading {
+    display: block;
+    min-width: 0;
+    align-self: start;
+  }
+
+  .client-main:has(.booking-intro-layout) .booking-page-heading .admin-eyebrow { display: none; }
+
+  .client-main:has(.booking-intro-layout) .booking-page-heading h1 {
+    margin: 0;
+    font: 500 clamp(2.5rem, calc(26cqi - 2.2rem), 3.95rem)/1 'Newsreader', Georgia, serif;
+    letter-spacing: -.025em;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .client-main:has(.booking-intro-layout) .booking-page-heading + .booking-editorial {
+    grid-row: 2;
   }
 
   .client-main:has(.booking-intro-layout) .booking-editorial > p:last-child {
@@ -1662,7 +1693,23 @@ h1 {
     grid-column: 2;
     grid-row: 1;
     width: 100%;
-    margin: clamp(22px, 1vw, 24px) 0 0;
+    align-self: start;
+    height: 64px;
+    margin: 0;
+  }
+
+  .client-main:has(.booking-intro-layout) .booking-stepper button {
+    height: 64px;
+    min-height: 56px;
+    gap: 8px;
+    padding: 10px clamp(8px, 1cqi, 14px);
+    font-size: clamp(10px, .75cqi, 12px);
+    letter-spacing: .04em;
+  }
+
+  .client-main:has(.booking-intro-layout) .booking-stepper__label {
+    overflow-wrap: normal;
+    word-break: normal;
   }
 
   .client-main:has(.booking-intro-layout) .booking-workspace {
@@ -1679,13 +1726,26 @@ h1 {
     position: sticky;
     top: clamp(1rem, 2cqi, 2rem);
     width: 100%;
-    max-width: 340px;
+    max-width: clamp(300px, 11.7cqi, 340px);
+  }
+
+  .client-main:has(.booking-intro-layout) .booking-summary h2 {
+    font-size: clamp(1.75rem, 2.8cqi, 2rem);
+    white-space: nowrap;
   }
 
   .client-main:has(.booking-intro-layout) .booking-card-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+}
+
+@container booking-summary (max-width: 319px) {
+  .booking-summary dl div { grid-template-columns: 1fr; gap: 4px; }
+}
+
+@media (max-width: 1439px) {
+  .client-main:has(.booking-intro-layout) > .admin-header { display: flex; }
 }
 
 @container (max-width: 719px) {
