@@ -81,7 +81,7 @@
 .service-form, .catalog-form { display: grid; gap: 17px; padding: 26px; background: rgb(251 249 245 / 94%); border: 1px solid var(--line); }
 .service-form header h3, .catalog-form header h3, .work-hours h4 { margin: 0; font: 500 27px/1.1 'Newsreader', Georgia, serif; }
 .service-form > label, .service-form__values label, .catalog-field { display: grid; gap: 7px; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
-.service-form input, .catalog-field input, .interval-row select, .interval-row input { min-height: 44px; padding: 10px 12px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 4px; font: inherit; letter-spacing: normal; text-transform: none; }
+.service-form input, .catalog-field input, .interval-row select, .interval-row input { min-height: 44px; padding: 10px 12px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 4px; font: inherit; font-size: 16px; letter-spacing: normal; text-transform: none; }
 .service-form input:focus, .catalog-field input:focus, .interval-row select:focus, .interval-row input:focus { outline: 2px solid color-mix(in srgb, var(--terracotta) 42%, transparent); border-color: var(--terracotta); }
 .service-form small, .catalog-field small, .field-error, .interval-error { color: #a52720; font-size: 12px; letter-spacing: normal; text-transform: none; }
 .service-form__values { display: grid; grid-template-columns: 1fr 1fr .7fr; gap: 12px; }
@@ -144,7 +144,7 @@
 .weekday-checkboxes label { display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 8px 10px; background: var(--paper); border: 1px solid var(--line); font-size: 11px; cursor: pointer; }
 .weekday-checkboxes input { accent-color: var(--terracotta); }
 .interval-builder__times { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.interval-builder__times input { min-height: 44px; padding: 10px 12px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); font: inherit; }
+.interval-builder__times input { min-height: 44px; padding: 10px 12px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); font: inherit; font-size: 16px; }
 .interval-builder > .primary-action { width: max-content; }
 @media (min-width: 1024px) {
   .service-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -183,19 +183,18 @@
 .appointment-step legend span { display: grid; place-items: center; width: 22px; height: 22px; color: var(--paper); background: var(--terracotta); border-radius: 50%; font-size: 11px; }
 .form-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .form-field { display: grid; gap: 7px; color: var(--ink); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
-.form-field select, .form-field input { width: 100%; min-height: 46px; padding: 10px 12px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 4px; font: inherit; letter-spacing: normal; text-transform: none; }
+.form-field select, .form-field input { width: 100%; min-height: 46px; padding: 10px 12px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 4px; font: inherit; font-size: 16px; letter-spacing: normal; text-transform: none; }
 .form-field input[type='date'] { appearance: none; color: var(--ink); background-color: var(--paper); border-color: var(--line); color-scheme: light; cursor: pointer; }
 .form-field input[type='date']:focus, .form-field select:focus, .form-field input:focus { outline: 2px solid color-mix(in srgb, var(--terracotta) 42%, transparent); border-color: var(--terracotta); }
 .form-field small, .field-error { color: #a52720; font-size: 12px; letter-spacing: normal; text-transform: none; }
 .form-field--date { width: min(100%, 220px); }
 .form-hint { margin: 0; color: var(--muted-ink); font-size: 13px; line-height: 1.5; }
-.form-hint--error, .form-error { color: #a52720; }
+.form-hint--error { color: #a52720; }
 .availability-list { display: flex; flex-wrap: wrap; gap: 9px; }
 .time-option { display: grid; gap: 2px; min-width: 90px; min-height: 44px; padding: 10px 12px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 4px; cursor: pointer; font: 600 16px 'Newsreader', Georgia, serif; }
 .time-option small { color: var(--muted-ink); font: 11px inherit; }
 .time-option:hover, .time-option--selected { color: var(--paper); background: var(--terracotta); border-color: var(--terracotta); }
 .time-option--selected small { color: #fbe7dc; }
-.form-error { margin: 0; padding: 12px 14px; background: #fff1ed; border-left: 3px solid #a52720; font-size: 13px; }
 .appointment-submit-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-top: 24px; border-top: 1px solid var(--line); }
 .appointment-submit-row p { margin: 0; color: var(--muted-ink); font-size: 12px; }
 @media (max-width: 1023px) { .new-appointment-page { grid-template-columns: 1fr; } .appointment-context { padding: 0; } .appointment-context > p:last-child { max-width: 600px; } }
@@ -280,14 +279,3 @@
 @keyframes cancel-dialog-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes cancel-dialog-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .cancel-dialog-backdrop, .cancel-dialog { animation: none; } }
-
-.booking-editorial h1 { font-size: clamp(30px, 5.2vw, 40px); line-height: 1.05; }
-.booking-editorial .section-label { font-size: clamp(9px, 1.2vw, 10px); line-height: 1.3; }
-.booking-editorial > p:last-child, .booking-step__header > p:last-child { font-size: clamp(12px, 1.6vw, 14px); line-height: 1.5; }
-.booking-step__header h2 { font-size: clamp(27px, 4.5vw, 36px); line-height: 1.08; }
-.booking-choice strong { font-size: 18px; line-height: 1.18; }
-.booking-choice > span:not(.booking-choice__mark, .booking-choice__avatar) { font-size: 12px; line-height: 1.45; }
-.booking-choice small { font-size: 11px; line-height: 1.3; }
-.booking-time strong { font-size: 16px; line-height: 1.1; }
-.booking-time span, .booking-time small { font-size: 9px; line-height: 1.3; }
-@media (max-width: 639px) { .booking-editorial h1 { font-size: clamp(29px, 8.2vw, 36px); } .booking-editorial > p:last-child { font-size: 12px; } .booking-step__header h2 { font-size: clamp(25px, 7vw, 32px); } .booking-step__header > p:last-child { font-size: 12px; } .booking-choice strong { font-size: 17px; } .booking-time strong { font-size: 15px; } }

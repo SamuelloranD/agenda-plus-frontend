@@ -25,7 +25,8 @@ describe('responsive agenda and booking', () => {
 
   it('gives client cards and dialogs safe mobile overflow rules', () => {
     const responsiveStyles = source('src/styles/responsive.css')
-    expect(responsiveStyles).toContain('.client-appointment-card__status')
+    const pageStyles = source('src/styles/pages.css')
+    expect(pageStyles).toContain('.client-appointment-card__status')
     expect(responsiveStyles).toContain('.cancel-dialog')
     expect(responsiveStyles).toContain('var(--safe-block-end)')
   })

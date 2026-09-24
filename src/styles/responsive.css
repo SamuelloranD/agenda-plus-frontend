@@ -156,16 +156,6 @@ textarea {
 .new-appointment-page,
 .client-appointments-page { width: min(100%, var(--content-max)); margin-inline: auto; }
 
-:where(.auth-field input,
-  .form-field input,
-  .form-field select,
-  .catalog-field input,
-  .interval-row input,
-  .interval-row select,
-  .service-form input,
-  .appointment-form input,
-  .appointment-form select) { font-size: 16px !important; }
-
 :where(.primary-action,
   .quiet-action,
   .danger-action,
@@ -185,16 +175,11 @@ textarea {
   .catalog-page__lead .primary-action,
   .appointment-folio__header .primary-action { width: 100%; }
 
-  .new-appointment-page { grid-template-columns: 1fr !important; }
   .weekly-toolbar .week-controls { width: 100%; }
   .weekly-toolbar .week-controls button { flex: 1; }
 }
 
 @media (max-width: 639px) {
-  .service-form__values,
-  .form-columns,
-  .interval-builder__times { grid-template-columns: 1fr !important; }
-
   .service-form footer,
   .catalog-form__footer,
   .appointment-submit-row { align-items: stretch; flex-direction: column; }
@@ -236,32 +221,9 @@ textarea {
   min-width: 0;
 }
 
-@media (max-width: 1023px) {
-  .booking-layout { grid-template-columns: minmax(0, 1fr) !important; }
-  .booking-sidebar {
-    position: static;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 639px) {
-  .booking-sidebar,
-  .booking-card-grid { grid-template-columns: minmax(0, 1fr) !important; }
-
-  .booking-stepper button { min-height: 60px; }
-
   .booking-summary dl div,
   .booking-confirmation dl div { grid-template-columns: 1fr; gap: 4px; }
-
-  .client-appointment-card__status {
-    justify-items: start !important;
-    white-space: normal !important;
-  }
-
-  .client-appointment-card__cancel {
-    justify-self: stretch !important;
-    width: 100%;
-  }
 }
 
 .cancel-dialog-backdrop {

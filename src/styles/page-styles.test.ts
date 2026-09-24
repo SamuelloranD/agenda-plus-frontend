@@ -11,7 +11,7 @@ describe('shared page styles', () => {
     expect(pageStyles).toContain('.dashboard-page')
     expect(pageStyles).toContain('.new-appointment-page')
     expect(pageStyles).toContain('.cancel-dialog')
-    expect(pageStyles).toContain('.booking-editorial')
+    expect(pageStyles).toContain('.weekly-page')
   })
 
   it('does not render inline style tags for page layout styles', () => {
