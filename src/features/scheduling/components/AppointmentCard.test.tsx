@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { describe, expect, it } from 'vitest'
 import { AppointmentCard } from './AppointmentCard'
@@ -33,5 +33,21 @@ describe('AppointmentCard', () => {
     expect(screen.getByText('Serviço Corte de Cabelo')).toBeInTheDocument()
     expect(screen.getByText('Profissional João Silva')).toBeInTheDocument()
     expect(screen.queryByText(/client-1|service-1|professional-1/)).not.toBeInTheDocument()
+  })
+
+  it('uses the appointment status as the visual state without inline actions or a badge', () => {
+    cleanup()
+    const queryClient = new QueryClient()
+    render(
+      <QueryClientProvider client={queryClient}><AppointmentCard
+        appointment={appointment}
+        directory={createAppointmentDirectory({ clients: [], professionals: [], services: [] })}
+      /></QueryClientProvider>,
+    )
+
+    const card = screen.getAllByRole('article')[0]
+    expect(card).toHaveClass('appointment-card--confirmed')
+    expect(screen.queryByText('CONFIRMADO')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 })

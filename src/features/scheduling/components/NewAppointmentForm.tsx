@@ -16,11 +16,33 @@ import { agendamentoSchema, type AgendamentoFormValues } from '../schemas/agenda
 
 interface NewAppointmentFormProps {
   onSuccess: () => void
+  initialDate?: string
+  initialStart?: string
 }
 
 function todayKey() {
   const now = new Date()
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+}
+
+function dateTimeKey(date: string, start: string) {
+  return `${date}T${start}:00`
+}
+
+function dateLabel(date: string) {
+  const [year, month, day] = date.split('-')
+  return `${day}/${month}/${year}`
+}
+
+function addMinutes(dateTime: string, minutes: number) {
+  const result = new Date(dateTime)
+  result.setMinutes(result.getMinutes() + minutes)
+  const year = result.getFullYear()
+  const month = String(result.getMonth() + 1).padStart(2, '0')
+  const day = String(result.getDate()).padStart(2, '0')
+  const hours = String(result.getHours()).padStart(2, '0')
+  const mins = String(result.getMinutes()).padStart(2, '0')
+  return `${year}-${month}-${day}T${hours}:${mins}:00`
 }
 
 function appointmentErrorMessage(error: unknown) {
@@ -34,29 +56,47 @@ function formatMissingCatalogs(catalogs: string[]) {
   return `${catalogs.slice(0, -1).join(', ')} e ${catalogs.at(-1)}`
 }
 
-export function NewAppointmentForm({ onSuccess }: NewAppointmentFormProps) {
-  const [data, setData] = useState(todayKey)
+export function NewAppointmentForm({ onSuccess, initialDate, initialStart }: NewAppointmentFormProps) {
+  const presetStart = initialDate && initialStart ? dateTimeKey(initialDate, initialStart) : ''
+  const hasFixedDateTime = Boolean(presetStart)
+  const [data, setData] = useState(initialDate ?? todayKey)
   const clientsQuery = useClients()
   const professionalsQuery = useProfessionals()
   const servicesQuery = useServices()
   const createAppointment = useCreateAgendamento()
   const form = useForm<AgendamentoFormValues>({
     resolver: zodResolver(agendamentoSchema),
-    defaultValues: { inicio: '', fim: '', profissionalId: '', clienteId: '', servicoId: '' },
+    defaultValues: { inicio: presetStart, fim: '', profissionalId: '', clienteId: '', servicoId: '' },
   })
   const profissionalId = useWatch({ control: form.control, name: 'profissionalId' })
   const servicoId = useWatch({ control: form.control, name: 'servicoId' })
   const horariosQuery = useHorariosDisponiveis({ profissionalId, servicoId, data })
+  const selectedStart = useWatch({ control: form.control, name: 'inicio' })
+  const selectedEnd = useWatch({ control: form.control, name: 'fim' })
+  const selectedService = (servicesQuery.data ?? []).find((service) => service.id === servicoId)
 
   useEffect(() => {
-    form.setValue('inicio', '')
-    form.setValue('fim', '')
-  }, [data, profissionalId, servicoId, form])
+    form.reset({ inicio: presetStart, fim: '', profissionalId: '', clienteId: '', servicoId: '' })
+  }, [form, initialDate, presetStart])
+
+  useEffect(() => {
+    const currentStart = form.getValues('inicio')
+    const isPresetForSelectedDate = Boolean(presetStart && currentStart === presetStart && data === initialDate)
+    if (!isPresetForSelectedDate) {
+      form.setValue('inicio', '')
+      form.setValue('fim', '')
+    }
+  }, [data, form, initialDate, presetStart, profissionalId, servicoId])
+
+  useEffect(() => {
+    if (!selectedStart || !selectedService) return
+    const availableSlot = horariosQuery.data?.find((slot) => slot.inicio === selectedStart)
+    const nextEnd = availableSlot?.fim ?? (selectedStart === presetStart ? addMinutes(selectedStart, selectedService.duracaoMinutos) : '')
+    form.setValue('fim', nextEnd, { shouldValidate: Boolean(nextEnd) })
+  }, [form, horariosQuery.data, presetStart, selectedService, selectedStart])
 
   const isLoadingCatalog = clientsQuery.isLoading || professionalsQuery.isLoading || servicesQuery.isLoading
   const catalogError = clientsQuery.isError || professionalsQuery.isError || servicesQuery.isError
-  const selectedStart = useWatch({ control: form.control, name: 'inicio' })
-
   function handleSuccessfulCreate() {
     form.reset()
     setData(todayKey())
@@ -108,23 +148,43 @@ export function NewAppointmentForm({ onSuccess }: NewAppointmentFormProps) {
 
       <fieldset className="appointment-step">
         <legend><span>3</span> Data e horário</legend>
-        <label className="form-field form-field--date">Data do atendimento
-          <DatePicker id="appointment-date" value={data} min={todayKey()} onChange={setData} />
-        </label>
-        {!profissionalId || !servicoId ? <p className="form-hint">Escolha o serviço e o profissional para consultar os horários livres.</p> : null}
-        {horariosQuery.isLoading && <p className="form-hint" role="status">Consultando a agenda disponível…</p>}
-        {horariosQuery.isError && <p className="form-hint form-hint--error" role="alert">Não foi possível consultar os horários. Tente escolher outra data.</p>}
-        {horariosQuery.data && horariosQuery.data.length === 0 && <p className="form-hint">Não há horários livres nesta data. Escolha outro dia.</p>}
-        {horariosQuery.data && horariosQuery.data.length > 0 && (
-          <div className="availability-list" aria-label="Horários disponíveis">
-            {horariosQuery.data.map((slot) => {
-              const isSelected = selectedStart === slot.inicio
-              return <button className={isSelected ? 'time-option time-option--selected' : 'time-option'} type="button" key={slot.inicio} onClick={() => {
-                form.setValue('inicio', slot.inicio, { shouldValidate: true })
-                form.setValue('fim', slot.fim, { shouldValidate: true })
-              }}>{slot.inicio.slice(11, 16)} <small>até {slot.fim.slice(11, 16)}</small></button>
-            })}
+        {hasFixedDateTime ? (
+          <div className="appointment-fixed-fields">
+            <div className="form-field form-field--date">
+              <span>Data do atendimento</span>
+              <div className="appointment-fixed-field" aria-label={`Data do atendimento: ${dateLabel(data)}`}>{dateLabel(data)}</div>
+            </div>
+            <div className="form-field form-field--time">
+              <span>Horário</span>
+              <div className="appointment-fixed-field" aria-label={`Horário: ${initialStart}`}>{initialStart}</div>
+            </div>
           </div>
+        ) : (
+          <>
+            <label className="form-field form-field--date">Data do atendimento
+              <DatePicker id="appointment-date" value={data} min={todayKey()} onChange={setData} />
+            </label>
+            {!profissionalId || !servicoId ? <p className="form-hint">Escolha o serviço e o profissional para consultar os horários livres.</p> : null}
+            {horariosQuery.isLoading && <p className="form-hint" role="status">Consultando a agenda disponível…</p>}
+            {horariosQuery.isError && <p className="form-hint form-hint--error" role="alert">Não foi possível consultar os horários. Tente escolher outra data.</p>}
+            {horariosQuery.data && horariosQuery.data.length === 0 && <p className="form-hint">Não há horários livres nesta data. Escolha outro dia.</p>}
+            {horariosQuery.data && horariosQuery.data.length > 0 && (
+              <div className="availability-list" aria-label="Horários disponíveis">
+                {horariosQuery.data.map((slot) => {
+                  const isSelected = selectedStart === slot.inicio
+                  return <button className={isSelected ? 'time-option time-option--selected' : 'time-option'} type="button" key={slot.inicio} onClick={() => {
+                    form.setValue('inicio', slot.inicio, { shouldValidate: true })
+                    form.setValue('fim', slot.fim, { shouldValidate: true })
+                  }}>{slot.inicio.slice(11, 16)} <small>até {slot.fim.slice(11, 16)}</small></button>
+                })}
+              </div>
+            )}
+            {selectedStart && !horariosQuery.data?.some((slot) => slot.inicio === selectedStart) && (
+              <button className="time-option time-option--selected" type="button" onClick={() => form.setValue('inicio', selectedStart, { shouldValidate: true })}>
+                {selectedStart.slice(11, 16)} <small>{selectedEnd ? `atÃ© ${selectedEnd.slice(11, 16)}` : 'horÃ¡rio escolhido'}</small>
+              </button>
+            )}
+          </>
         )}
         {(form.formState.errors.inicio || form.formState.errors.fim) && <small className="field-error">{form.formState.errors.inicio?.message ?? form.formState.errors.fim?.message}</small>}
       </fieldset>

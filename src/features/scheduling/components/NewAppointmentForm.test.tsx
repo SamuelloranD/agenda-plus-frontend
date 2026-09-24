@@ -77,6 +77,16 @@ describe('NewAppointmentForm catalog states', () => {
 })
 
 describe('NewAppointmentForm success flow', () => {
+  it('shows the date and start time supplied by the weekly calendar as fixed values', () => {
+    render(<NewAppointmentForm initialDate="2026-09-25" initialStart="08:45" onSuccess={vi.fn()} />)
+
+    expect(screen.getByText('25/09/2026')).toHaveClass('appointment-fixed-field')
+    expect(screen.getByText('08:45')).toHaveClass('appointment-fixed-field')
+    expect(screen.queryByRole('button', { name: 'Data do atendimento' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /08:45/ })).not.toBeInTheDocument()
+    expect(document.querySelector('input[name="inicio"]')).toHaveValue('2026-09-25T08:45:00')
+  })
+
   it('resets the selected fields after a successful appointment creation', async () => {
     const mutate = vi.fn((_values: unknown, options: { onSuccess: () => void }) => options.onSuccess())
     hooks.createAppointment.mockReturnValue({ mutate, isPending: false, isError: false, error: null })
