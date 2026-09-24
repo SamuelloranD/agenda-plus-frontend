@@ -35,19 +35,37 @@ describe('booking cascade', () => {
     const indexStyles = source('src/index.css').replaceAll('\r\n', '\n')
 
     expect(indexStyles).toContain('@container (min-width: 720px)')
-    expect(indexStyles).toContain('@container (min-width: 1180px)')
-    expect(indexStyles).toContain('minmax(320px, .9fr) minmax(480px, 2fr) minmax(280px, clamp(280px, 15.2cqi, 460px))')
-    expect(indexStyles).toContain('grid-column: 2 / -1;')
+    expect(indexStyles).toContain('@container app-content (min-width: 1180px)')
+    expect(indexStyles).toContain('minmax(280px, 1fr) minmax(520px, clamp(520px, 20.3vw, 580px)) minmax(280px, clamp(280px, 11.7vw, 340px))')
+    expect(indexStyles).toContain('grid-column: 2;')
     expect(indexStyles).toContain('grid-row: 2;')
-    expect(indexStyles).toContain('width: 100%;\n    max-width: none;')
-    expect(indexStyles).toContain('max-width: clamp(280px, 15.2cqi, 460px)')
+    expect(indexStyles).toContain('max-width: 580px')
+    expect(indexStyles).toContain('max-width: 340px')
     expect(indexStyles).toContain("font: 500 clamp(2rem, 4.5cqi, 3.5rem)")
+  })
+
+  it('places the client title and booking flow in one compact wide grid', () => {
+    const indexStyles = source('src/index.css').replaceAll('\r\n', '\n')
+
+    expect(indexStyles).toContain('display: contents;')
+    expect(indexStyles).toContain('grid-template-columns: minmax(280px, 1fr) minmax(520px, clamp(520px, 20.3vw, 580px)) minmax(280px, clamp(280px, 11.7vw, 340px));')
+    expect(indexStyles).toContain('grid-column: 2;')
+    expect(indexStyles).toContain('grid-column: 3;')
+    expect(indexStyles).toContain('max-width: 580px')
+  })
+
+  it('keeps booking cards and time slots compact at every width', () => {
+    const indexStyles = source('src/index.css').replaceAll('\r\n', '\n')
+
+    expect(indexStyles).toContain('grid-template-columns: repeat(2, minmax(0, 1fr));')
+    expect(indexStyles).toContain('max-height: min(55dvh, 38rem)')
+    expect(indexStyles).toContain('min-height: clamp(56px, 4cqi, 64px)')
   })
 
   it('lets booking cards grow intrinsically and keeps the stepper compact on narrow screens', () => {
     const indexStyles = source('src/index.css')
 
-    expect(indexStyles).toContain('repeat(auto-fill, minmax(min(100%, 220px), 1fr))')
+    expect(indexStyles).toContain('repeat(2, minmax(0, 1fr))')
     expect(indexStyles).toContain('.booking-stepper__label')
     expect(indexStyles).toContain('.booking-stepper__item:not(:has(button[aria-current=\'step\'])) .booking-stepper__label')
     expect(indexStyles).not.toContain('min-height: max(520px, calc(100dvh - 320px));')

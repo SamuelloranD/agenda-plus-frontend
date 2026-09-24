@@ -35,4 +35,11 @@ describe('responsive foundation', () => {
     expect(stylesheet).toContain('@container (min-width: 1180px)')
     expect(stylesheet).toContain('width: 100%; max-width: none; margin-inline: 0;')
   })
+
+  it('centers wide shell containers in the area beside the sidebar', () => {
+    const stylesheet = readFileSync(stylesheetPath, 'utf8')
+
+    expect(stylesheet).toContain('--content-max-booking:')
+    expect(stylesheet).toContain('--content-max-calendar:')
+  })
 })

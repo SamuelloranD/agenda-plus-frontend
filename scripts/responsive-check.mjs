@@ -17,7 +17,15 @@ const COMPOSITION_WIDTHS = [2560, 3840]
 const COMPOSITION_GAP_LIMIT = 120
 const COMPOSITION_PARITY_LIMIT = 0.03
 const COMPOSITION_WIDTH_RATIO_MIN = 0.85
-const BASELINE_SCREENSHOT = process.env.RESPONSIVE_BASELINE_SCREENSHOT ?? path.join(os.tmpdir(), 'agenda-plus-responsive-screenshots', 'baseline-master-2560x1440.png')
+const SHELL_CENTERING_WIDTHS = [1920, 2560, 3840]
+const SHELL_CENTERING_TOLERANCE = 2
+const BOOKING_TITLE_STEPPER_LIMIT = 4
+const BOOKING_CARD_MAX_WIDTH = 620
+const BOOKING_SLOT_WIDTH_TOLERANCE = 2
+const BOOKING_SLOT_HEIGHT_MIN = 56
+const BOOKING_SLOT_HEIGHT_MAX = 64
+const BOOKING_STATE_WIDTHS = new Set([320, 360, 375, 390, 414, 768, 820, 1024, 1180, 1920, 2560, 3840])
+const BASELINE_SCREENSHOT = process.env.RESPONSIVE_BASELINE_SCREENSHOT ?? path.join(ROOT, 'scripts', 'baselines', 'booking-2560x1440.png')
 
 const services = [
   { id: 'service-1', nome: 'Corte de cabelo', duracaoMinutos: 45, preco: { valor: 85, moeda: 'BRL' } },
@@ -171,9 +179,9 @@ async function pixelDifferenceRatio(page, actualPath, baselinePath) {
   }, { actualData: actual.toString('base64'), baselineData: baseline.toString('base64') })
 }
 
-async function inspectPage(page, routePath, width, height) {
+async function inspectPage(page, routePath, width, height, expectedBookingChoiceWidth = null) {
   const contentSelector = compositionSelector(routePath)
-  return page.evaluate(({ routePath, width, height, contentSelector, compositionGapLimit, compositionWidthRatioMin }) => {
+  return page.evaluate(({ routePath, width, height, contentSelector, compositionGapLimit, compositionWidthRatioMin, shellCenteringWidths, shellCenteringTolerance, bookingTitleStepperLimit, bookingCardMaxWidth, bookingSlotWidthTolerance, bookingSlotHeightMin, bookingSlotHeightMax, expectedBookingChoiceWidth }) => {
     const failures = []
     const viewport = { width, height }
     const visible = (element) => {
@@ -266,17 +274,83 @@ async function inspectPage(page, routePath, width, height) {
       if (intersection(workspace, sidebar) > 0) failures.push('workspace e resumo do booking sobrepostos')
     }
 
+    const bookingCardGrid = [...document.querySelectorAll('.booking-card-grid')].find(visible)
+    if (bookingCardGrid) {
+      const gridStyle = getComputedStyle(bookingCardGrid)
+      const columns = gridStyle.gridTemplateColumns.split(/\s+/).filter(Boolean)
+      const gridBox = box(bookingCardGrid)
+      const gap = Number.parseFloat(gridStyle.columnGap) || 0
+      const canFitTwoCards = (gridBox.width - gap) / 2 >= 150
+      if (columns.length > 2 || (canFitTwoCards && columns.length !== 2)) {
+        failures.push(`serviÃ§os/profissionais usam ${columns.length} colunas; o mÃ¡ximo esperado Ã© 2`)
+      }
+    }
+
+    const bookingTimeGrid = [...document.querySelectorAll('.booking-time-grid')].find(visible)
+    if (bookingTimeGrid) {
+      const gridStyle = getComputedStyle(bookingTimeGrid)
+      const columns = gridStyle.gridTemplateColumns.split(/\s+/).filter(Boolean)
+      const gridBox = box(bookingTimeGrid)
+      const timeSlots = [...bookingTimeGrid.children].filter(visible)
+      const firstSlot = timeSlots[0]
+      if (columns.length !== 2) failures.push(`colunas de horÃ¡rios: esperado exatamente 2, encontrado ${columns.length}`)
+      if (firstSlot) {
+        const slotBox = box(firstSlot)
+        const expectedWidth = expectedBookingChoiceWidth ?? Number.parseFloat(columns[0])
+        if (Math.abs(slotBox.width - expectedWidth) > bookingSlotWidthTolerance) {
+          failures.push(`largura do quadrado de horÃ¡rio diverge ${Math.round(Math.abs(slotBox.width - expectedWidth))}px`)
+        }
+        if (slotBox.height < bookingSlotHeightMin || slotBox.height > bookingSlotHeightMax) {
+          failures.push(`altura do quadrado de horÃ¡rio fora de ${bookingSlotHeightMin}-${bookingSlotHeightMax}px: ${Math.round(slotBox.height)}px`)
+        }
+      }
+      if (bookingTimeGrid.scrollHeight > bookingTimeGrid.clientHeight + 1 && viewport.height - gridBox.bottom > 120) {
+        failures.push(`scroll interno de horÃ¡rios com espaÃ§o livre de ${Math.round(viewport.height - gridBox.bottom)}px`)
+      }
+    }
+
     let composition = null
     if (width >= 1180 && contentSelector) {
       const main = document.querySelector('.admin-main, .client-main')
       const heading = main?.querySelector('.admin-header h1')
+      const sidebar = document.querySelector('.admin-sidebar, .client-sidebar')
       const content = document.querySelector(contentSelector)
       const metric = (element) => element ? box(element) : null
       const mainBox = metric(main)
       const headingBox = metric(heading)
-      const contentBox = metric(content)
+      const measuredContentBox = metric(content)
+      const mainStyle = main ? getComputedStyle(main) : null
+      const contentBox = measuredContentBox?.width > 0 && measuredContentBox?.height > 0
+        ? measuredContentBox
+        : mainBox && mainStyle
+          ? {
+              ...mainBox,
+              left: mainBox.left + Number.parseFloat(mainStyle.paddingLeft),
+              right: mainBox.right - Number.parseFloat(mainStyle.paddingRight),
+              top: mainBox.top + Number.parseFloat(mainStyle.paddingTop),
+              bottom: mainBox.bottom - Number.parseFloat(mainStyle.paddingBottom),
+              width: mainBox.width - Number.parseFloat(mainStyle.paddingLeft) - Number.parseFloat(mainStyle.paddingRight),
+              height: mainBox.height - Number.parseFloat(mainStyle.paddingTop) - Number.parseFloat(mainStyle.paddingBottom),
+            }
+          : null
+      const sidebarBox = metric(sidebar)
       const blocks = { main: mainBox, heading: headingBox, content: contentBox }
       if (mainBox && headingBox && contentBox) {
+        const computedMain = getComputedStyle(main)
+        const maxWidth = Number.parseFloat(computedMain.maxWidth)
+        const availableWidth = viewport.width - (sidebarBox?.right ?? 0)
+        const atMaxWidth = availableWidth - mainBox.width > shellCenteringTolerance
+        const shellContainer = {
+          ...mainBox,
+          maxWidth,
+          marginLeft: mainBox.left - (sidebarBox?.right ?? 0),
+          marginRight: viewport.width - mainBox.right,
+          atMaxWidth,
+        }
+        blocks.shellContainer = shellContainer
+        if (shellCenteringWidths.includes(width) && atMaxWidth && Math.abs(shellContainer.marginLeft - shellContainer.marginRight) > shellCenteringTolerance) {
+          failures.push(`margem esquerda e direita do container divergem ${Math.round(Math.abs(shellContainer.marginLeft - shellContainer.marginRight))}px`)
+        }
         if (Math.abs(headingBox.left - contentBox.left) > 2) {
           failures.push(`booking composition: borda esquerda do h1 e do conteúdo divergem ${Math.round(Math.abs(headingBox.left - contentBox.left))}px`)
         }
@@ -293,11 +367,23 @@ async function inspectPage(page, routePath, width, height) {
           blocks.workspace = workspace
           blocks.sidebar = sidebar
           const token = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--space-section')) || 32
-          if (stepper && workspace) {
+          const isWideBooking = (document.querySelector('.client-main')?.clientWidth ?? 0) >= 1180
+          blocks.bookingTitle = headingBox
+          blocks.bookingCardWidth = workspace
+          if (isWideBooking && headingBox && stepper && Math.abs(headingBox.top - stepper.top) > bookingTitleStepperLimit) {
+            failures.push(`topo do tÃ­tulo e do stepper divergem ${Math.round(Math.abs(headingBox.top - stepper.top))}px`)
+          }
+          if (isWideBooking && workspace && workspace.width > bookingCardMaxWidth) {
+            failures.push(`largura do card do booking excede ${bookingCardMaxWidth}px: ${Math.round(workspace.width)}px`)
+          }
+          if (isWideBooking && headingBox && stepper && Math.max(0, stepper.left - headingBox.right) > compositionGapLimit) {
+            failures.push(`faixa horizontal vazia entre tÃ­tulo e stepper: ${Math.round(stepper.left - headingBox.right)}px`)
+          }
+          if (isWideBooking && stepper && workspace) {
             const gap = workspace.top - stepper.bottom
             if (gap > token * 1.5 || gap > compositionGapLimit) failures.push(`booking composition: vão stepper -> card de ${Math.round(gap)}px`)
           }
-          if (workspace && sidebar && Math.abs(workspace.top - sidebar.top) > 2) {
+          if (isWideBooking && workspace && sidebar && Math.abs(workspace.top - sidebar.top) > 2) {
             failures.push(`booking composition: topo do card e do resumo divergem ${Math.round(Math.abs(workspace.top - sidebar.top))}px`)
           }
         } else {
@@ -322,7 +408,22 @@ async function inspectPage(page, routePath, width, height) {
     }
 
     return { failures, composition }
-  }, { routePath, width, height, contentSelector, compositionGapLimit: COMPOSITION_GAP_LIMIT, compositionWidthRatioMin: COMPOSITION_WIDTH_RATIO_MIN })
+  }, {
+    routePath,
+    width,
+    height,
+    contentSelector,
+    compositionGapLimit: COMPOSITION_GAP_LIMIT,
+    compositionWidthRatioMin: COMPOSITION_WIDTH_RATIO_MIN,
+    shellCenteringWidths: SHELL_CENTERING_WIDTHS,
+    shellCenteringTolerance: SHELL_CENTERING_TOLERANCE,
+    bookingTitleStepperLimit: BOOKING_TITLE_STEPPER_LIMIT,
+    bookingCardMaxWidth: BOOKING_CARD_MAX_WIDTH,
+    bookingSlotWidthTolerance: BOOKING_SLOT_WIDTH_TOLERANCE,
+    bookingSlotHeightMin: BOOKING_SLOT_HEIGHT_MIN,
+    bookingSlotHeightMax: BOOKING_SLOT_HEIGHT_MAX,
+    expectedBookingChoiceWidth,
+  })
 }
 
 async function main() {
@@ -359,6 +460,7 @@ async function main() {
             if (token) localStorage.setItem('agenda-plus:auth-token', token)
             else localStorage.removeItem('agenda-plus:auth-token')
           }, role === 'CLIENTE' ? 'client-token' : role === 'ADMIN' ? 'admin-token' : null)
+          if (routePath === '/agendar') await page.evaluate(() => sessionStorage.removeItem('agenda-plus:client-booking-draft')).catch(() => {})
           await page.goto(`${baseUrl}${routePath}`, { waitUntil: 'domcontentloaded' })
           await page.waitForTimeout(150)
           if (compositionSelector(routePath) && width >= 1180) {
@@ -370,6 +472,29 @@ async function main() {
             compositionByRoute[routePath] ??= {}
             compositionByRoute[routePath][width] = inspection.composition
           }
+          if (routePath === '/agendar' && BOOKING_STATE_WIDTHS.has(width)) {
+            try {
+              const currentStep = page.locator('.booking-stepper button[aria-current="step"]')
+              const currentStepLabel = (await currentStep.first().textContent().catch(() => '')) ?? ''
+              if (await currentStep.count() && !/Servi/.test(currentStepLabel)) {
+                await page.locator('.booking-stepper button').first().click()
+              }
+              await page.locator('.booking-card-grid .booking-choice').first().waitFor({ state: 'visible', timeout: 3000 })
+              const bookingChoiceGrid = page.locator('.booking-card-grid').first()
+              const bookingChoiceColumns = await bookingChoiceGrid.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(/\s+/).filter(Boolean).length)
+              const expectedBookingChoiceWidth = bookingChoiceColumns === 2
+                ? await page.locator('.booking-card-grid .booking-choice').first().evaluate((element) => element.getBoundingClientRect().width)
+                : null
+              await page.getByRole('button', { name: /Corte de cabelo/ }).first().click()
+              await page.getByRole('button', { name: /Qualquer profissional/ }).waitFor({ state: 'visible', timeout: 3000 })
+              await page.getByRole('button', { name: /Qualquer profissional/ }).click()
+              await page.waitForTimeout(100)
+              const timeInspection = await inspectPage(page, routePath, width, height, expectedBookingChoiceWidth)
+              for (const failure of timeInspection.failures) failures.push(`${routePath} @ ${width}x${height} (horarios): ${failure}`)
+            } catch (error) {
+              failures.push(`${routePath} @ ${width}x${height}: nao foi possivel chegar ao estado de horarios: ${error.message}`)
+            }
+          }
           for (const error of runtimeErrors.splice(0)) failures.push(`${routePath} @ ${width}x${height}: erro de runtime: ${error}`)
         }
       }
@@ -380,6 +505,8 @@ async function main() {
       const at3840 = compositionByRoute[routePath]?.[3840]
       if (!at2560 || !at3840 || !at2560.main || !at3840.main) continue
       const blockNames = new Set([...Object.keys(at2560.blocks), ...Object.keys(at3840.blocks)])
+      blockNames.delete('heading')
+      blockNames.delete('bookingTitle')
       for (const blockName of blockNames) {
         const first = at2560.blocks[blockName]
         const second = at3840.blocks[blockName]
@@ -399,8 +526,10 @@ async function main() {
         if (token) localStorage.setItem('agenda-plus:auth-token', token)
         else localStorage.removeItem('agenda-plus:auth-token')
       }, 'client-token')
+      await page.evaluate(() => sessionStorage.removeItem('agenda-plus:client-booking-draft')).catch(() => {})
       await page.goto(`${baseUrl}/agendar`, { waitUntil: 'domcontentloaded' })
       await page.waitForTimeout(150)
+      await page.locator('.booking-card-grid .booking-choice').first().waitFor({ state: 'visible', timeout: 3000 }).catch(() => {})
       const screenshotPath = path.join(screenshotDirectory, `booking-${width}x${height}.png`)
       await page.screenshot({ path: screenshotPath, fullPage: false })
       if (width === 2560 && height === 1440) {

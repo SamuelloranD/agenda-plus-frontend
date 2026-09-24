@@ -23,6 +23,7 @@ describe('responsive browser checker', () => {
     expect(script).toContain('1.5')
     expect(script).toContain('0.85')
     expect(script).toContain('RESPONSIVE_BASELINE_SCREENSHOT')
+    expect(script).toContain("path.join(ROOT, 'scripts', 'baselines', 'booking-2560x1440.png')")
   })
 
   it('checks every application route instead of only the booking page', () => {
@@ -43,5 +44,16 @@ describe('responsive browser checker', () => {
     expect(script).toContain('compositionByRoute')
     expect(script).toContain('pixelDifferenceRatio')
     expect(script).toContain('`booking-${width}x${height}.png`')
+  })
+
+  it('checks shell centering and compact booking composition', () => {
+    expect(script).toContain('shellContainer')
+    expect(script).toContain('margem esquerda e direita')
+    expect(script).toContain('bookingTitle')
+    expect(script).toContain('bookingCardWidth')
+    expect(script).toContain('620')
+    expect(script).toContain('booking-time-grid')
+    expect(script).toContain('colunas de horÃ¡rios')
+    expect(script).toContain('scroll interno')
   })
 })

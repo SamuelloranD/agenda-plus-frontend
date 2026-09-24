@@ -32,4 +32,10 @@ describe('responsive shells', () => {
     expect(stylesheet).toContain('@media (min-width: 3840px)')
     expect(stylesheet).toContain('font-size: clamp(64px, 2.8cqi, 84px)')
   })
+
+  it('centers wide shell containers beside the fixed sidebar', () => {
+    expect(stylesheet).toContain('margin-inline-start: calc(var(--shell-sidebar-width) + max(0px,')
+    expect(stylesheet).toContain('margin-inline-end: 0')
+    expect(stylesheet).toContain('--shell-content-max: var(--content-max-dashboard)')
+  })
 })
