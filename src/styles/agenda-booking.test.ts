@@ -57,4 +57,16 @@ describe('responsive agenda and booking', () => {
     expect(timeStep).toContain('slot.candidates.length === 1')
     expect(timeStep).not.toContain('slot.candidates.length > 1 &&')
   })
+
+  it('keeps the summary at its intrinsic content height and composes public intro responsively', () => {
+    const indexStyles = source('src/index.css').replaceAll('\r\n', '\n')
+
+    expect(indexStyles).toContain('.booking-summary { align-self: start; height: fit-content; }')
+    expect(indexStyles).toContain('.booking-sidebar {')
+    expect(indexStyles).toContain('align-self: start;')
+    expect(indexStyles).toContain('height: fit-content;')
+    expect(indexStyles).toContain('.booking-page:not(.booking-page--embedded) .booking-editorial')
+    expect(indexStyles).toContain('.booking-page:not(.booking-page--embedded) .booking-inline-brand')
+    expect(indexStyles).toContain('grid-row: 3;')
+  })
 })

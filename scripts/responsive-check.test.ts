@@ -62,5 +62,6 @@ describe('responsive browser checker', () => {
     expect(script).toContain('valores do resumo')
     expect(script).toContain('EXACT_BOOKING_VIEWPORTS')
     expect(script).toContain('inspectBookingTimeState')
+    expect(script).toContain('RESPONSIVE_BOOKING_PUBLIC')
   })
 })

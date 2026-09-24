@@ -26,7 +26,9 @@ const BOOKING_SLOT_WIDTH_TOLERANCE = 2
 const BOOKING_SLOT_HEIGHT_MIN = 80
 const BOOKING_SLOT_HEIGHT_MAX = 96
 const BOOKING_STATE_WIDTHS = new Set([320, 360, 375, 390, 414, 768, 820, 1024, 1180, 1920, 2560, 3840, ...WIDTHS.filter((width) => width >= 1440 && width <= 1920)])
-const BASELINE_SCREENSHOT = process.env.RESPONSIVE_BASELINE_SCREENSHOT ?? path.join(ROOT, 'scripts', 'baselines', 'booking-2560x1440.png')
+const PUBLIC_BOOKING = process.env.RESPONSIVE_BOOKING_PUBLIC === '1'
+const BASELINE_SCREENSHOT = process.env.RESPONSIVE_BASELINE_SCREENSHOT
+  ?? (PUBLIC_BOOKING ? null : path.join(ROOT, 'scripts', 'baselines', 'booking-2560x1440.png'))
 
 const services = [
   { id: 'service-1', nome: 'Corte de cabelo', duracaoMinutos: 45, preco: { valor: 85, moeda: 'BRL' } },
@@ -393,6 +395,20 @@ async function inspectPage(page, routePath, width, height, expectedBookingChoice
       }
     }
 
+    if (routePath === '/agendar' && !document.querySelector('.client-main') && width >= 720) {
+      const publicEditorial = document.querySelector('.booking-page:not(.booking-page--embedded) .booking-editorial')
+      const publicTitle = publicEditorial?.querySelector('h1')
+      const publicDescription = publicEditorial?.querySelector('p:last-child')
+      const publicBrand = publicEditorial?.querySelector('.booking-inline-brand')
+      const publicLabel = publicEditorial?.querySelector('.section-label')
+      if (publicTitle && publicDescription && Math.abs(box(publicTitle).top - box(publicDescription).top) > 4) {
+        failures.push('booking publico: titulo e descricao nao estao na mesma faixa')
+      }
+      if (publicBrand && publicLabel && box(publicLabel).top - box(publicBrand).bottom > 32) {
+        failures.push(`booking publico: distancia entre Agenda+ e introducao excede 32px (${Math.round(box(publicLabel).top - box(publicBrand).bottom)}px)`)
+      }
+    }
+
     let composition = null
     if (width >= 1180 && contentSelector) {
       const main = document.querySelector('.admin-main, .client-main')
@@ -574,7 +590,7 @@ async function main() {
           await context.addInitScript((token) => {
             if (token) localStorage.setItem('agenda-plus:auth-token', token)
             else localStorage.removeItem('agenda-plus:auth-token')
-          }, role === 'CLIENTE' ? 'client-token' : role === 'ADMIN' ? 'admin-token' : null)
+          }, routePath === '/agendar' && PUBLIC_BOOKING ? null : role === 'CLIENTE' ? 'client-token' : role === 'ADMIN' ? 'admin-token' : null)
           if (routePath === '/agendar') await page.evaluate(() => sessionStorage.removeItem('agenda-plus:client-booking-draft')).catch(() => {})
           await page.goto(`${baseUrl}${routePath}`, { waitUntil: 'domcontentloaded' })
           await page.waitForTimeout(150)
@@ -620,14 +636,14 @@ async function main() {
       await context.addInitScript((token) => {
         if (token) localStorage.setItem('agenda-plus:auth-token', token)
         else localStorage.removeItem('agenda-plus:auth-token')
-      }, 'client-token')
+      }, PUBLIC_BOOKING ? null : 'client-token')
       await page.evaluate(() => sessionStorage.removeItem('agenda-plus:client-booking-draft')).catch(() => {})
       await page.goto(`${baseUrl}/agendar`, { waitUntil: 'domcontentloaded' })
       await page.waitForTimeout(150)
       await page.locator('.booking-card-grid .booking-choice').first().waitFor({ state: 'visible', timeout: 3000 })
       const screenshotPath = path.join(screenshotDirectory, `booking-${width}x${height}.png`)
       await page.screenshot({ path: screenshotPath, fullPage: false })
-      if (width === 2560 && height === 1440) {
+      if (width === 2560 && height === 1440 && BASELINE_SCREENSHOT) {
         try {
           const comparison = await pixelDifferenceRatio(page, screenshotPath, BASELINE_SCREENSHOT)
           screenshotComparisons.push({ baseline: BASELINE_SCREENSHOT, ...comparison })

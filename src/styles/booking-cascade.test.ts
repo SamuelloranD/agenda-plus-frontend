@@ -26,7 +26,7 @@ describe('booking cascade', () => {
 
     expect(indexStyles).toContain('grid-template-columns: repeat(3, minmax(0, 1fr));')
     expect(indexStyles).toContain('@container (min-width: 720px)')
-    expect(indexStyles).toContain('grid-template-columns: minmax(0, 1fr) minmax(220px, 32cqi);')
+    expect(indexStyles).toContain('grid-template-columns: minmax(0, 1fr) minmax(300px, 32cqi);')
     expect(indexStyles).toContain('@container (max-width: 719px)')
     expect(indexStyles).toContain('grid-template-columns: 1fr;')
   })
