@@ -21,4 +21,15 @@ describe('responsive shells', () => {
     expect(stylesheet).toContain('overflow-y: auto')
     expect(stylesheet).toContain('min-height: 100svh')
   })
+
+  it('measures shell content with its own inline-size container', () => {
+    expect(stylesheet).toContain('container: admin-shell / inline-size')
+    expect(stylesheet).toContain('container: client-shell / inline-size')
+    expect(stylesheet).toContain('container-type: inline-size')
+  })
+
+  it('scales the page title above 3840px without changing smaller widths', () => {
+    expect(stylesheet).toContain('@media (min-width: 3840px)')
+    expect(stylesheet).toContain('font-size: clamp(64px, 2.8cqi, 84px)')
+  })
 })

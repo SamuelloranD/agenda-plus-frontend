@@ -18,10 +18,12 @@ describe('responsive content pages', () => {
   it('keeps forms readable and expandable on low-height screens', () => {
     const responsiveStyles = source('src/styles/responsive.css')
     const globalStyles = source('src/index.css')
+    const normalizedGlobalStyles = globalStyles.replaceAll('\r\n', '\n')
 
     expect(responsiveStyles).toContain('.auth-page')
     expect(responsiveStyles).toContain('.auth-shell')
     expect(globalStyles).toContain('.auth-field input')
     expect(globalStyles).toContain('font-size: 16px')
+    expect(normalizedGlobalStyles).toContain('.auth-switch a {\n  display: inline-flex;')
   })
 })

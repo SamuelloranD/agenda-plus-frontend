@@ -24,11 +24,35 @@ describe('booking cascade', () => {
   it('separates tablet and desktop booking columns', () => {
     const indexStyles = source('src/index.css')
 
-    expect(indexStyles).toContain('grid-template-columns: 1fr;')
-    expect(indexStyles).toContain('@media (min-width: 768px)')
-    expect(indexStyles).toContain('grid-template-columns: repeat(2, minmax(0, 1fr));')
-    expect(indexStyles).toContain('@media (min-width: 1024px)')
     expect(indexStyles).toContain('grid-template-columns: repeat(3, minmax(0, 1fr));')
+    expect(indexStyles).toContain('@container (min-width: 720px)')
+    expect(indexStyles).toContain('grid-template-columns: minmax(0, 1fr) minmax(220px, 32cqi);')
+    expect(indexStyles).toContain('@container (max-width: 719px)')
+    expect(indexStyles).toContain('grid-template-columns: 1fr;')
+  })
+
+  it('uses the real booking container instead of viewport width for composition', () => {
+    const indexStyles = source('src/index.css').replaceAll('\r\n', '\n')
+
+    expect(indexStyles).toContain('@container (min-width: 720px)')
+    expect(indexStyles).toContain('@container (min-width: 1180px)')
+    expect(indexStyles).toContain('minmax(320px, .9fr) minmax(480px, 2fr) minmax(280px, clamp(280px, 15.2cqi, 460px))')
+    expect(indexStyles).toContain('grid-column: 2 / -1;')
+    expect(indexStyles).toContain('grid-row: 2;')
+    expect(indexStyles).toContain('width: 100%;\n    max-width: none;')
+    expect(indexStyles).toContain('max-width: clamp(280px, 15.2cqi, 460px)')
+    expect(indexStyles).toContain("font: 500 clamp(2rem, 4.5cqi, 3.5rem)")
+  })
+
+  it('lets booking cards grow intrinsically and keeps the stepper compact on narrow screens', () => {
+    const indexStyles = source('src/index.css')
+
+    expect(indexStyles).toContain('repeat(auto-fill, minmax(min(100%, 220px), 1fr))')
+    expect(indexStyles).toContain('.booking-stepper__label')
+    expect(indexStyles).toContain('.booking-stepper__item:not(:has(button[aria-current=\'step\'])) .booking-stepper__label')
+    expect(indexStyles).not.toContain('min-height: max(520px, calc(100dvh - 320px));')
+    expect(indexStyles).not.toMatch(/\n\s+height: 0;/)
+    expect(indexStyles).not.toContain('transform: translateY(clamp(-88px, -8dvh, -56px));')
   })
 
   it('keeps page styles consolidated instead of relying on load order', () => {

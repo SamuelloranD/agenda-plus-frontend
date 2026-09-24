@@ -16,11 +16,13 @@ describe('responsive agenda and booking', () => {
   })
 
   it('avoids desktop-only booking height locks on tablets', () => {
-    const indexStyles = source('src/index.css')
+    const indexStyles = source('src/index.css').replaceAll('\r\n', '\n')
     expect(indexStyles).not.toContain('@media (min-width: 761px)')
     expect(indexStyles).not.toContain('@media (min-width: 981px)')
-    expect(indexStyles).toContain('@media (min-width: 1024px)')
-    expect(indexStyles).toContain('overflow: visible;')
+    expect(indexStyles).toContain('@container (min-width: 1180px)')
+    expect(indexStyles).toContain('grid-template-columns: minmax(320px, .9fr) minmax(480px, 2fr) minmax(280px, clamp(280px, 15.2cqi, 460px));')
+    expect(indexStyles).not.toContain('.booking-layout {\n  height: 100%;')
+    expect(indexStyles).not.toContain('.booking-layout {\n  transform: translateX(30px)')
   })
 
   it('gives client cards and dialogs safe mobile overflow rules', () => {

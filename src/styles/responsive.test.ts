@@ -19,4 +19,20 @@ describe('responsive foundation', () => {
     expect(stylesheet).toContain('overflow-x: clip')
     expect(stylesheet).toContain('min-height: 100svh')
   })
+
+  it('exposes fluid scale tokens for every container width', () => {
+    const stylesheet = readFileSync(stylesheetPath, 'utf8')
+
+    expect(stylesheet).toContain('--space-page: clamp(')
+    expect(stylesheet).toContain('--control-height: 44px')
+    expect(stylesheet).toContain('--radius-control: 4px')
+    expect(stylesheet).toContain('--type-body: clamp(')
+  })
+
+  it('expands wide page content to the shell container', () => {
+    const stylesheet = readFileSync(stylesheetPath, 'utf8')
+
+    expect(stylesheet).toContain('@container (min-width: 1180px)')
+    expect(stylesheet).toContain('width: 100%; max-width: none; margin-inline: 0;')
+  })
 })
