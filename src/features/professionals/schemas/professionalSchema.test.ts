@@ -12,6 +12,13 @@ describe('professionalSchema', () => {
     expect(professionalSchema.safeParse(validProfessional).success).toBe(true)
   })
 
+  it('accepts the seconds precision returned by the API for existing work intervals', () => {
+    expect(professionalSchema.safeParse({
+      ...validProfessional,
+      horariosTrabalho: [{ diaSemana: 'MONDAY', inicio: '09:00:00', fim: '18:00:00' }],
+    }).success).toBe(true)
+  })
+
   it('rejects a professional without work intervals', () => {
     expect(professionalSchema.safeParse({ ...validProfessional, horariosTrabalho: [] }).success).toBe(false)
   })

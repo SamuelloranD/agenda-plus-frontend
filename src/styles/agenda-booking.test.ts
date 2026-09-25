@@ -90,4 +90,12 @@ describe('responsive agenda and booking', () => {
 
     expect(indexStyles).toContain('width: min(100%, var(--content-max-booking));')
   })
+
+  it('keeps the shared date picker grid contained inside its popover', () => {
+    const indexStyles = source('src/index.css').replaceAll('\r\n', '\n')
+
+    expect(indexStyles).toContain('width: min(320px, calc(100vw - 32px));')
+    expect(indexStyles).toContain('grid-template-columns: repeat(7, minmax(0, 1fr));')
+    expect(indexStyles).toContain('width: 100%;\n  min-width: 0;')
+  })
 })

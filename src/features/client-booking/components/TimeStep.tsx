@@ -1,5 +1,6 @@
 import { ErrorState } from '../../../components/ui/ErrorState'
 import { LoadingState } from '../../../components/ui/LoadingState'
+import { DatePicker } from '../../../components/ui/DatePicker'
 import type { AggregatedAvailabilitySlot, SelectedAvailabilitySlot } from '../types'
 
 interface TimeStepProps {
@@ -32,7 +33,7 @@ export function TimeStep({ date, slots, selectedSlot, isLoading, isError, onRetr
       </header>
       <label className="booking-date-field">
         <span>DATA DO ATENDIMENTO</span>
-        <input type="date" min={todayKey()} value={date} onChange={(event) => onDateChange(event.target.value)} />
+        <DatePicker id="booking-date" value={date} min={todayKey()} onChange={onDateChange} />
       </label>
       {isLoading && <LoadingState message="Consultando as agendas…" />}
       {isError && <ErrorState message="Não foi possível consultar todos os horários." onRetry={onRetry} />}

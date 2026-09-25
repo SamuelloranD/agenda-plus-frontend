@@ -2,13 +2,18 @@ import { z } from 'zod'
 
 export const weekdays = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'] as const
 
-const timeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Informe um horário válido.')
+const timeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/, 'Informe um horário válido.')
+
+function timeInMinutes(value: string) {
+  const [hours, minutes] = value.split(':').map(Number)
+  return hours * 60 + minutes
+}
 
 const workIntervalSchema = z.object({
   diaSemana: z.enum(weekdays),
   inicio: timeSchema,
   fim: timeSchema,
-}).refine((interval) => interval.fim > interval.inicio, {
+}).refine((interval) => timeInMinutes(interval.fim) > timeInMinutes(interval.inicio), {
   message: 'O fim deve ser posterior ao início.',
   path: ['fim'],
 })

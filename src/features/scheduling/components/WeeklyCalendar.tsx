@@ -6,6 +6,12 @@ interface WeeklyCalendarProps {
   weekStart: Date
   appointments: AgendamentoResponse[]
   directory: AppointmentDirectory
+  onReserve: (slot: ReservationSlot) => void
+}
+
+export interface ReservationSlot {
+  date: string
+  start: string
 }
 
 function addDays(date: Date, amount: number) {
@@ -25,7 +31,7 @@ function accessibleDayLabel(date: Date) {
   return new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }).format(date)
 }
 
-export function WeeklyCalendar({ weekStart, appointments, directory }: WeeklyCalendarProps) {
+export function WeeklyCalendar({ weekStart, appointments, directory, onReserve }: WeeklyCalendarProps) {
   const days = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index))
   const defaultTimes = ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00']
   const times = [...new Set([...defaultTimes, ...appointments.map(({ inicio }) => inicio.slice(11, 16))])].toSorted()
@@ -49,7 +55,7 @@ export function WeeklyCalendar({ weekStart, appointments, directory }: WeeklyCal
               const cellAppointments = appointments.filter(({ inicio }) => inicio.slice(0, 10) === key && inicio.slice(11, 16) === time)
               const dayLabel = accessibleDayLabel(day)
               const cellLabel = `${dayLabel}, ${time} — ${cellAppointments.length > 0 ? `${cellAppointments.length} agendamento${cellAppointments.length === 1 ? '' : 's'}` : 'reservar'}`
-              return <div className="calendar-cell" key={`${key}-${time}`} role="gridcell" aria-label={cellLabel}>{cellAppointments.length > 0 ? cellAppointments.map((appointment) => <AppointmentCard key={appointment.id} appointment={appointment} directory={directory} />) : <span aria-hidden="true">+ Reservar</span>}</div>
+              return <div className="calendar-cell" key={`${key}-${time}`} role="gridcell" aria-label={cellLabel}>{cellAppointments.length > 0 ? cellAppointments.map((appointment) => <AppointmentCard key={appointment.id} appointment={appointment} directory={directory} />) : <button type="button" className="calendar-reserve" onClick={() => onReserve({ date: key, start: time })}>+ Reservar</button>}</div>
             })}
           </div>
         ))}

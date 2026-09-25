@@ -40,4 +40,40 @@ describe('shared page styles', () => {
     expect(pageStyles).toContain('position: absolute;')
     expect(pageStyles).toContain('inset-inline-start: calc(var(--admin-new-left)')
   })
+
+  it('defines rounded shared actions and status-colored weekly cards', () => {
+    expect(pageStyles).toContain('.primary-action, .quiet-action, .danger-action')
+    expect(pageStyles).toContain('border-radius: 999px')
+    expect(pageStyles).toContain('.appointment-card--confirmed')
+    expect(pageStyles).toContain('background: #5cff8d')
+    expect(pageStyles).toContain('background: #fdb563')
+    expect(pageStyles).toContain('background: #ffb0b0')
+    expect(pageStyles).toContain('height: 132px')
+    expect(pageStyles).not.toContain('.appointment-card .status-badge')
+  })
+
+  it('keeps preset appointment date and time fields compact', () => {
+    expect(pageStyles).toContain('.appointment-fixed-field { display: flex; align-items: center; height: 38px; min-height: 0; box-sizing: border-box; padding: 7px 10px;')
+    expect(pageStyles).toContain('font-size: 14px;')
+  })
+
+  it('keeps the quick appointment modal opaque, closes with a plain red icon, and uses narrow preset fields', () => {
+    expect(pageStyles).toContain('.appointment-fixed-fields .form-field--date, .appointment-fixed-fields .form-field--time { width: min(100%, 110px); }')
+    expect(pageStyles).toContain('.appointment-fixed-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 110px));')
+    expect(pageStyles).toContain('background: rgb(251 249 245 / 58%); backdrop-filter: blur(10px);')
+    expect(pageStyles).toContain('-webkit-backdrop-filter: blur(10px);')
+    expect(pageStyles).toContain('background: var(--paper);')
+    expect(pageStyles).toContain('color: #a52720; background: transparent; border: 0; border-radius: 0;')
+  })
+
+  it('aligns both fixed appointment fields with identical dimensions', () => {
+    expect(pageStyles).toContain('.appointment-fixed-fields .form-field { grid-template-rows: 24px 38px; }')
+    expect(pageStyles).toContain('height: 38px; min-height: 0; box-sizing: border-box;')
+  })
+
+  it('gives professional work-hour pickers a custom rounded popover', () => {
+    expect(pageStyles).toContain('.time-picker__popover')
+    expect(pageStyles).toContain('border-radius: 8px;')
+    expect(pageStyles).toContain('.time-picker__option')
+  })
 })

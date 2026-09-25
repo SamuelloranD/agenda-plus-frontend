@@ -221,8 +221,7 @@ button {
   z-index: 10;
   top: calc(100% + 6px);
   left: 0;
-  width: min(286px, calc(100vw - 32px));
-  max-width: 100%;
+  width: min(320px, calc(100vw - 32px));
   padding: 12px;
   background: #fffdf9;
   border: 1px solid var(--line);
@@ -234,7 +233,7 @@ button {
 .ui-date-picker__weekdays,
 .ui-date-picker__days {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   align-items: center;
   gap: 4px;
 }
@@ -255,7 +254,8 @@ button {
 .ui-date-picker__day {
   display: grid;
   place-items: center;
-  min-width: 44px;
+  width: 100%;
+  min-width: 0;
   min-height: 44px;
   color: var(--ink);
   background: transparent;
@@ -300,6 +300,20 @@ button {
   background: var(--terracotta);
   border-color: var(--terracotta);
   font-weight: 700;
+}
+
+.booking-date-field .ui-date-picker {
+  width: min(100%, 320px);
+}
+
+.booking-date-field .ui-date-picker__trigger {
+  min-height: 52px;
+  background: #fbf7ef;
+  border-radius: 4px;
+}
+
+.booking-date-field .ui-date-picker__trigger:focus-visible {
+  outline: 3px solid rgb(200 90 50 / 12%);
 }
 
 .appointment-form .form-field input:not([type='hidden']),
