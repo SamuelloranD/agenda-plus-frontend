@@ -16,13 +16,20 @@ function dateKey(date: Date) {
 export function DashboardPage() {
   const today = new Date()
   const key = dateKey(today)
+  const tomorrow = new Date(today)
+  tomorrow.setDate(today.getDate() + 1)
   const appointmentsQuery = useAgendamentos({ dataInicio: key, dataFim: key, tamanho: 100 }, { allPages: true })
+  const futureAppointmentsQuery = useAgendamentos({ dataInicio: dateKey(tomorrow), tamanho: 100 }, { allPages: true })
   const directoryQuery = useAppointmentDirectory()
+
+  if (futureAppointmentsQuery.isLoading) return <LoadingState message="Abrindo a agenda futura..." />
+  if (futureAppointmentsQuery.isError) return <ErrorState message="Nao foi possivel carregar os atendimentos futuros." onRetry={() => void futureAppointmentsQuery.refetch()} />
 
   if (appointmentsQuery.isLoading || directoryQuery.isLoading) return <LoadingState message="Abrindo o caderno de hoje…" />
   if (appointmentsQuery.isError || directoryQuery.isError) return <ErrorState message="Não foi possível carregar o painel." onRetry={() => void Promise.all([appointmentsQuery.refetch(), directoryQuery.refetch()])} />
 
   const appointments = appointmentsQuery.data?.conteudo ?? []
+  const futureAppointments = futureAppointmentsQuery.data?.conteudo ?? []
   const metrics = deriveDashboardMetrics(appointments, today)
   const expectedBilling = calculateExpectedBilling(appointments, directoryQuery.directory.servicePrices)
   const formattedDate = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' }).format(today)
@@ -37,6 +44,9 @@ export function DashboardPage() {
       <MetricCard label="Cancelados" value={metrics.cancelledCount} tone="muted" note="registro do dia" />
       <MetricCard label="Faturamento previsto" value={billingLabel} tone="terracotta" note="pendentes, confirmados e concluídos" />
     </div>
-    <section className="today-panel" aria-labelledby="today-heading"><div className="section-heading"><div><p className="section-label">Linha do tempo</p><h3 id="today-heading">Atendimentos de hoje</h3></div><span>{metrics.todayCount} registros</span></div><TodayAppointments appointments={metrics.todayAppointments} directory={directoryQuery.directory} /></section>
+    <>
+      <section className="today-panel" aria-labelledby="today-heading"><div className="section-heading"><div><p className="section-label">Linha do tempo</p><h3 id="today-heading">Atendimentos de hoje</h3></div><span>{metrics.todayCount} registros</span></div><TodayAppointments appointments={metrics.todayAppointments} directory={directoryQuery.directory} /></section>
+      <section className="today-panel" aria-labelledby="future-heading"><div className="section-heading"><div><p className="section-label">Proximos na agenda</p><h3 id="future-heading">Atendimentos futuros</h3></div><span>{futureAppointments.length} registros</span></div><TodayAppointments appointments={futureAppointments} directory={directoryQuery.directory} emptyMessage="Nenhum atendimento futuro reservado." /></section>
+    </>
   </section>
 }

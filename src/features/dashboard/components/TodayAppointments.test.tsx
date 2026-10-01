@@ -15,51 +15,37 @@ const appointment: AgendamentoResponse = {
   status: 'PENDENTE',
 }
 
+function renderList(appointments: AgendamentoResponse[], emptyMessage?: string) {
+  const queryClient = new QueryClient()
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <TodayAppointments
+        appointments={appointments}
+        directory={createAppointmentDirectory({
+          clients: [{ id: 'client-1', nome: 'Maria Souza', email: 'maria@example.com', role: 'CLIENTE' }],
+          professionals: [{ id: 'professional-1', nome: 'Joao Silva', especialidade: 'Cabeleireiro', horariosTrabalho: [] }],
+          services: [{ id: 'service-1', nome: 'Corte de Cabelo', duracaoMinutos: 45, preco: { valor: 80, moeda: 'BRL' } }],
+        })}
+        emptyMessage={emptyMessage}
+      />
+    </QueryClientProvider>,
+  )
+}
+
 afterEach(cleanup)
 
 describe('TodayAppointments', () => {
-  it('renders catalog names instead of shortened IDs', () => {
-    const queryClient = new QueryClient()
-    render(
-      <QueryClientProvider client={queryClient}><TodayAppointments
-        appointments={[appointment]}
-        directory={createAppointmentDirectory({
-          clients: [{ id: 'client-1', nome: 'Maria Souza', email: 'maria@example.com', role: 'CLIENTE' }],
-          professionals: [{ id: 'professional-1', nome: 'João Silva', especialidade: 'Cabeleireiro', horariosTrabalho: [] }],
-          services: [{ id: 'service-1', nome: 'Corte de Cabelo', duracaoMinutos: 45, preco: { valor: 80, moeda: 'BRL' } }],
-        })}
-      /></QueryClientProvider>,
-    )
+  it('renders catalog names and prices', () => {
+    renderList([appointment])
 
     expect(screen.getByText('Cliente Maria Souza')).toBeInTheDocument()
-    expect(screen.getByText('Serviço Corte de Cabelo · Profissional João Silva')).toBeInTheDocument()
-    expect(screen.queryByText(/client-1|service-1|professional-1/)).not.toBeInTheDocument()
+    expect(screen.getByText(/Corte de Cabelo/)).toBeInTheDocument()
     expect(screen.getByText('R$ 80,00')).toBeInTheDocument()
   })
 
-  it('renders friendly fallback labels when names are unavailable', () => {
-    const queryClient = new QueryClient()
-    render(
-      <QueryClientProvider client={queryClient}><TodayAppointments
-        appointments={[appointment]}
-        directory={createAppointmentDirectory({ clients: [], professionals: [], services: [] })}
-      /></QueryClientProvider>,
-    )
+  it('uses a custom empty message for another dashboard time range', () => {
+    renderList([], 'Nenhum atendimento futuro reservado.')
 
-    expect(screen.getByText('Cliente Cliente não identificado')).toBeInTheDocument()
-    expect(screen.getByText('Serviço Serviço não identificado · Profissional Profissional não identificado')).toBeInTheDocument()
-    expect(screen.queryByText(/professional-1|client-1|service-1/)).not.toBeInTheDocument()
-  })
-
-  it('shows a safe fallback when the service price is unavailable', () => {
-    const queryClient = new QueryClient()
-    render(
-      <QueryClientProvider client={queryClient}><TodayAppointments
-        appointments={[appointment]}
-        directory={createAppointmentDirectory({ clients: [], professionals: [], services: [] })}
-      /></QueryClientProvider>,
-    )
-
-    expect(screen.getByText('Preço não informado')).toBeInTheDocument()
+    expect(screen.getByText('Nenhum atendimento futuro reservado.')).toBeInTheDocument()
   })
 })

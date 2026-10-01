@@ -8,10 +8,11 @@ import { formatServicePrice } from '../../client-appointments/utils/appointmentP
 interface TodayAppointmentsProps {
   appointments: AgendamentoResponse[]
   directory: AppointmentDirectory
+  emptyMessage?: string
 }
 
-export function TodayAppointments({ appointments, directory }: TodayAppointmentsProps) {
-  if (appointments.length === 0) return <EmptyState message="Nenhum atendimento reservado para hoje." />
+export function TodayAppointments({ appointments, directory, emptyMessage = 'Nenhum atendimento reservado para hoje.' }: TodayAppointmentsProps) {
+  if (appointments.length === 0) return <EmptyState message={emptyMessage} />
 
   return (
     <ol className="today-list">

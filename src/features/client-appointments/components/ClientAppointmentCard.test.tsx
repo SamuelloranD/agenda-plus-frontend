@@ -1,5 +1,5 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { cleanup, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it } from 'vitest'
 import type { AgendamentoResponse } from '../../../types/scheduling'
 import { ClientAppointmentCard } from './ClientAppointmentCard'
 
@@ -16,15 +16,12 @@ const appointment: AgendamentoResponse = {
 afterEach(cleanup)
 
 describe('ClientAppointmentCard', () => {
-  it('shows resolved names, date, time, status, and an eligible cancellation action', () => {
-    const onCancel = vi.fn()
+  it('shows resolved names, date, time, status, and no cancellation action', () => {
     render(
       <ClientAppointmentCard
         appointment={appointment}
         names={{ professionalName: 'João Silva', serviceName: 'Corte de Cabelo' }}
-        now={new Date('2026-09-19T10:00:00')}
         price={80}
-        onCancel={onCancel}
       />,
     )
 
@@ -35,22 +32,19 @@ describe('ClientAppointmentCard', () => {
     expect(screen.getByText('CONFIRMADO')).toBeInTheDocument()
     expect(screen.getByText('R$ 80,00')).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
-    expect(onCancel).toHaveBeenCalledTimes(1)
+    expect(screen.queryByRole('button', { name: 'Cancelar' })).not.toBeInTheDocument()
   })
 
-  it('shows cancellation for an eligible pending appointment', () => {
+  it('does not expose cancellation for a pending appointment', () => {
     render(
       <ClientAppointmentCard
         appointment={{ ...appointment, status: 'PENDENTE' }}
         names={{ professionalName: 'João Silva', serviceName: 'Corte de Cabelo' }}
-        now={new Date('2026-09-19T10:00:00')}
-        onCancel={() => undefined}
       />,
     )
 
     expect(screen.getByText('PENDENTE')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Cancelar' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Cancelar' })).not.toBeInTheDocument()
   })
 
   it('never renders raw IDs when catalog names are missing', () => {
@@ -58,8 +52,6 @@ describe('ClientAppointmentCard', () => {
       <ClientAppointmentCard
         appointment={appointment}
         names={{ professionalName: 'Profissional não identificado', serviceName: 'Serviço não identificado' }}
-        now={new Date('2026-09-19T10:00:00')}
-        onCancel={() => undefined}
       />,
     )
 
@@ -68,17 +60,11 @@ describe('ClientAppointmentCard', () => {
     expect(screen.queryByText(/appointment-1|professional-1|service-1|client-1/)).not.toBeInTheDocument()
   })
 
-  it.each([
-    ['CANCELADO', '2026-09-19T10:00:00'],
-    ['CONCLUIDO', '2026-09-19T10:00:00'],
-    ['CONFIRMADO', '2026-09-21T10:00:00'],
-  ] as const)('hides cancellation for %s appointments at %s', (status, now) => {
+  it.each(['CANCELADO', 'CONCLUIDO', 'CONFIRMADO'] as const)('hides cancellation for %s appointments', (status) => {
     render(
       <ClientAppointmentCard
         appointment={{ ...appointment, status }}
         names={{ professionalName: 'João Silva', serviceName: 'Corte de Cabelo' }}
-        now={new Date(now)}
-        onCancel={() => undefined}
       />,
     )
 

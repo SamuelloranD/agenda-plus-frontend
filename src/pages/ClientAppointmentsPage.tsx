@@ -1,8 +1,7 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { EmptyState } from '../components/ui/EmptyState'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
-import { CancelAppointmentDialog } from '../features/client-appointments/components/CancelAppointmentDialog'
 import { ClientAppointmentCard } from '../features/client-appointments/components/ClientAppointmentCard'
 import {
   buildAppointmentNameMaps,
@@ -10,30 +9,18 @@ import {
   splitClientAppointments,
 } from '../features/client-appointments/utils/appointmentPresentation'
 import { useProfessionals } from '../features/professionals/hooks/useProfessionals'
-import { useCancelAgendamento } from '../features/scheduling/hooks/useCancelAgendamento'
 import { useAgendamentos } from '../features/scheduling/hooks/useAgendamentos'
 import { useServices } from '../features/services/hooks/useServices'
 import { useAuthStore } from '../store/authStore'
 import type { AgendamentoResponse } from '../types/scheduling'
 
-function cancellationErrorMessage(error: unknown) {
-  if (error instanceof Error && error.message.trim()) return error.message
-  if (typeof error === 'object' && error && 'message' in error && typeof error.message === 'string' && error.message.trim()) {
-    return error.message
-  }
-  return 'Não foi possível cancelar agora. Verifique a janela de cancelamento e tente novamente.'
-}
 
 export function ClientAppointmentsPage() {
-  const sectionRef = useRef<HTMLElement>(null)
   const user = useAuthStore((state) => state.user)
   const [page, setPage] = useState(0)
   const appointments = useAgendamentos({ clienteId: user?.id, escopo: 'cliente', pagina: page, tamanho: 20 })
   const professionals = useProfessionals()
   const services = useServices()
-  const cancel = useCancelAgendamento()
-  const [selectedAppointment, setSelectedAppointment] = useState<AgendamentoResponse | null>(null)
-  const [cancelError, setCancelError] = useState<string | null>(null)
 
   const names = useMemo(
     () => buildAppointmentNameMaps(professionals.data ?? [], services.data ?? []),
@@ -47,31 +34,8 @@ export function ClientAppointmentsPage() {
     () => splitClientAppointments(appointments.data?.conteudo ?? []),
     [appointments.data?.conteudo],
   )
-  const selectedNames = selectedAppointment ? resolveClientAppointmentNames(selectedAppointment, names) : null
   const isLoading = appointments.isLoading || professionals.isLoading || services.isLoading
   const isError = appointments.isError || professionals.isError || services.isError
-
-  function openCancelDialog(appointment: AgendamentoResponse) {
-    setCancelError(null)
-    setSelectedAppointment(appointment)
-  }
-
-  function closeCancelDialog() {
-    if (cancel.isPending) return
-    setCancelError(null)
-    setSelectedAppointment(null)
-  }
-
-  async function confirmCancellation() {
-    if (!selectedAppointment) return
-    setCancelError(null)
-    try {
-      await cancel.mutateAsync(selectedAppointment.id)
-      setSelectedAppointment(null)
-    } catch (error) {
-      setCancelError(cancellationErrorMessage(error))
-    }
-  }
 
   const retryQueries = () => void Promise.all([
     appointments.refetch(),
@@ -80,7 +44,7 @@ export function ClientAppointmentsPage() {
   ])
 
   return (
-    <section ref={sectionRef} className="client-appointments-page" aria-label="Meus agendamentos" tabIndex={-1}>
+    <section className="client-appointments-page" aria-label="Meus agendamentos" tabIndex={-1}>
       {isLoading && <LoadingState message="Preparando seus agendamentos…" />}
       {!isLoading && isError && <ErrorState message="Não foi possível carregar seus agendamentos." onRetry={retryQueries} />}
       {!isLoading && !isError && appointments.data?.conteudo.length === 0 && <EmptyState message="Você ainda não possui agendamentos." />}
@@ -93,7 +57,6 @@ export function ClientAppointmentsPage() {
             emptyMessage="Nenhum próximo agendamento."
             names={names}
             servicePrices={servicePrices}
-            onCancel={openCancelDialog}
           />
           <AppointmentSection
             title="Histórico"
@@ -102,7 +65,6 @@ export function ClientAppointmentsPage() {
             emptyMessage="Seu histórico ainda está vazio."
             names={names}
             servicePrices={servicePrices}
-            onCancel={openCancelDialog}
           />
           {appointments.data.totalPaginas > 1 && (
             <nav className="client-appointments-pagination" aria-label="Paginação dos agendamentos">
@@ -112,17 +74,6 @@ export function ClientAppointmentsPage() {
             </nav>
           )}
         </div>
-      )}
-      {selectedAppointment && selectedNames && (
-        <CancelAppointmentDialog
-          focusFallbackRef={sectionRef}
-          appointment={selectedAppointment}
-          names={selectedNames}
-          isPending={cancel.isPending}
-          errorMessage={cancelError}
-          onClose={closeCancelDialog}
-          onConfirm={() => void confirmCancellation()}
-        />
       )}
     </section>
   )
@@ -135,10 +86,9 @@ interface AppointmentSectionProps {
   emptyMessage: string
   names: ReturnType<typeof buildAppointmentNameMaps>
   servicePrices: ReadonlyMap<string, number>
-  onCancel: (appointment: AgendamentoResponse) => void
 }
 
-function AppointmentSection({ title, subtitle, appointments, emptyMessage, names, servicePrices, onCancel }: AppointmentSectionProps) {
+function AppointmentSection({ title, subtitle, appointments, emptyMessage, names, servicePrices }: AppointmentSectionProps) {
   const sectionId = `section-${title.replaceAll(' ', '-').toLowerCase()}`
   return (
     <section className="client-appointments-section" aria-labelledby={sectionId}>
@@ -157,7 +107,6 @@ function AppointmentSection({ title, subtitle, appointments, emptyMessage, names
               appointment={appointment}
               names={resolveClientAppointmentNames(appointment, names)}
               price={servicePrices.get(appointment.servicoId)}
-              onCancel={() => onCancel(appointment)}
             />
           ))}
         </div>

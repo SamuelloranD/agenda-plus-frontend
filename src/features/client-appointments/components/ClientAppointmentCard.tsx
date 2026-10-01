@@ -1,7 +1,6 @@
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import type { AgendamentoResponse } from '../../../types/scheduling'
 import {
-  canCancelAppointment,
   formatAppointmentDate,
   formatAppointmentTimeRange,
   formatServicePrice,
@@ -11,12 +10,10 @@ import {
 interface ClientAppointmentCardProps {
   appointment: AgendamentoResponse
   names: ClientAppointmentNames
-  now?: Date
-  onCancel: () => void
   price?: number
 }
 
-export function ClientAppointmentCard({ appointment, names, now, onCancel, price }: ClientAppointmentCardProps) {
+export function ClientAppointmentCard({ appointment, names, price }: ClientAppointmentCardProps) {
   return (
     <article className="client-appointment-card">
       <div className="client-appointment-card__main">
@@ -32,9 +29,6 @@ export function ClientAppointmentCard({ appointment, names, now, onCancel, price
           <div><dt>Horário</dt><dd>{formatAppointmentTimeRange(appointment.inicio, appointment.fim)}</dd></div>
         </dl>
       </div>
-      {canCancelAppointment(appointment, now) && (
-        <button className="client-appointment-card__cancel" type="button" onClick={onCancel}>Cancelar</button>
-      )}
     </article>
   )
 }
