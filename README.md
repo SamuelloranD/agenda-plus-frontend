@@ -2,13 +2,13 @@
 
 Interface web do Agenda+, uma aplicação para organizar serviços, profissionais e agendamentos de estúdios e casas de ofício.
 
-## Produção
+## Demonstração online
 
 - Aplicação: <https://agenda-plus-frontend-pearl.vercel.app>
 - API: <https://agenda-plus-api-2nm8.onrender.com>
 - Repositório: <https://github.com/SamuelIoranD/agenda-plus-frontend>
 
-Use o domínio de produção acima para compartilhar a aplicação. URLs de preview da Vercel podem estar protegidas por autenticação da equipe e exibir a tela `You Need Access`.
+Como entrega adicional, a aplicação foi publicada na Vercel e está integrada à API online do projeto.
 
 ## O que a aplicação oferece
 
@@ -75,7 +75,7 @@ Para apontar a interface diretamente para a API publicada:
 VITE_API_URL=https://agenda-plus-api-2nm8.onrender.com
 ```
 
-`VITE_API_URL` é uma variável de build do Vite. Depois de alterá-la, reinicie o servidor de desenvolvimento ou faça um novo deploy.
+`VITE_API_URL` é uma variável de build do Vite. Depois de alterá-la, reinicie o servidor de desenvolvimento ou gere uma nova compilação.
 
 ### 4. Inicie o servidor
 
@@ -155,18 +155,9 @@ O cliente HTTP está em `src/services/api/client.ts`. Ele:
 
 As integrações são organizadas por contexto em `src/services/api`: autenticação, clientes, profissionais, serviços e agendamentos.
 
-## Deploy na Vercel
+## Publicação
 
-O projeto já está preparado para deploy conectado ao GitHub:
-
-1. Importe o repositório `agenda-plus-frontend` na Vercel.
-2. Use a raiz do repositório como `Root Directory`.
-3. Selecione o preset `Vite`.
-4. Configure `VITE_API_URL` com a URL pública da API, sem uma barra final:
-   `https://agenda-plus-api-2nm8.onrender.com`
-5. Faça o deploy da branch `master`.
-
-O arquivo `vercel.json` contém o rewrite:
+Como etapa adicional do projeto, o frontend foi publicado na Vercel com integração contínua ao repositório GitHub. O arquivo `vercel.json` mantém o funcionamento das rotas da SPA quando uma página interna é aberta diretamente:
 
 ```json
 {
@@ -176,7 +167,7 @@ O arquivo `vercel.json` contém o rewrite:
 }
 ```
 
-Esse rewrite é necessário para que `/login`, `/painel` e outras rotas funcionem ao serem abertas diretamente ou compartilhadas. Após alterar uma variável `VITE_*`, é necessário gerar um novo deployment.
+Esse rewrite permite abrir e compartilhar rotas como `/login` e `/painel` sem perder a navegação do React Router.
 
 ## Integração com o backend
 
@@ -192,13 +183,6 @@ O backend precisa permitir a origem do frontend em `CORS_ALLOWED_ORIGINS`. Para 
 ```text
 https://agenda-plus-frontend-pearl.vercel.app
 ```
-
-Se o login ficar carregando indefinidamente, confira nesta ordem:
-
-1. `VITE_API_URL` está apontando para a API correta.
-2. O backend está online e acordado no Render.
-3. O backend aceita a origem atual em `CORS_ALLOWED_ORIGINS`.
-4. O navegador não está reutilizando um token inválido no `localStorage`.
 
 ## Estrutura do projeto
 
@@ -239,24 +223,6 @@ As verificações de responsividade usam Playwright e podem exigir a instalaçã
 npx playwright install
 npm run check:responsive
 ```
-
-## Solução de problemas
-
-### A URL interna retorna `404 NOT_FOUND`
-
-Use o domínio de produção da Vercel e confirme que o deployment inclui o `vercel.json`. Se a alteração foi feita depois do último deploy, publique um novo deployment.
-
-### A Vercel exibe `You Need Access`
-
-Esse aviso normalmente pertence à proteção de deployments de preview. Compartilhe o domínio de produção, não o domínio `git-...vercel.app` de preview.
-
-### O login retorna `401`
-
-Verifique e-mail e senha e confirme se `VITE_API_URL` aponta para o backend. Se houver uma sessão antiga, remova o token do armazenamento local do navegador e faça login novamente.
-
-### O navegador acusa erro de CORS
-
-Adicione a origem exata do frontend em `CORS_ALLOWED_ORIGINS` no backend e reinicie o serviço. Não inclua uma barra final na origem.
 
 ## Desenvolvimento
 
