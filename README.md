@@ -1,103 +1,174 @@
 # Agenda+ Frontend
 
-Interface web do Agenda+, uma aplicação para organizar serviços, profissionais e agendamentos de estúdios e casas de ofício.
+Interface web do Agenda+, uma plataforma de gestão de estúdios e casas de ofício. A aplicação conecta a operação do negócio à experiência do cliente: apresenta o catálogo, conduz a reserva de um horário e organiza o acompanhamento dos atendimentos.
+
+Este repositório representa a parte do projeto em que concentrei experiência de uso, arquitetura de frontend, integração com API, autenticação de sessão, responsividade e testes de interface.
 
 ## Demonstração online
 
 - Aplicação: <https://agenda-plus-frontend-pearl.vercel.app>
-- API: <https://agenda-plus-api-2nm8.onrender.com>
+- API consumida: <https://agenda-plus-api-2nm8.onrender.com>
 - Repositório: <https://github.com/SamuelIoranD/agenda-plus-frontend>
 
-Como entrega adicional, a aplicação foi publicada na Vercel e está integrada à API online do projeto.
+Como entrega adicional, o frontend foi publicado na Vercel com integração ao repositório GitHub e conectado à API online do projeto.
 
-## O que a aplicação oferece
+## Visão do produto
 
-- Login e cadastro de administradores e clientes.
-- Fluxo de reserva para clientes, com seleção de serviço, profissional, data e horário.
-- Área do cliente com consulta dos próprios agendamentos.
-- Painel administrativo com atendimentos de hoje e atendimentos futuros.
-- Confirmação e cancelamento de agendamentos pelo administrador.
-- Gerenciamento de serviços e profissionais.
-- Agenda semanal para criação de reservas pelo administrador.
-- Layout responsivo para desktop e celular.
-- Rota SPA configurada para funcionar ao abrir URLs internas diretamente na Vercel.
+O Agenda+ foi pensado para uma rotina em que o negócio precisa administrar serviços, profissionais e reservas, enquanto o cliente precisa encontrar um horário sem depender de troca de mensagens.
+
+### Experiência do administrador
+
+- painel com atendimentos de hoje;
+- painel separado para atendimentos futuros;
+- confirmação e cancelamento de reservas;
+- agenda semanal;
+- cadastro e manutenção de profissionais;
+- cadastro e manutenção de serviços;
+- criação de agendamento para um cliente.
+
+### Experiência do cliente
+
+- cadastro e login próprios;
+- seleção de serviço;
+- seleção de profissional;
+- consulta de horários disponíveis;
+- criação de reserva;
+- consulta dos próprios agendamentos.
+
+A interface diferencia os dois papéis por rotas protegidas e por shells de layout próprios, mantendo o foco de cada usuário na tarefa que precisa executar.
 
 ## Stack
 
-- React 19
-- TypeScript
-- Vite
-- React Router
-- TanStack Query
-- Axios
-- React Hook Form e Zod
-- Zustand
-- Tailwind CSS
-- Vitest e Testing Library
-- Oxlint
-- Playwright
+| Área | Tecnologias |
+| --- | --- |
+| Interface | React 19 e TypeScript |
+| Build | Vite |
+| Rotas | React Router |
+| Dados assíncronos | TanStack Query |
+| HTTP | Axios |
+| Formulários | React Hook Form e Zod |
+| Estado de sessão | Zustand |
+| Estilos | Tailwind CSS e CSS modular por contexto |
+| Qualidade | Oxlint, Vitest e Testing Library |
+| Responsividade | Playwright |
+| Publicação | Vercel |
 
-## Pré-requisitos
+## Arquitetura por features
 
-- Node.js compatível com o projeto, preferencialmente a versão LTS atual
-- npm
-- Backend do Agenda+ disponível localmente ou em produção
-- Git
+O projeto é organizado por domínio funcional, evitando que páginas e componentes de assuntos diferentes formem um único bloco difícil de evoluir.
 
-## Executando localmente
-
-### 1. Baixe o projeto
-
-```bash
-git clone https://github.com/SamuelIoranD/agenda-plus-frontend.git
-cd agenda-plus-frontend
+```text
+src/
+├── features/
+│   ├── auth/                 # login, cadastro e mensagens de autenticação
+│   ├── client-booking/       # jornada de reserva do cliente
+│   ├── client-appointments/  # acompanhamento do cliente
+│   ├── dashboard/            # visão operacional do administrador
+│   ├── professionals/        # gestão e apresentação de profissionais
+│   ├── scheduling/           # criação e organização de reservas
+│   └── services/             # gestão e apresentação de serviços
+├── components/               # componentes compartilhados e layouts
+├── pages/                    # composição das telas
+├── routes/                   # rotas públicas e protegidas
+├── services/api/             # integração HTTP por contexto
+├── store/                    # estado persistido da sessão
+├── styles/                   # linguagem visual e estilos de página
+└── types/                    # contratos tipados da aplicação
 ```
 
-### 2. Instale as dependências
+Essa divisão aproxima componentes, hooks, schemas e testes da funcionalidade a que pertencem. As páginas ficam responsáveis por composição e os módulos de API concentram a comunicação com o backend.
 
-```bash
-npm install
+## Fluxo de dados
+
+```text
+Página
+  ↓
+Hook da feature
+  ↓
+TanStack Query / mutation
+  ↓
+Módulo em services/api
+  ↓
+Axios com token JWT
+  ↓
+Agenda+ Backend
 ```
 
-### 3. Configure a API
+O TanStack Query controla carregamento, cache, refetch e invalidação. O Axios adiciona o token automaticamente e normaliza respostas de autenticação. O Zustand mantém a sessão entre navegações e limpa o token quando a API retorna `401`.
 
-Crie `.env.local` na raiz:
+## Autenticação e autorização no cliente
+
+O fluxo de sessão é centralizado no `authStore`:
+
+1. O usuário envia e-mail e senha.
+2. O frontend chama `/auth/login`.
+3. O token é armazenado no `localStorage`.
+4. O usuário atual é carregado por `/identity/me`.
+5. O roteamento direciona administradores e clientes para suas respectivas áreas.
+6. Uma resposta `401` remove a sessão e retorna o usuário para o login.
+
+`ProtectedRoute` protege a área administrativa, enquanto `ClientRoute` limita as telas do cliente. A autorização visual acompanha a autorização do backend, sem tratar o frontend como a única camada de segurança.
+
+## Decisões de interface
+
+- A tela de login foi compactada para funcionar bem em celulares, sem criar uma etapa de rolagem desnecessária.
+- O layout usa contraste, hierarquia tipográfica e espaçamento para separar operação de informação.
+- O painel administrativo separa atendimentos de hoje e futuros, reduzindo ruído na rotina diária.
+- O cliente acompanha seus agendamentos sem receber ações de gerenciamento que pertencem ao negócio.
+- Estados de carregamento, erro e vazio são tratados pelas telas e componentes compartilhados.
+- O fluxo de reserva é progressivo: serviço, profissional, data, horário e confirmação.
+- A interface preserva o mesmo padrão visual em desktop e telas pequenas.
+
+## Rotas principais
+
+| Rota | Papel | Responsabilidade |
+| --- | --- | --- |
+| `/login` | Público | Login. |
+| `/cadastro` | Público | Cadastro de cliente ou negócio. |
+| `/agendar` | Cliente | Fluxo de reserva. |
+| `/meus-agendamentos` | Cliente | Acompanhamento de reservas. |
+| `/painel` | Administrador | Atendimentos de hoje e futuros. |
+| `/painel/agenda` | Administrador | Agenda semanal. |
+| `/painel/profissionais` | Administrador | Gestão de profissionais. |
+| `/painel/servicos` | Administrador | Gestão de serviços. |
+| `/painel/agendamentos/novo` | Administrador | Nova reserva para cliente. |
+
+O `vercel.json` mantém o fallback para `index.html`, permitindo que rotas internas do React Router sejam abertas diretamente.
+
+## Integração com a API
+
+O endereço da API é configurado por `VITE_API_URL`:
 
 ```dotenv
 VITE_API_URL=http://localhost:8080
 ```
 
-Durante o desenvolvimento, também é possível omitir `VITE_API_URL`: o Vite usa o proxy configurado em `vite.config.ts` e encaminha `/api` para `http://localhost:8080`, removendo o prefixo `/api`.
+No desenvolvimento, quando a variável não é definida, o Vite usa o proxy de `/api` para o backend local. Em produção, a aplicação usa a URL pública da API.
 
-Para apontar a interface diretamente para a API publicada:
+Os módulos em `src/services/api` agrupam os contratos de:
 
-```dotenv
-VITE_API_URL=https://agenda-plus-api-2nm8.onrender.com
-```
+- autenticação;
+- clientes;
+- profissionais;
+- serviços;
+- agendamentos;
+- horários disponíveis.
 
-`VITE_API_URL` é uma variável de build do Vite. Depois de alterá-la, reinicie o servidor de desenvolvimento ou gere uma nova compilação.
+Os tipos TypeScript refletem as respostas e entradas esperadas pela API, reduzindo inconsistências entre formulário, estado e requisição.
 
-### 4. Inicie o servidor
+## Testes e qualidade
 
-```bash
-npm run dev
-```
+Os testes de unidade e componentes utilizam Vitest, Testing Library e `jsdom`. Eles cobrem, entre outros pontos:
 
-Abra a URL exibida pelo Vite, normalmente <http://localhost:5173/login>.
+- proteção e redirecionamento de rotas;
+- login, cadastro e tratamento de sessão;
+- mensagens de erro da API;
+- componentes de layout;
+- fluxo de agendamento;
+- renderização de estados vazios e de carregamento;
+- regras de apresentação do painel.
 
-## Scripts disponíveis
-
-| Comando | Finalidade |
-| --- | --- |
-| `npm run dev` | Inicia o Vite com hot reload. |
-| `npm run build` | Executa a checagem TypeScript e gera o build de produção. |
-| `npm run preview` | Serve localmente o build gerado. |
-| `npm run lint` | Executa o Oxlint. |
-| `npm test` | Inicia o Vitest em modo interativo. |
-| `npm run test:run` | Executa todos os testes uma vez. |
-| `npm run check:responsive` | Executa as verificações automatizadas de responsividade. |
-
-Antes de publicar uma alteração:
+Comandos principais:
 
 ```bash
 npm run lint
@@ -106,127 +177,44 @@ npm run build
 npm run check:responsive
 ```
 
-## Fluxos de uso
+O build executa a checagem TypeScript antes de gerar os arquivos de produção. As verificações de responsividade usam Playwright para exercitar dimensões de tela importantes.
 
-### Administrador
+## Execução local
 
-1. Acesse `/cadastro` e escolha o cadastro de negócio.
-2. Entre com as credenciais em `/login`.
-3. Use `/painel` para visualizar atendimentos de hoje e futuros.
-4. Confirme ou cancele agendamentos nos cartões correspondentes.
-5. Use `/painel/agenda` para visualizar a agenda semanal e criar uma reserva.
-6. Gerencie o catálogo em `/painel/servicos` e `/painel/profissionais`.
-
-O cartão `Atendimentos futuros` usa a mesma apresentação e as mesmas ações de confirmação/cancelamento dos atendimentos do dia.
-
-### Cliente
-
-1. Acesse `/cadastro` e escolha o cadastro de cliente.
-2. Entre com as credenciais em `/login`.
-3. Acesse `/agendar` para escolher serviço, profissional, data e horário.
-4. Consulte as reservas em `/meus-agendamentos`.
-
-A área do cliente é somente para acompanhamento. O botão de cancelamento não é exibido para o cliente; o gerenciamento do status fica no painel administrativo.
-
-## Rotas da aplicação
-
-| Rota | Acesso | Descrição |
-| --- | --- | --- |
-| `/login` | Público | Login. |
-| `/cadastro` | Público | Cadastro de cliente ou negócio. |
-| `/agendar` | Cliente | Fluxo de reserva. |
-| `/meus-agendamentos` | Cliente | Reservas do cliente autenticado. |
-| `/painel` | Administrador | Resumo de atendimentos de hoje e futuros. |
-| `/painel/agenda` | Administrador | Agenda semanal. |
-| `/painel/profissionais` | Administrador | Gestão de profissionais. |
-| `/painel/servicos` | Administrador | Gestão de serviços. |
-| `/painel/agendamentos/novo` | Administrador | Criação de reserva para um cliente. |
-
-Rotas desconhecidas redirecionam para `/login`.
-
-## Autenticação e API
-
-O cliente HTTP está em `src/services/api/client.ts`. Ele:
-
-- usa `VITE_API_URL` como base da API;
-- adiciona automaticamente `Authorization: Bearer <token>` às requisições;
-- mantém o token no `localStorage` com a chave `agenda-plus:auth-token`;
-- limpa a sessão quando a API retorna `401`.
-
-As integrações são organizadas por contexto em `src/services/api`: autenticação, clientes, profissionais, serviços e agendamentos.
-
-## Publicação
-
-Como etapa adicional do projeto, o frontend foi publicado na Vercel com integração contínua ao repositório GitHub. O arquivo `vercel.json` mantém o funcionamento das rotas da SPA quando uma página interna é aberta diretamente:
-
-```json
-{
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
-}
-```
-
-Esse rewrite permite abrir e compartilhar rotas como `/login` e `/painel` sem perder a navegação do React Router.
-
-## Integração com o backend
-
-Em desenvolvimento, a combinação recomendada é:
-
-```text
-Frontend: http://localhost:5173
-Backend:  http://localhost:8080
-```
-
-O backend precisa permitir a origem do frontend em `CORS_ALLOWED_ORIGINS`. Para produção, a origem deve incluir:
-
-```text
-https://agenda-plus-frontend-pearl.vercel.app
-```
-
-## Estrutura do projeto
-
-```text
-src/
-├── components/       # componentes compartilhados e shells de layout
-├── features/         # funcionalidades por domínio
-│   ├── auth/
-│   ├── client-booking/
-│   ├── client-appointments/
-│   ├── dashboard/
-│   ├── professionals/
-│   ├── scheduling/
-│   └── services/
-├── pages/            # páginas associadas às rotas
-├── routes/           # composição e proteção das rotas
-├── services/api/     # cliente HTTP e serviços de integração
-├── store/            # estado persistido da sessão
-├── styles/            # estilos globais e por página
-└── types/             # tipos compartilhados do frontend
-
-public/               # arquivos públicos
-scripts/              # verificações auxiliares
-vercel.json           # fallback de rotas da SPA
-```
-
-## Testes
-
-Os testes unitários e de componentes usam Vitest, Testing Library e `jsdom`. Execute:
+Pré-requisitos: Node.js LTS, npm e a API do Agenda+ disponível.
 
 ```bash
-npm run test:run
+git clone https://github.com/SamuelIoranD/agenda-plus-frontend.git
+cd agenda-plus-frontend
+npm install
+npm run dev
 ```
 
-As verificações de responsividade usam Playwright e podem exigir a instalação do navegador correspondente:
+A aplicação normalmente fica disponível em `http://localhost:5173`. Para utilizar um backend local, o proxy do Vite aponta para `http://localhost:8080`. Para utilizar a API publicada, defina `VITE_API_URL` em `.env.local`.
 
-```bash
-npx playwright install
-npm run check:responsive
+## Estrutura de uma feature
+
+Uma feature pode reunir seus próprios componentes, hooks, schemas, tipos e testes. Esse padrão mantém a regra de apresentação próxima do fluxo que a utiliza e evita componentes genéricos com responsabilidades demais.
+
+```text
+features/<contexto>/
+├── components/   # partes visuais do contexto
+├── hooks/         # leitura e mutações de dados
+├── schemas/       # validação de formulários
+└── *.test.tsx     # comportamento verificável
 ```
 
-## Desenvolvimento
+Componentes realmente compartilhados ficam em `src/components`, enquanto integrações HTTP permanecem em `src/services/api`.
 
-- Mantenha componentes e regras de negócio próximos ao contexto funcional correspondente.
-- Prefira chamadas à API pelos módulos em `src/services/api`, evitando requisições espalhadas nas páginas.
-- Atualize testes quando alterar rotas, autenticação ou regras de agendamento.
-- Antes de enviar alterações, execute lint, testes, build e verificação responsiva.
+## O que este projeto demonstra
+
+- Construção de uma experiência completa para dois papéis de usuário.
+- Organização de frontend por contexto funcional, e não apenas por tipo de arquivo.
+- Uso de TypeScript para explicitar contratos entre telas, estado e API.
+- Gerenciamento de dados assíncronos com cache e invalidação.
+- Autenticação persistida e rotas protegidas.
+- Integração real com backend Java/Spring e PostgreSQL.
+- Tratamento de estados de carregamento, erro e ausência de dados.
+- Atenção a responsividade e uso em celular.
+- Testes automatizados de componentes, navegação e regras de interface.
+- Publicação de uma aplicação funcional consumindo uma API online.
