@@ -58,12 +58,12 @@ describe('catalog deletion confirmations', () => {
     const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false)
     render(<ProfessionalsPage />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Excluir' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Excluir profissional João Silva' }))
     expect(confirm).toHaveBeenCalledWith('Excluir João Silva? Esta ação não pode ser desfeita.')
     expect(hooks.mutateProfessional).not.toHaveBeenCalled()
 
     confirm.mockReturnValue(true)
-    fireEvent.click(screen.getByRole('button', { name: 'Excluir' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Excluir profissional João Silva' }))
     expect(hooks.mutateProfessional).toHaveBeenCalledWith('professional-1', expect.any(Object))
   })
 

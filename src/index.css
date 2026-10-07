@@ -1193,7 +1193,7 @@ h1 {
 
 .booking-card-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -1311,7 +1311,7 @@ h1 {
 
 .booking-time-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   max-height: min(55dvh, 38rem);
   overflow-y: auto;
@@ -1827,7 +1827,7 @@ h1 {
   }
 
   .client-main:has(.booking-intro-layout) .booking-card-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 }
@@ -1861,7 +1861,10 @@ h1 {
   .booking-stepper__item:not(:has(button[aria-current='step'])) .booking-stepper__label { display: none; }
 
   .booking-workspace { padding: clamp(1rem, 5cqi, 1.5rem); }
-  .booking-choice { min-height: clamp(138px, 34cqi, 164px); }
+   .booking-card-grid { align-items: start; }
+   .booking-card-grid--professionals .booking-choice { min-height: 0; }
+   .booking-choice { min-height: 0; padding: clamp(12px, 2cqi, 22px); }
+   .booking-choice strong { font: 700 clamp(16px, 3.8cqi, 20px)/1.2 'Newsreader', Georgia, serif; }
   .booking-sidebar { position: static; }
 }
 
@@ -1873,4 +1876,8 @@ h1 {
   .client-shell:has(.booking-intro-layout) .admin-header { margin-bottom: clamp(1rem, 2.5cqi, 1.75rem); }
   .client-main:has(.booking-page--confirmation) > .admin-header { display: none; }
 }
+
+.booking-card-grid { align-items: start; }
+.booking-card-grid .booking-choice { min-height: 0; padding: 14px 10px; }
+.booking-card-grid .booking-choice strong { font: 700 clamp(16px, 1.4vw, 20px)/1.2 'Newsreader', Georgia, serif; }
 

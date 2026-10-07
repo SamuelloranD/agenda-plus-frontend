@@ -1,3 +1,4 @@
+import { Pencil, Trash2 } from 'lucide-react'
 import type { ProfissionalResponse } from '../../../types/professionals'
 import { getProfessionalTone, professionalToneColors } from '../../scheduling/utils/professionalTone'
 
@@ -15,9 +16,26 @@ function formatHour(value: string) {
 }
 
 export function ProfessionalList({ professionals, onEdit, onDelete, deletingId }: ProfessionalListProps) {
-  return <div className="professional-list">{professionals.map((professional) => { const tone = getProfessionalTone(professional.id); return <article className={`professional-card professional-card--${tone}`} style={{ borderTopColor: professionalToneColors[tone] }} key={professional.id}>
-    {professional.imagem ? <img className="professional-card__photo" src={professional.imagem} alt="" /> : <div className={`professional-card__mark professional-card__mark--${tone}`} style={{ backgroundColor: professionalToneColors[tone] }} aria-hidden="true">{professional.nome.split(' ').map((name) => name[0]).join('').slice(0, 2)}</div>}
-    <div className="professional-card__main"><p className="section-label">Corpo técnico</p><h3>{professional.nome}</h3><p>{professional.especialidade}</p><div className="work-pill-list">{professional.horariosTrabalho.map(({ diaSemana, inicio, fim }) => <span key={`${diaSemana}-${inicio}-${fim}`}>{weekdayLabels[diaSemana] ?? diaSemana} · {formatHour(inicio)}–{formatHour(fim)}</span>)}</div></div>
-    <div className="catalog-card__actions"><button type="button" className="quiet-action" onClick={() => onEdit(professional)}>Editar</button><button type="button" className="danger-action" onClick={() => onDelete(professional)} disabled={deletingId === professional.id}>{deletingId === professional.id ? 'Excluindo…' : 'Excluir'}</button></div>
-  </article> })}</div>
+  return (
+    <div className="professional-list">
+      {professionals.map((professional) => {
+        const tone = getProfessionalTone(professional.id)
+        return (
+          <article className={`professional-card professional-card--${tone}`} style={{ borderTopColor: professionalToneColors[tone] }} key={professional.id}>
+            <div className="professional-card__identity">
+              {professional.imagem ? <img className="professional-card__photo" src={professional.imagem} alt="" /> : <div className={`professional-card__mark professional-card__mark--${tone}`} style={{ backgroundColor: professionalToneColors[tone] }} aria-hidden="true">{professional.nome.split(' ').map((name) => name[0]).join('').slice(0, 2)}</div>}
+              <div className="professional-card__main"><h3>{professional.nome}</h3><p>{professional.especialidade}</p></div>
+            </div>
+            <div className="professional-card__schedule" role="list" aria-label="Horários de trabalho">
+              {professional.horariosTrabalho.map(({ diaSemana, inicio, fim }) => <div key={`${diaSemana}-${inicio}-${fim}`} role="listitem"><strong>{weekdayLabels[diaSemana] ?? diaSemana}</strong><time>{formatHour(inicio)}–{formatHour(fim)}</time></div>)}
+            </div>
+            <div className="professional-card__actions">
+              <button type="button" className="professional-card__icon-action" onClick={() => onEdit(professional)} aria-label={`Editar profissional ${professional.nome}`} title="Editar profissional"><Pencil size={15} strokeWidth={1.8} aria-hidden="true" /></button>
+              <button type="button" className="professional-card__icon-action professional-card__icon-action--danger" onClick={() => onDelete(professional)} disabled={deletingId === professional.id} aria-label={`Excluir profissional ${professional.nome}`} title="Excluir profissional"><Trash2 size={15} strokeWidth={1.8} aria-hidden="true" /></button>
+            </div>
+          </article>
+        )
+      })}
+    </div>
+  )
 }

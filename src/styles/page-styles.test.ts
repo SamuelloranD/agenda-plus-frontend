@@ -17,6 +17,10 @@ describe('shared page styles', () => {
     expect(pageStyles).toContain('.calendar-corner { left: 0; z-index: 2; display: flex; align-items: center; justify-content: center;')
   })
 
+  it('separates the professional identity from the work schedule', () => {
+    expect(pageStyles).toContain('.professional-card__schedule { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 6px; padding-top: 18px; border-top: 1px solid var(--line);')
+  })
+
   it('does not render inline style tags for page layout styles', () => {
     for (const file of [
       'src/pages/DashboardPage.tsx',
@@ -62,6 +66,12 @@ describe('shared page styles', () => {
   it('keeps preset appointment date and time fields compact', () => {
     expect(pageStyles).toContain('.appointment-fixed-field { display: flex; align-items: center; height: 38px; min-height: 0; box-sizing: border-box; padding: 7px 10px;')
     expect(pageStyles).toContain('font-size: 14px;')
+  })
+
+  it('keeps available appointment times in a compact three-column grid', () => {
+    expect(pageStyles).toContain('.availability-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; width: min(100%, 520px);')
+    expect(pageStyles).toContain('.time-option { display: grid; gap: 2px; min-width: 0; min-height: 58px; padding: 8px 6px;')
+    expect(pageStyles).not.toContain('@media (max-width: 359px) { .availability-list { grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }')
   })
 
   it('keeps the quick appointment modal opaque, closes with a plain red icon, and uses narrow preset fields', () => {

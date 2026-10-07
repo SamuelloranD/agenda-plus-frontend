@@ -57,7 +57,8 @@ describe('booking cascade', () => {
   it('keeps booking cards and time slots compact at every width', () => {
     const indexStyles = source('src/index.css').replaceAll('\r\n', '\n')
 
-    expect(indexStyles).toContain('grid-template-columns: repeat(2, minmax(0, 1fr));')
+    expect(indexStyles).toContain('.booking-card-grid {\n  display: grid;\n  grid-template-columns: repeat(3, minmax(0, 1fr));')
+    expect(indexStyles).toContain('.booking-time-grid {\n  display: grid;\n  grid-template-columns: repeat(3, minmax(0, 1fr));')
     expect(indexStyles).toContain('max-height: min(55dvh, 38rem)')
     expect(indexStyles).toContain('min-height: clamp(80px, 8cqi, 96px)')
   })
@@ -65,12 +66,24 @@ describe('booking cascade', () => {
   it('lets booking cards grow intrinsically and keeps the stepper compact on narrow screens', () => {
     const indexStyles = source('src/index.css')
 
-    expect(indexStyles).toContain('repeat(2, minmax(0, 1fr))')
+    expect(indexStyles).toContain('.client-main:has(.booking-intro-layout) .booking-card-grid')
+    expect(indexStyles).toContain('grid-template-columns: repeat(3, minmax(0, 1fr));')
     expect(indexStyles).toContain('.booking-stepper__label')
     expect(indexStyles).toContain('.booking-stepper__item:not(:has(button[aria-current=\'step\'])) .booking-stepper__label')
     expect(indexStyles).not.toContain('min-height: max(520px, calc(100dvh - 320px));')
     expect(indexStyles).not.toMatch(/\n\s+height: 0;/)
     expect(indexStyles).not.toContain('transform: translateY(clamp(-88px, -8dvh, -56px));')
+  })
+
+  it('keeps compact booking cards readable on narrow screens', () => {
+    const indexStyles = source('src/index.css').replaceAll('\r\n', '\n')
+
+    expect(indexStyles).toContain('.booking-card-grid .booking-choice { min-height: 0; padding: 14px 10px; }')
+    expect(indexStyles).toContain(".booking-card-grid .booking-choice strong { font: 700 clamp(16px, 1.4vw, 20px)/1.2 'Newsreader', Georgia, serif; }")
+    expect(indexStyles).toContain('.booking-card-grid { align-items: start; }')
+    expect(indexStyles).toContain('.booking-card-grid--professionals .booking-choice { min-height: 0; }')
+    expect(indexStyles).toContain('.booking-choice { min-height: 0; padding: clamp(12px, 2cqi, 22px); }')
+    expect(indexStyles).toContain("font: 700 clamp(16px, 3.8cqi, 20px)/1.2 'Newsreader', Georgia, serif;")
   })
 
   it('keeps page styles consolidated instead of relying on load order', () => {
