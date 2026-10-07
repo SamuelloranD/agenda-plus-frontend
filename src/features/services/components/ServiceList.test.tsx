@@ -5,7 +5,7 @@ import { ServiceList } from './ServiceList'
 afterEach(cleanup)
 
 describe('ServiceList', () => {
-  it('keeps the service glyph without rendering an image', () => {
+  it('does not render a decorative service glyph', () => {
     render(<ServiceList
       services={[{ id: 'service-1', nome: 'Barba', duracaoMinutos: 30, preco: { valor: 50, moeda: 'BRL' } }]}
       onEdit={vi.fn()}
@@ -13,6 +13,6 @@ describe('ServiceList', () => {
     />)
 
     expect(screen.queryByAltText('')).not.toBeInTheDocument()
-    expect(screen.getByText('✦')).toBeInTheDocument()
+    expect(screen.queryByText('✦')).not.toBeInTheDocument()
   })
 })

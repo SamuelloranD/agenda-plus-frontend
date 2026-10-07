@@ -43,9 +43,9 @@ describe('shared page styles', () => {
     expect(pageStyles).toContain('inset-inline-start: calc(var(--admin-new-left)')
   })
 
-  it('defines rounded shared actions and status-colored weekly cards', () => {
+  it('defines compact shared actions and status-colored weekly cards', () => {
     expect(pageStyles).toContain('.primary-action, .quiet-action, .danger-action')
-    expect(pageStyles).toContain('border-radius: 999px')
+    expect(pageStyles).toContain('.primary-action, .quiet-action, .danger-action { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 11px 18px; border: 1px solid transparent; border-radius: 4px;')
     expect(pageStyles).toContain('.appointment-card--confirmed')
     expect(pageStyles).toContain('background: #5cff8d')
     expect(pageStyles).toContain('background: #fdb563')
