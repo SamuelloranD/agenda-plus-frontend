@@ -23,7 +23,7 @@
 .section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 20px; }
 .section-heading h3 { margin: 0; font: 500 29px/1.15 'Newsreader', Georgia, serif; }
 .section-heading > span { color: var(--muted-ink); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
-.today-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+.today-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 360px)); justify-content: start; gap: 14px; margin: 0; padding: 0; list-style: none; }
 .today-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto 1fr auto; align-items: start; gap: 12px; padding: 16px; background: var(--paper); border: 1px solid var(--line); border-left: 4px solid var(--line); box-shadow: 0 6px 16px rgb(60 45 30 / 4%); }
 .today-item--pendente { border-left-color: var(--mustard); }
 .today-item--confirmado { border-left-color: var(--olive); }
@@ -52,14 +52,14 @@
 .today-item__footer .appointment-actions { grid-column: auto; justify-content: flex-end; }
 .appointment-status-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; grid-column: 3; }
 .appointment-actions { grid-column: auto; margin: 0; }
-@media (max-width: 1279px) { .metric-grid { grid-template-columns: repeat(3, 1fr); } .today-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 1279px) { .metric-grid { grid-template-columns: repeat(3, 1fr); } .today-list { grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 360px)); } }
 @media (max-width: 1023px) { .metric-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 639px) {
   .metric-grid { grid-template-columns: 1fr; }
   .metric-card { min-height: 130px; border-right: 0; border-bottom: 1px solid var(--line); }
   .today-panel { padding: 18px; }
   .section-heading { align-items: flex-start; flex-direction: column; }
-  .today-list { grid-template-columns: 1fr; }
+  .today-list { grid-template-columns: minmax(0, 360px); }
   .today-item { grid-template-columns: minmax(0, 1fr) auto; min-height: 148px; }
   .today-item .appointment-status-row { grid-column: 2; }
   .today-item__footer { align-items: flex-start; flex-direction: column; }
