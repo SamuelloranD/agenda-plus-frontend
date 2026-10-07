@@ -1193,7 +1193,7 @@ h1 {
 
 .booking-card-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -1311,7 +1311,7 @@ h1 {
 
 .booking-time-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   max-height: min(55dvh, 38rem);
   overflow-y: auto;
@@ -1827,7 +1827,7 @@ h1 {
   }
 
   .client-main:has(.booking-intro-layout) .booking-card-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 }
