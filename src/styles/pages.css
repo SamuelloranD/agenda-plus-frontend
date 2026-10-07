@@ -238,7 +238,6 @@
 .appointment-submit-row p { margin: 0; color: var(--muted-ink); font-size: 12px; }
 @media (max-width: 1023px) { .new-appointment-page { grid-template-columns: 1fr; } .appointment-context { padding: 0; } .appointment-context > p:last-child { max-width: 600px; } }
 @media (max-width: 639px) { .appointment-folio__header, .appointment-form { padding-inline: 20px; } .appointment-folio__header { align-items: start; flex-direction: column; } .form-columns, .appointment-fixed-fields { grid-template-columns: 1fr; } .appointment-submit-row { align-items: stretch; flex-direction: column; } .primary-action { width: 100%; } }
-@media (max-width: 359px) { .availability-list { grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; } }
 
 @media (min-width: 1180px) {
   .admin-main:has(.new-appointment-page) {

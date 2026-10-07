@@ -70,7 +70,7 @@ describe('shared page styles', () => {
   it('keeps available appointment times in a compact three-column grid', () => {
     expect(pageStyles).toContain('.availability-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; width: min(100%, 520px);')
     expect(pageStyles).toContain('.time-option { display: grid; gap: 2px; min-width: 0; min-height: 58px; padding: 8px 6px;')
-    expect(pageStyles).toContain('@media (max-width: 359px) { .availability-list { grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }')
+    expect(pageStyles).not.toContain('@media (max-width: 359px) { .availability-list { grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }')
   })
 
   it('keeps the quick appointment modal opaque, closes with a plain red icon, and uses narrow preset fields', () => {
