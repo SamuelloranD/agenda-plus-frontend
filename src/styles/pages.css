@@ -41,6 +41,7 @@
 .appointment-action--cancel { color: var(--terracotta); background: transparent; border-color: var(--terracotta); }
 .appointment-action--cancel:hover:not(:disabled) { color: var(--paper); background: var(--terracotta); transform: translateY(-1px); }
 .today-item .appointment-action--cancel { min-height: 32px; padding: 6px 12px; font-size: 10px; }
+.today-item .appointment-action--confirm { min-height: 32px; padding: 6px 12px; font-size: 10px; }
 .appointment-action:focus-visible { outline: 3px solid color-mix(in srgb, var(--mustard) 72%, transparent); outline-offset: 3px; }
 .appointment-action:disabled { cursor: wait; opacity: .6; }
 .appointment-action-error { flex-basis: 100%; color: #a52720; font-size: 11px; }
