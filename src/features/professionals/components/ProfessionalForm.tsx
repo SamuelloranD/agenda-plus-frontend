@@ -5,9 +5,10 @@ import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import type { ApiError } from '../../../types/api'
 import { Select } from '../../../components/ui/Select'
 import { TimePicker } from '../../../components/ui/TimePicker'
+import { ImageUploadField } from '../../../components/ui/ImageUploadField'
 import type { ProfissionalResponse } from '../../../types/professionals'
 import { useCreateProfessional, useUpdateProfessional } from '../hooks/useProfessionals'
-import { professionalSchema, weekdays, type ProfessionalFormValues } from '../schemas/professionalSchema'
+import { professionalSchema, weekdays, type ProfessionalFormInput, type ProfessionalFormValues } from '../schemas/professionalSchema'
 
 interface ProfessionalFormProps {
   professional?: ProfissionalResponse | null
@@ -19,11 +20,11 @@ const weekdayLabels: Record<(typeof weekdays)[number], string> = {
 }
 
 function emptyValues(): ProfessionalFormValues {
-  return { nome: '', especialidade: '', horariosTrabalho: [{ diaSemana: 'MONDAY', inicio: '09:00', fim: '18:00' }] }
+  return { nome: '', especialidade: '', imagem: null, horariosTrabalho: [{ diaSemana: 'MONDAY', inicio: '09:00', fim: '18:00' }] }
 }
 
 export function ProfessionalForm({ professional, onDone }: ProfessionalFormProps) {
-  const form = useForm<ProfessionalFormValues>({ resolver: zodResolver(professionalSchema), defaultValues: emptyValues() })
+  const form = useForm<ProfessionalFormInput, unknown, ProfessionalFormValues>({ resolver: zodResolver(professionalSchema), defaultValues: emptyValues() })
   const intervals = useFieldArray({ control: form.control, name: 'horariosTrabalho' })
   const [isAddingInterval, setIsAddingInterval] = useState(false)
   const [selectedDays, setSelectedDays] = useState<(typeof weekdays)[number][]>(['MONDAY'])
@@ -33,7 +34,7 @@ export function ProfessionalForm({ professional, onDone }: ProfessionalFormProps
   const updateProfessional = useUpdateProfessional()
 
   useEffect(() => {
-    form.reset(professional ? { nome: professional.nome, especialidade: professional.especialidade, horariosTrabalho: professional.horariosTrabalho.map(({ diaSemana, inicio, fim }) => ({ diaSemana: diaSemana as (typeof weekdays)[number], inicio, fim })) } : emptyValues())
+    form.reset(professional ? { nome: professional.nome, especialidade: professional.especialidade, imagem: professional.imagem ?? null, horariosTrabalho: professional.horariosTrabalho.map(({ diaSemana, inicio, fim }) => ({ diaSemana: diaSemana as (typeof weekdays)[number], inicio, fim })) } : emptyValues())
   }, [professional, form])
 
   function toggleDay(day: (typeof weekdays)[number]) {
@@ -76,6 +77,7 @@ export function ProfessionalForm({ professional, onDone }: ProfessionalFormProps
         <input {...form.register('especialidade')} placeholder="Ex.: Barbeiro, manicure, estética" aria-invalid={Boolean(form.formState.errors.especialidade)} />
         {form.formState.errors.especialidade && <small>{form.formState.errors.especialidade.message}</small>}
       </label>
+      <Controller control={form.control} name="imagem" render={({ field, fieldState }) => <ImageUploadField id="professional-image" label="Imagem" value={field.value ?? null} onChange={field.onChange} error={fieldState.error?.message} />} />
       <section className="work-hours" aria-labelledby="work-hours-title">
         <div className="work-hours__heading"><div><p className="section-label">Disponibilidade</p><h4 id="work-hours-title">Jornada de trabalho</h4></div><button type="button" className="quiet-action" onClick={toggleIntervalBuilder}>{isAddingInterval ? 'Fechar intervalo' : 'Adicionar intervalo diferente'}</button></div>
         {isAddingInterval && <div className="interval-builder"><p className="section-label">Aplicar o mesmo horário</p><fieldset><legend>Dias da semana</legend><div className="weekday-checkboxes">{weekdays.map((weekday) => { const occupied = form.getValues('horariosTrabalho').some((interval) => interval.diaSemana === weekday); return <label key={weekday}><input type="checkbox" checked={selectedDays.includes(weekday)} disabled={occupied} onChange={() => toggleDay(weekday)} />{weekdayLabels[weekday]}{occupied && <small>já cadastrada</small>}</label> })}</div></fieldset><div className="interval-builder__times"><label>Início<TimePicker id="new-interval-start" value={newStart} onChange={setNewStart} /></label><label>Fim<TimePicker id="new-interval-end" value={newEnd} onChange={setNewEnd} /></label></div><button type="button" className="primary-action" onClick={addIntervalGroup} disabled={selectedDays.length === 0}>Aplicar aos dias selecionados</button></div>}

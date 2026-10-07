@@ -11,7 +11,10 @@ describe('shared page styles', () => {
     expect(pageStyles).toContain('.dashboard-page')
     expect(pageStyles).toContain('.new-appointment-page')
     expect(pageStyles).toContain('.cancel-dialog')
+    expect(pageStyles).toContain('.professional-card__photo')
+    expect(pageStyles).toContain('width: 72px; height: 72px;')
     expect(pageStyles).toContain('.weekly-page')
+    expect(pageStyles).toContain('.calendar-corner { left: 0; z-index: 2; display: flex; align-items: center; justify-content: center;')
   })
 
   it('does not render inline style tags for page layout styles', () => {
@@ -41,14 +44,17 @@ describe('shared page styles', () => {
     expect(pageStyles).toContain('inset-inline-start: calc(var(--admin-new-left)')
   })
 
-  it('defines rounded shared actions and status-colored weekly cards', () => {
+  it('defines compact shared actions and status-colored weekly cards', () => {
     expect(pageStyles).toContain('.primary-action, .quiet-action, .danger-action')
-    expect(pageStyles).toContain('border-radius: 999px')
+    expect(pageStyles).toContain('.primary-action, .quiet-action, .danger-action { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 11px 18px; border: 1px solid transparent; border-radius: 4px;')
     expect(pageStyles).toContain('.appointment-card--confirmed')
     expect(pageStyles).toContain('background: #5cff8d')
     expect(pageStyles).toContain('background: #fdb563')
     expect(pageStyles).toContain('background: #ffb0b0')
     expect(pageStyles).toContain('height: 132px')
+    expect(pageStyles).toContain('.today-item .appointment-action--cancel { min-height: 32px; padding: 6px 12px;')
+    expect(pageStyles).toContain('.today-item .appointment-action--confirm { min-height: 32px; padding: 6px 12px;')
+    expect(pageStyles).toContain('.today-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 360px));')
     expect(pageStyles).not.toContain('.appointment-card .status-badge')
   })
 

@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import type { ApiError } from '../../../types/api'
 import type { ServicoResponse } from '../../../types/services'
 import { useCreateService, useUpdateService } from '../hooks/useServices'
-import { serviceSchema, type ServiceFormValues } from '../schemas/serviceSchema'
+import { serviceSchema, type ServiceFormInput, type ServiceFormValues } from '../schemas/serviceSchema'
 
 interface ServiceFormProps {
   service?: ServicoResponse | null
@@ -14,7 +14,7 @@ interface ServiceFormProps {
 const emptyValues: ServiceFormValues = { nome: '', duracaoMinutos: 30, preco: { valor: 0, moeda: 'BRL' } }
 
 export function ServiceForm({ service, onDone }: ServiceFormProps) {
-  const form = useForm<ServiceFormValues>({ resolver: zodResolver(serviceSchema), defaultValues: emptyValues })
+  const form = useForm<ServiceFormInput, unknown, ServiceFormValues>({ resolver: zodResolver(serviceSchema), defaultValues: emptyValues })
   const createService = useCreateService()
   const updateService = useUpdateService()
 

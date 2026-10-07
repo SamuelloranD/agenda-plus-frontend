@@ -10,3 +10,4 @@ export const serviceSchema = z.object({
 })
 
 export type ServiceFormValues = z.infer<typeof serviceSchema>
+export type ServiceFormInput = z.input<typeof serviceSchema>

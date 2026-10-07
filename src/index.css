@@ -1226,7 +1226,6 @@ h1 {
   background: #fff8f2;
 }
 
-.booking-choice__mark,
 .booking-choice__avatar {
   width: 38px;
   height: 38px;
@@ -1239,11 +1238,6 @@ h1 {
   background: var(--olive);
   border-radius: 50%;
   font: italic 700 17px 'Newsreader', Georgia, serif;
-}
-
-.booking-choice__mark {
-  color: var(--terracotta);
-  background: #efe3d4;
 }
 
 .booking-choice--any .booking-choice__avatar {
@@ -1266,7 +1260,7 @@ h1 {
   font: 700 20px/1.2 'Newsreader', Georgia, serif;
 }
 
-.booking-choice > span:not(.booking-choice__mark, .booking-choice__avatar) {
+.booking-choice > span:not(.booking-choice__avatar) {
   color: var(--muted-ink);
   font-size: 13px;
   line-height: 1.5;
