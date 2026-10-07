@@ -75,6 +75,15 @@ describe('booking cascade', () => {
     expect(indexStyles).not.toContain('transform: translateY(clamp(-88px, -8dvh, -56px));')
   })
 
+  it('keeps compact booking cards readable on narrow screens', () => {
+    const indexStyles = source('src/index.css').replaceAll('\r\n', '\n')
+
+    expect(indexStyles).toContain('.booking-card-grid { align-items: start; }')
+    expect(indexStyles).toContain('.booking-card-grid--professionals .booking-choice { min-height: 0; }')
+    expect(indexStyles).toContain('.booking-choice { min-height: 0; padding: clamp(12px, 2cqi, 22px); }')
+    expect(indexStyles).toContain("font: 700 clamp(16px, 3.8cqi, 20px)/1.2 'Newsreader', Georgia, serif;")
+  })
+
   it('keeps page styles consolidated instead of relying on load order', () => {
     const indexStyles = source('src/index.css')
     const pageStyles = source('src/styles/pages.css')
