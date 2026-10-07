@@ -39,7 +39,6 @@ export function ServiceStep({ services, selectedId, isLoading, isError, onRetry,
             onClick={() => onSelect(service)}
             aria-pressed={selectedId === service.id}
           >
-            <span className="booking-choice__mark" aria-hidden="true">✦</span>
             <strong>{service.nome}</strong>
             <span>{service.duracaoMinutos} min · {formatPrice(service)}</span>
             <small>Selecionar serviço</small>
