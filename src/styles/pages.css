@@ -128,13 +128,16 @@
 .remove-action { display: grid; place-items: center; width: 35px; height: 35px; color: #a52720; background: transparent; border: 1px solid #e4c6bd; border-radius: 4px; cursor: pointer; }
 .remove-action:disabled { opacity: .35; cursor: not-allowed; }
 .professional-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); align-items: stretch; gap: 18px; }
-.professional-card { display: grid; grid-template-columns: auto 1fr; grid-template-rows: 1fr auto; gap: 15px; height: 100%; box-sizing: border-box; padding: 22px; background: rgb(251 249 245 / 92%); border: 1px solid var(--line); border-top: 3px solid var(--olive); }
+.professional-card { display: grid; grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; gap: 18px; height: 100%; box-sizing: border-box; padding: 22px; background: rgb(251 249 245 / 92%); border: 1px solid var(--line); border-top: 3px solid var(--olive); }
+.professional-card__identity { display: grid; grid-template-columns: auto 1fr; align-items: start; gap: 15px; min-width: 0; }
 .professional-card__mark { display: grid; place-items: center; width: 47px; height: 47px; color: var(--paper); background: var(--olive); border-radius: 50%; font: 500 18px 'Newsreader', Georgia, serif; }
 .professional-card__photo { display: block; width: 72px; height: 72px; object-fit: cover; border-radius: 50%; }
 .professional-card__main h3 { margin: 1px 0 5px; font: 500 26px/1.05 'Newsreader', Georgia, serif; }
 .professional-card__main > p:not(.section-label) { margin: 0; color: var(--muted-ink); font-size: 13px; }
-.work-pill-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
-.work-pill-list span { padding: 5px 7px; color: var(--olive); background: #edf2eb; border-radius: 3px; font-size: 10px; }
+.professional-card__schedule { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 6px; }
+.professional-card__schedule [role='listitem'] { display: grid; gap: 3px; min-width: 0; padding: 8px 9px; background: #edf2eb; border: 1px solid rgb(76 104 85 / 10%); }
+.professional-card__schedule strong { color: var(--olive); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
+.professional-card__schedule time { color: var(--muted-ink); font-size: 10px; white-space: nowrap; }
 .professional-card__mark--terracotta { background: var(--terracotta); }
 .professional-card--terracotta { border-top-color: var(--terracotta); }
 .professional-card__mark--olive { background: var(--olive); }
