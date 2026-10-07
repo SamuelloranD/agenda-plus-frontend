@@ -67,6 +67,11 @@ describe('shared page styles', () => {
     expect(pageStyles).toContain('font-size: 14px;')
   })
 
+  it('keeps available appointment times in a compact three-column grid', () => {
+    expect(pageStyles).toContain('.availability-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; width: min(100%, 520px);')
+    expect(pageStyles).toContain('.time-option { display: grid; gap: 2px; min-width: 0; min-height: 58px; padding: 8px 6px;')
+  })
+
   it('keeps the quick appointment modal opaque, closes with a plain red icon, and uses narrow preset fields', () => {
     expect(pageStyles).toContain('.appointment-fixed-fields .form-field--date, .appointment-fixed-fields .form-field--time { width: min(100%, 110px); }')
     expect(pageStyles).toContain('.appointment-fixed-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 110px));')

@@ -229,15 +229,15 @@
 .appointment-fixed-field { display: flex; align-items: center; height: 38px; min-height: 0; box-sizing: border-box; padding: 7px 10px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 4px; font-size: 14px; font-weight: 600; letter-spacing: normal; text-transform: none; }
 .form-hint { margin: 0; color: var(--muted-ink); font-size: 13px; line-height: 1.5; }
 .form-hint--error { color: #a52720; }
-.availability-list { display: flex; flex-wrap: wrap; gap: 9px; }
-.time-option { display: grid; gap: 2px; min-width: 90px; min-height: 44px; padding: 10px 12px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 4px; cursor: pointer; font: 600 16px 'Newsreader', Georgia, serif; }
+.availability-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; width: min(100%, 520px); }
+.time-option { display: grid; gap: 2px; min-width: 0; min-height: 58px; padding: 8px 6px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 4px; cursor: pointer; font: 600 15px 'Newsreader', Georgia, serif; }
 .time-option small { color: var(--muted-ink); font: 11px inherit; }
 .time-option:hover, .time-option--selected { color: var(--paper); background: var(--terracotta); border-color: var(--terracotta); }
 .time-option--selected small { color: #fbe7dc; }
 .appointment-submit-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-top: 24px; border-top: 1px solid var(--line); }
 .appointment-submit-row p { margin: 0; color: var(--muted-ink); font-size: 12px; }
 @media (max-width: 1023px) { .new-appointment-page { grid-template-columns: 1fr; } .appointment-context { padding: 0; } .appointment-context > p:last-child { max-width: 600px; } }
-@media (max-width: 639px) { .appointment-folio__header, .appointment-form { padding-inline: 20px; } .appointment-folio__header { align-items: start; flex-direction: column; } .form-columns, .appointment-fixed-fields { grid-template-columns: 1fr; } .appointment-submit-row { align-items: stretch; flex-direction: column; } .primary-action { width: 100%; } }
+@media (max-width: 639px) { .appointment-folio__header, .appointment-form { padding-inline: 20px; } .appointment-folio__header { align-items: start; flex-direction: column; } .form-columns, .appointment-fixed-fields { grid-template-columns: 1fr; } .availability-list { grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; } .appointment-submit-row { align-items: stretch; flex-direction: column; } .primary-action { width: 100%; } }
 
 @media (min-width: 1180px) {
   .admin-main:has(.new-appointment-page) {
