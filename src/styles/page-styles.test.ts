@@ -11,6 +11,8 @@ describe('shared page styles', () => {
     expect(pageStyles).toContain('.dashboard-page')
     expect(pageStyles).toContain('.new-appointment-page')
     expect(pageStyles).toContain('.cancel-dialog')
+    expect(pageStyles).toContain('.professional-card__photo')
+    expect(pageStyles).toContain('width: 72px; height: 72px;')
     expect(pageStyles).toContain('.weekly-page')
   })
 
