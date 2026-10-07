@@ -93,4 +93,8 @@ describe('shared page styles', () => {
     expect(pageStyles).toContain('border-radius: 8px;')
     expect(pageStyles).toContain('.time-picker__option')
   })
+
+  it('centers the weekly calendar time label inside its corner cell', () => {
+    expect(pageStyles).toContain('.calendar-corner { left: 0; z-index: 2; display: flex; align-items: center; justify-content: center;')
+  })
 })

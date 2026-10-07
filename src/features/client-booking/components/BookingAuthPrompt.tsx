@@ -37,7 +37,7 @@ export function BookingAuthPrompt({ role, isLoading, onSwitchAccount }: BookingA
       <p>Entre ou crie uma conta de cliente. Serviço, profissional, data e horário serão preservados.</p>
       <div className="booking-auth-actions">
         <Link className="booking-auth-primary" to={`/login${authSearch}`}>Entrar</Link>
-        <Link to={`/cadastro${authSearch}`}>Criar conta de cliente</Link>
+        <Link to={`/cadastro${authSearch}`}>Criar conta</Link>
       </div>
     </section>
   )

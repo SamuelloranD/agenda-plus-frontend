@@ -21,7 +21,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
             </div>
             <div className="auth-audience">
               <span aria-hidden="true" />
-              ATELIÊS &amp; CASAS DE OFÍCIO
+              CASAS DE OFÍCIO
             </div>
             <blockquote>“O tempo bem cuidado é a arte suprema do seu negócio.”</blockquote>
           </div>

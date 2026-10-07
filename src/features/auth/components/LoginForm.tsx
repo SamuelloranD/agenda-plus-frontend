@@ -60,7 +60,7 @@ export function LoginForm() {
             id="login-email"
             type="email"
             autoComplete="email"
-            placeholder="mestre@seuatelie.com.br"
+            placeholder="mestre@seudominio.com.br"
             aria-invalid={Boolean(errors.email)}
             aria-describedby={errors.email ? 'login-email-error' : undefined}
             {...register('email')}
