@@ -78,6 +78,8 @@ describe('booking cascade', () => {
   it('keeps compact booking cards readable on narrow screens', () => {
     const indexStyles = source('src/index.css').replaceAll('\r\n', '\n')
 
+    expect(indexStyles).toContain('.booking-card-grid .booking-choice { min-height: 0; padding: 14px 10px; }')
+    expect(indexStyles).toContain(".booking-card-grid .booking-choice strong { font: 700 clamp(16px, 1.4vw, 20px)/1.2 'Newsreader', Georgia, serif; }")
     expect(indexStyles).toContain('.booking-card-grid { align-items: start; }')
     expect(indexStyles).toContain('.booking-card-grid--professionals .booking-choice { min-height: 0; }')
     expect(indexStyles).toContain('.booking-choice { min-height: 0; padding: clamp(12px, 2cqi, 22px); }')

@@ -1877,3 +1877,7 @@ h1 {
   .client-main:has(.booking-page--confirmation) > .admin-header { display: none; }
 }
 
+.booking-card-grid { align-items: start; }
+.booking-card-grid .booking-choice { min-height: 0; padding: 14px 10px; }
+.booking-card-grid .booking-choice strong { font: 700 clamp(16px, 1.4vw, 20px)/1.2 'Newsreader', Georgia, serif; }
+
