@@ -19,6 +19,7 @@ const workIntervalSchema = z.object({
 })
 
 export const professionalSchema = z.object({
+  imagem: z.string().nullable().default(null),
   nome: z.string().trim().min(1, 'Informe o nome.').max(150, 'O nome deve ter no máximo 150 caracteres.'),
   especialidade: z.string().trim().min(1, 'Informe a especialidade.').max(150, 'A especialidade deve ter no máximo 150 caracteres.'),
   horariosTrabalho: z.array(workIntervalSchema).min(1, 'Informe ao menos um horário de trabalho.'),
