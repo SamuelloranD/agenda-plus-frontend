@@ -300,13 +300,13 @@
 .day-heading span { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
 .day-heading strong { margin-top: 8px; font: 500 27px 'Newsreader', Georgia, serif; }
 .day-heading--today { color: var(--paper); background: var(--terracotta); }
-.calendar-row > time { position: sticky; left: 0; z-index: 1; min-height: 96px; padding: 18px 14px; color: var(--muted-ink); background: #f4efe6; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 12px; }
-.calendar-cell { min-height: 96px; padding: 8px; background: rgb(251 249 245 / 78%); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.calendar-row > time { position: sticky; left: 0; z-index: 1; height: 96px; min-height: 96px; box-sizing: border-box; padding: 18px 14px; color: var(--muted-ink); background: #f4efe6; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 12px; }
+.calendar-cell { position: relative; height: 96px; min-height: 96px; box-sizing: border-box; padding: 8px; overflow: visible; background: rgb(251 249 245 / 78%); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .calendar-cell > span, .calendar-reserve { color: #aaa198; font-size: 11px; letter-spacing: .04em; }
 .calendar-reserve { display: inline-flex; align-items: center; min-height: 40px; padding: 0; color: #a99e95; background: transparent; border: 0; cursor: pointer; font: inherit; text-align: left; }
 .calendar-reserve:hover { color: var(--terracotta); text-decoration: underline; text-underline-offset: 3px; }
 .calendar-reserve:focus-visible { outline: 3px solid color-mix(in srgb, var(--mustard) 72%, transparent); outline-offset: 3px; }
-.appointment-card { display: grid; grid-template-rows: auto auto auto 1fr; gap: 5px; height: 132px; overflow: hidden; padding: 12px; color: var(--ink); border: 1px solid transparent; border-left: 4px solid rgb(31 31 30 / 24%); }
+.appointment-card { position: absolute; top: 0; right: 8px; left: 8px; z-index: 2; display: grid; grid-template-rows: auto auto auto 1fr; gap: 5px; box-sizing: border-box; overflow: hidden; padding: 12px; color: var(--ink); border: 1px solid transparent; border-left: 4px solid rgb(31 31 30 / 24%); }
 .appointment-card--confirmed { background: #5cff8d; border-color: #5cff8d; }
 .appointment-card--pending { background: #fdb563; border-color: #fdb563; }
 .appointment-card--cancelled { background: #ffb0b0; border-color: #ffb0b0; }
