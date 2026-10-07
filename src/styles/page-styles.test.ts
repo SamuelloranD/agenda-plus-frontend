@@ -17,6 +17,10 @@ describe('shared page styles', () => {
     expect(pageStyles).toContain('.calendar-corner { left: 0; z-index: 2; display: flex; align-items: center; justify-content: center;')
   })
 
+  it('separates the professional identity from the work schedule', () => {
+    expect(pageStyles).toContain('.professional-card__schedule { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 6px; padding-top: 18px; border-top: 1px solid var(--line);')
+  })
+
   it('does not render inline style tags for page layout styles', () => {
     for (const file of [
       'src/pages/DashboardPage.tsx',
