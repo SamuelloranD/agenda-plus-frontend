@@ -44,5 +44,8 @@ describe('ProfessionalList images', () => {
 
     expect(screen.getByRole('list', { name: 'Horários de trabalho' })).toHaveClass('professional-card__schedule')
     expect(screen.getAllByRole('listitem')).toHaveLength(4)
+    expect(screen.queryByText('Corpo técnico')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Editar profissional André Silva' })).toHaveAttribute('title', 'Editar profissional')
+    expect(screen.getByRole('button', { name: 'Excluir profissional André Silva' })).toHaveAttribute('title', 'Excluir profissional')
   })
 })
