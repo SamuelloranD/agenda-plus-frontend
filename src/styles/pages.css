@@ -293,7 +293,7 @@
 .weekly-calendar { min-width: 1160px; display: grid; }
 .calendar-header-row, .calendar-row { display: grid; grid-column: 1 / -1; }
 .calendar-corner, .day-heading { position: sticky; top: 0; z-index: 1; min-height: 86px; padding: 16px; background: #efeae3; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.calendar-corner { left: 0; z-index: 2; display: flex; align-items: flex-end; color: var(--muted-ink); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+.calendar-corner { left: 0; z-index: 2; display: flex; align-items: center; justify-content: center; color: var(--muted-ink); font-size: 10px; letter-spacing: .12em; text-align: center; text-transform: uppercase; }
 .day-heading span, .day-heading strong { display: block; }
 .day-heading span { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
 .day-heading strong { margin-top: 8px; font: 500 27px 'Newsreader', Georgia, serif; }

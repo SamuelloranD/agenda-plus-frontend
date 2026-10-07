@@ -14,6 +14,7 @@ describe('shared page styles', () => {
     expect(pageStyles).toContain('.professional-card__photo')
     expect(pageStyles).toContain('width: 72px; height: 72px;')
     expect(pageStyles).toContain('.weekly-page')
+    expect(pageStyles).toContain('.calendar-corner { left: 0; z-index: 2; display: flex; align-items: center; justify-content: center;')
   })
 
   it('does not render inline style tags for page layout styles', () => {
