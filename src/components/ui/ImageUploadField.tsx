@@ -30,7 +30,7 @@ export function ImageUploadField({ id, label, value, onChange, error }: ImageUpl
       return
     }
     if (file.size > MAX_IMAGE_BYTES) {
-      setFileError('A imagem deve ter no mÃ¡ximo 2 MiB.')
+      setFileError('A imagem deve ter no máximo 2 MiB.')
       return
     }
 
@@ -38,9 +38,9 @@ export function ImageUploadField({ id, label, value, onChange, error }: ImageUpl
     const reader = new FileReader()
     reader.onload = () => {
       if (typeof reader.result === 'string') onChange(reader.result)
-      else setFileError('NÃ£o foi possÃ­vel ler a imagem selecionada.')
+      else setFileError('Não foi possível ler a imagem selecionada.')
     }
-    reader.onerror = () => setFileError('NÃ£o foi possÃ­vel ler a imagem selecionada.')
+    reader.onerror = () => setFileError('Não foi possível ler a imagem selecionada.')
     reader.readAsDataURL(file)
   }
 
@@ -50,7 +50,7 @@ export function ImageUploadField({ id, label, value, onChange, error }: ImageUpl
       {value ? <img className="image-upload-field__preview" src={value} alt="" /> : <div className="image-upload-field__empty" aria-hidden="true">Sem imagem</div>}
       <div className="image-upload-field__controls">
         <input id={inputId} type="file" accept={ACCEPTED_IMAGE_TYPES.join(',')} onChange={handleFileChange} />
-        <small>JPG, PNG ou WebP · mÃ¡ximo 2 MiB.</small>
+        <small>JPG, PNG ou WebP · máximo 2 MiB.</small>
         {value && <button type="button" className="quiet-action image-upload-field__remove" onClick={() => { setFileError(null); onChange(null) }}>Remover imagem</button>}
       </div>
     </div>

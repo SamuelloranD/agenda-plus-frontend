@@ -103,6 +103,7 @@
 .service-row--1 { border-left-color: var(--terracotta); }
 .service-row--2 { border-left-color: #a57925; }
 .service-row__glyph { display: grid; place-items: center; width: 44px; height: 44px; color: var(--olive); background: #edf2eb; border-radius: 4px; }
+.service-row__photo { display: block; width: 44px; height: 44px; object-fit: cover; border-radius: 4px; }
 .service-row--1 .service-row__glyph { color: var(--terracotta); background: #f9eae4; }
 .service-row--2 .service-row__glyph { color: #8d601c; background: #f9f0db; }
 .service-row__main h3 { margin: 1px 0 7px; font: 500 27px/1.08 'Newsreader', Georgia, serif; }
@@ -123,6 +124,7 @@
 .professional-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); align-items: stretch; gap: 18px; }
 .professional-card { display: grid; grid-template-columns: auto 1fr; grid-template-rows: 1fr auto; gap: 15px; height: 100%; box-sizing: border-box; padding: 22px; background: rgb(251 249 245 / 92%); border: 1px solid var(--line); border-top: 3px solid var(--olive); }
 .professional-card__mark { display: grid; place-items: center; width: 47px; height: 47px; color: var(--paper); background: var(--olive); border-radius: 50%; font: 500 18px 'Newsreader', Georgia, serif; }
+.professional-card__photo { display: block; width: 47px; height: 47px; object-fit: cover; border-radius: 50%; }
 .professional-card__main h3 { margin: 1px 0 5px; font: 500 26px/1.05 'Newsreader', Georgia, serif; }
 .professional-card__main > p:not(.section-label) { margin: 0; color: var(--muted-ink); font-size: 13px; }
 .work-pill-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }

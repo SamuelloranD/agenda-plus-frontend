@@ -26,3 +26,4 @@ export const professionalSchema = z.object({
 })
 
 export type ProfessionalFormValues = z.infer<typeof professionalSchema>
+export type ProfessionalFormInput = z.input<typeof professionalSchema>
