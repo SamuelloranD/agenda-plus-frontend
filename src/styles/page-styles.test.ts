@@ -52,6 +52,7 @@ describe('shared page styles', () => {
     expect(pageStyles).toContain('background: #fdb563')
     expect(pageStyles).toContain('background: #ffb0b0')
     expect(pageStyles).toContain('height: 132px')
+    expect(pageStyles).toContain('.today-item .appointment-action--cancel { min-height: 32px; padding: 6px 12px;')
     expect(pageStyles).not.toContain('.appointment-card .status-badge')
   })
 
