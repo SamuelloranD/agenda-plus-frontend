@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ServiceForm } from './ServiceForm'
 
@@ -15,14 +15,15 @@ vi.mock('../hooks/useServices', () => ({
 afterEach(cleanup)
 beforeEach(() => vi.clearAllMocks())
 
-describe('ServiceForm image integration', () => {
-  it('sends null when removing an existing service image', async () => {
-    render(<ServiceForm service={{ id: 'service-1', nome: 'Corte', duracaoMinutos: 30, preco: { valor: 50, moeda: 'BRL' }, imagem: 'data:image/png;base64,old' }} onDone={vi.fn()} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Remover imagem' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Salvar alterações' }))
+describe('ServiceForm', () => {
+  it('does not render an image field or submit image data', async () => {
+    render(<ServiceForm service={{ id: 'service-1', nome: 'Corte', duracaoMinutos: 30, preco: { valor: 50, moeda: 'BRL' } }} onDone={vi.fn()} />)
+
+    expect(screen.queryByLabelText('Imagem')).not.toBeInTheDocument()
+    screen.getByRole('button', { name: 'Salvar alterações' }).click()
 
     await waitFor(() => expect(hooks.update.mutate).toHaveBeenCalledWith(
-      expect.objectContaining({ id: 'service-1', input: expect.objectContaining({ imagem: null }) }),
+      { id: 'service-1', input: { nome: 'Corte', duracaoMinutos: 30, preco: { valor: 50, moeda: 'BRL' } } },
       expect.any(Object),
     ))
   })

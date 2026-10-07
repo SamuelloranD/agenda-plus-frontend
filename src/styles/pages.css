@@ -111,7 +111,6 @@
 .service-row--1 { border-left-color: var(--terracotta); }
 .service-row--2 { border-left-color: #a57925; }
 .service-row__glyph { display: grid; place-items: center; width: 44px; height: 44px; color: var(--olive); background: #edf2eb; border-radius: 4px; }
-.service-row__photo { display: block; width: 44px; height: 44px; object-fit: cover; border-radius: 4px; }
 .service-row--1 .service-row__glyph { color: var(--terracotta); background: #f9eae4; }
 .service-row--2 .service-row__glyph { color: #8d601c; background: #f9f0db; }
 .service-row__main h3 { margin: 1px 0 7px; font: 500 27px/1.08 'Newsreader', Georgia, serif; }

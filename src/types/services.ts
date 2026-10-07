@@ -8,12 +8,10 @@ export interface ServicoResponse {
   nome: string
   duracaoMinutos: number
   preco: PrecoResponse
-  imagem?: string | null
 }
 
 export interface ServicoInput {
   nome: string
   duracaoMinutos: number
   preco: PrecoResponse
-  imagem: string | null
 }
