@@ -39,7 +39,7 @@
 .agenda-time-cell { position: absolute; inset-inline: 0; width: 100%; border: 0; background: transparent; }
 .agenda-time-cell:hover:not(:disabled) { background: #faeee6; }
 .agenda-time-cell.unavailable { background: repeating-linear-gradient(135deg, #f0efed, #f0efed 3px, #f9f8f6 3px, #f9f8f6 9px); }
-.agenda-event { position: absolute; z-index: 2; min-width: 0; overflow: visible; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 19px 7px 5px; border: 1px solid transparent; border-left: 3px solid; border-radius: 5px; text-align: left; font-size: 11px; line-height: 1.18; color: #10211b; }
+.agenda-event { position: absolute; z-index: 2; min-width: 0; overflow: visible; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 6px 7px 5px; border: 1px solid transparent; border-left: 3px solid; border-radius: 5px; text-align: left; font-size: 11px; line-height: 1.18; color: #10211b; }
 .agenda-event small, .agenda-event strong, .agenda-event span { max-width: 100%; overflow-wrap: anywhere; white-space: normal; }
 .agenda-event small { position: absolute; top: 5px; right: 7px; font-size: 10px; white-space: nowrap; }
 .agenda-event strong { font-size: 11.5px; }
