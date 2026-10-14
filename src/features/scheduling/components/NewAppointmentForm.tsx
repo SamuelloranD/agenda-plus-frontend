@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { DatePicker } from '../../../components/ui/DatePicker'
 import { ErrorState } from '../../../components/ui/ErrorState'
 import { LoadingState } from '../../../components/ui/LoadingState'
@@ -9,11 +9,11 @@ import { useServices } from '../../services/hooks/useServices'
 import { useCreateAgendamento } from '../hooks/useCreateAgendamento'
 import { useHorariosDisponiveis } from '../hooks/useHorariosDisponiveis'
 
-interface Props { onSuccess: () => void; initialDate?: string; initialStart?: string; initialProfessionalId?: string }
+interface Props { onSuccess: () => void; onDirtyChange?: (dirty: boolean) => void; initialDate?: string; initialStart?: string; initialProfessionalId?: string }
 const todayKey = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` }
 const money = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
 
-export function NewAppointmentForm({ onSuccess, initialDate, initialStart, initialProfessionalId }: Props) {
+export function NewAppointmentForm({ onSuccess, onDirtyChange, initialDate, initialStart, initialProfessionalId }: Props) {
   const [date, setDate] = useState(initialDate ?? todayKey)
   const [time, setTime] = useState(initialStart ?? '')
   const [clientId, setClientId] = useState('')
@@ -28,6 +28,8 @@ export function NewAppointmentForm({ onSuccess, initialDate, initialStart, initi
   const service = services.data?.find((item) => item.id === serviceId)
   const slot = availability.data?.find((item) => item.inicio.slice(11, 16) === time)
   const eligibleClients = (clients.data ?? []).filter((client) => client.role === 'CLIENTE')
+  const dirty = Boolean(clientId || serviceId || professionalId !== (initialProfessionalId ?? '') || date !== (initialDate ?? todayKey()) || time !== (initialStart ?? ''))
+  useEffect(() => { onDirtyChange?.(dirty) }, [dirty, onDirtyChange])
 
   if (clients.isLoading || services.isLoading || professionals.isLoading) return <LoadingState message="Carregando dados do agendamento…" />
   if (clients.isError || services.isError || professionals.isError) return <ErrorState message="Não foi possível carregar os dados para criar o agendamento." onRetry={() => void Promise.all([clients.refetch(), services.refetch(), professionals.refetch()])} />
@@ -55,10 +57,11 @@ export function NewAppointmentForm({ onSuccess, initialDate, initialStart, initi
     {availability.isLoading && <p role="status">Consultando horários disponíveis…</p>}
     {availability.isError && <p role="alert">Não foi possível consultar a disponibilidade. Altere a data ou tente novamente.</p>}
     {availability.data?.length === 0 && <p role="status">Não há horários disponíveis nesta data.</p>}
+    {date < todayKey() && <p role="alert">Escolha uma data futura para criar o agendamento.</p>}
     {time && !slot && !availability.isLoading && <p role="alert">O horário selecionado não está disponível. Escolha outro.</p>}
     <div className="agenda-form-summary"><span>Duração <strong>{service ? `${service.duracaoMinutos} min` : '—'}</strong></span><span>Término <strong>{slot ? slot.fim.slice(11, 16) : '—'}</strong></span><span>Valor atual <strong>{service ? money(service.preco.valor) : '—'}</strong></span></div>
     <p className="agenda-form-note">O agendamento será criado como pendente. O valor exibido é o preço atual do serviço; o sistema não registra um preço histórico no agendamento.</p>
     {error && <p className="form-error" role="alert">{error}</p>}
-    <button className="primary-action" type="submit" disabled={create.isPending || !slot || !clientId || !serviceId || !professionalId}>{create.isPending ? 'Criando…' : 'Criar agendamento'}</button>
+    <button className="primary-action" type="submit" disabled={create.isPending || date < todayKey() || !slot || !clientId || !serviceId || !professionalId}>{create.isPending ? 'Criando…' : 'Criar agendamento'}</button>
   </form>
 }

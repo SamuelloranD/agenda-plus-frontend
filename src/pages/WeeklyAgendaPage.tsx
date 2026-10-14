@@ -1,6 +1,6 @@
 import { CalendarDays, ChevronLeft, ChevronRight, Plus, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useBlocker, useSearchParams } from 'react-router-dom'
 import { DatePicker } from '../components/ui/DatePicker'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
@@ -66,20 +66,31 @@ export function WeeklyAgendaPage() {
   const slot = manualSlot ?? (newFromUrl ? { date: selectedDate, professionalId: validProfessionalId || undefined } : null)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [notice, setNotice] = useState('')
+  const [draftDirty, setDraftDirty] = useState(false)
+  const [confirmDiscard, setConfirmDiscard] = useState(false)
   const [now, setNow] = useState(() => new Date())
   const selected = appointments.find((item) => item.id === selectedId)
   const panelOpen = Boolean(slot || selectedId)
+  const panelIsCreate = Boolean(slot)
+  const blocker = useBlocker(({ currentLocation, nextLocation }) => Boolean(slot && draftDirty && currentLocation.pathname !== nextLocation.pathname))
+  const showingDiscard = confirmDiscard || blocker.state === 'blocked'
   const panelRef = useRef<HTMLElement>(null)
+  const discardRef = useRef<HTMLDivElement>(null)
   const previousFocus = useRef<HTMLElement | null>(null)
   const today = dateKey(now)
 
   const changeParam = useCallback((key: string, value: string | null) => { setParams((old) => { const next = new URLSearchParams(old); if (value) next.set(key, value); else next.delete(key); return next }) }, [setParams])
   function setView(next: View) { if (userId) localStorage.setItem(preferenceKey, next); changeParam('visao', next) }
-  const closePanel = useCallback(() => { setSlot(null); setSelectedId(null); changeParam('novo', null); previousFocus.current?.focus() }, [changeParam])
-  function openCreate(next: Slot) { previousFocus.current = document.activeElement as HTMLElement; setSelectedId(null); setSlot(next) }
-  function openDetails(id: string) { previousFocus.current = document.activeElement as HTMLElement; changeParam('novo', null); setSlot(null); setSelectedId(id) }
+  const closePanel = useCallback(() => { setDraftDirty(false); setConfirmDiscard(false); setSlot(null); setSelectedId(null); changeParam('novo', null); previousFocus.current?.focus() }, [changeParam])
+  const requestClose = useCallback(() => { if (panelIsCreate && draftDirty) setConfirmDiscard(true); else closePanel() }, [panelIsCreate, draftDirty, closePanel])
+  function continueEditing() { if (blocker.state === 'blocked') blocker.reset(); setConfirmDiscard(false) }
+  function discardChanges() { if (blocker.state === 'blocked') { setDraftDirty(false); blocker.proceed() } else closePanel() }
+  function openCreate(next: Slot) { previousFocus.current = document.activeElement as HTMLElement; setDraftDirty(false); setSelectedId(null); setSlot(next) }
+  function openDetails(id: string) { previousFocus.current = document.activeElement as HTMLElement; setDraftDirty(false); changeParam('novo', null); setSlot(null); setSelectedId(id) }
 
   useEffect(() => { const timer = window.setInterval(() => setNow(new Date()), 60_000); return () => window.clearInterval(timer) }, [])
+  useEffect(() => { if (showingDiscard) discardRef.current?.querySelector('button')?.focus() }, [showingDiscard])
+  useEffect(() => { if (!panelIsCreate || !draftDirty) return; const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = '' }; window.addEventListener('beforeunload', warn); return () => window.removeEventListener('beforeunload', warn) }, [panelIsCreate, draftDirty])
   useEffect(() => { if (professionalId && professionalsQuery.isSuccess && !validProfessionalId) changeParam('profissionalId', null) }, [professionalId, professionalsQuery.isSuccess, validProfessionalId, changeParam])
   useEffect(() => {
     if (!panelOpen) return
@@ -88,12 +99,13 @@ export function WeeklyAgendaPage() {
     panelRef.current?.focus()
     function onKey(event: KeyboardEvent) {
       if (document.querySelector('.cancel-dialog-backdrop')) return
-      if (event.key === 'Escape') closePanel()
+      if (showingDiscard) { if (event.key === 'Escape') { if (blocker.state === 'blocked') blocker.reset(); setConfirmDiscard(false) } if (event.key === 'Tab') { const buttons = [...(discardRef.current?.querySelectorAll('button') ?? [])]; if (buttons.length) { const index = buttons.indexOf(document.activeElement as HTMLButtonElement); if (event.shiftKey && index <= 0) { event.preventDefault(); buttons.at(-1)?.focus() } else if (!event.shiftKey && index === buttons.length - 1) { event.preventDefault(); buttons[0]?.focus() } } } return }
+      if (event.key === 'Escape') requestClose()
       if (event.key === 'Tab' && panelRef.current) { const focusable = [...panelRef.current.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled), [tabindex="0"]')]; const first = focusable[0]; const last = focusable.at(-1); if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus() } else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus() } }
     }
     document.addEventListener('keydown', onKey)
     return () => { document.body.style.overflow = prior; document.removeEventListener('keydown', onKey) }
-  }, [panelOpen, closePanel])
+  }, [panelOpen, requestClose, showingDiscard, blocker])
 
   const visible = appointments.filter((item) => item.status !== 'CANCELADO')
   const dates = Array.from({ length: 7 }, (_, index) => addDays(weekStart(selectedDate), index))
@@ -131,6 +143,6 @@ export function WeeklyAgendaPage() {
       <div className="agenda-mobile-list"><div className="agenda-mobile-days">{dates.map((date) => <button type="button" key={date} className={date === selectedDate ? 'active' : ''} onClick={() => changeParam('data', date)}>{dateText(date, { weekday: 'short' })}<strong>{parseDate(date).getDate()}</strong></button>)}</div>{appointments.filter((item) => item.inicio.slice(0, 10) === selectedDate).sort((a, b) => a.inicio.localeCompare(b.inicio)).map((item) => { const labels = resolveAppointmentLabels(item, directoryQuery.directory); return <button type="button" className={`agenda-mobile-event ${statusClass(item.status)}`} key={item.id} onClick={() => openDetails(item.id)}><time>{timeText(item.inicio)} – {timeText(item.fim)}</time><strong>{labels.clientName}</strong><span>{labels.serviceName} · {labels.professionalName}</span><small>{statusLabel[item.status]}</small></button> })}<button type="button" className="agenda-mobile-add" onClick={() => openCreate({ date: selectedDate, professionalId: validProfessionalId || undefined })}><Plus size={18} /> Novo agendamento</button></div>
       <div className="agenda-legend"><span className="agenda-status--confirmado">Confirmado</span><span className="agenda-status--pendente">Aguardando confirmação</span><span className="agenda-status--concluido">Concluído</span><span className="agenda-status--cancelado">Cancelado na lista</span><span className="agenda-unavailable">Fora do atendimento (profissional filtrado)</span></div>
     </>)}
-    {(slot || selected) && <div className="agenda-panel-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) closePanel() }}><section ref={panelRef} tabIndex={-1} className="agenda-panel" role="dialog" aria-modal="true" aria-labelledby="agenda-panel-title"><button type="button" className="agenda-panel-close" aria-label="Fechar painel" onClick={closePanel}><X size={20} /></button>{slot ? <><h2 id="agenda-panel-title">Novo agendamento</h2><p>Preencha os dados para criar um novo atendimento.</p><div className="agenda-panel-context"><CalendarDays size={20} /><span>{dateText(slot.date, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}{slot.start && <small>Início sugerido às {slot.start}</small>}</span></div><NewAppointmentForm key={`${slot.date}-${slot.start}-${slot.professionalId}`} initialDate={slot.date} initialStart={slot.start} initialProfessionalId={slot.professionalId} onSuccess={() => { closePanel(); setNotice('Agendamento criado — aguardando confirmação.'); void appointmentsQuery.refetch() }} /></> : selected && (() => { const labels = resolveAppointmentLabels(selected, directoryQuery.directory); return <><h2 id="agenda-panel-title">Detalhes do agendamento</h2><p className={`agenda-detail-status ${statusClass(selected.status)}`}>{statusLabel[selected.status]}</p><dl className="agenda-detail-list"><dt>Cliente</dt><dd>{labels.clientName}</dd><dt>Serviço</dt><dd>{labels.serviceName}</dd><dt>Profissional</dt><dd>{labels.professionalName}</dd><dt>Data</dt><dd>{dateText(selected.inicio.slice(0, 10), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</dd><dt>Horário</dt><dd>{timeText(selected.inicio)} – {timeText(selected.fim)}</dd><dt>Duração</dt><dd>{minutes(selected.fim) - minutes(selected.inicio)} minutos</dd><dt>Preço registrado</dt><dd>Não registrado</dd></dl><AppointmentActions appointment={selected} serviceName={labels.serviceName} professionalName={labels.professionalName} /></> })()}</section></div>}
+    {(slot || selected) && <div className="agenda-panel-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) requestClose() }}><section ref={panelRef} tabIndex={-1} className="agenda-panel" role="dialog" aria-modal="true" aria-labelledby="agenda-panel-title"><button type="button" className="agenda-panel-close" aria-label="Fechar painel" onClick={requestClose}><X size={20} /></button>{slot ? <><h2 id="agenda-panel-title">Novo agendamento</h2><p>Preencha os dados para criar um novo atendimento.</p><div className="agenda-panel-context"><CalendarDays size={20} /><span>{dateText(slot.date, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}{slot.start && <small>Início sugerido às {slot.start}</small>}</span></div><NewAppointmentForm key={`${slot.date}-${slot.start}-${slot.professionalId}`} initialDate={slot.date} initialStart={slot.start} initialProfessionalId={slot.professionalId} onDirtyChange={setDraftDirty} onSuccess={() => { closePanel(); setNotice('Agendamento criado — aguardando confirmação.'); void appointmentsQuery.refetch() }} /></> : selected && (() => { const labels = resolveAppointmentLabels(selected, directoryQuery.directory); return <><h2 id="agenda-panel-title">Detalhes do agendamento</h2><p className={`agenda-detail-status ${statusClass(selected.status)}`}>{statusLabel[selected.status]}</p><dl className="agenda-detail-list"><dt>Cliente</dt><dd>{labels.clientName}</dd><dt>Serviço</dt><dd>{labels.serviceName}</dd><dt>Profissional</dt><dd>{labels.professionalName}</dd><dt>Data</dt><dd>{dateText(selected.inicio.slice(0, 10), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</dd><dt>Horário</dt><dd>{timeText(selected.inicio)} – {timeText(selected.fim)}</dd><dt>Duração</dt><dd>{minutes(selected.fim) - minutes(selected.inicio)} minutos</dd><dt>Preço registrado</dt><dd>Não registrado</dd></dl><AppointmentActions appointment={selected} serviceName={labels.serviceName} professionalName={labels.professionalName} /></> })()}{showingDiscard && <div className="agenda-discard-backdrop"><div ref={discardRef} className="agenda-discard-dialog" role="alertdialog" aria-modal="true" aria-labelledby="agenda-discard-title"><h3 id="agenda-discard-title">Descartar alterações?</h3><p>Os dados preenchidos neste agendamento serão perdidos.</p><div><button type="button" onClick={continueEditing}>Continuar editando</button><button type="button" onClick={discardChanges}>Descartar alterações</button></div></div></div>}</section></div>}
   </section>
 }

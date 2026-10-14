@@ -73,6 +73,13 @@
 .agenda-panel-backdrop { position: fixed; inset: 0; z-index: 50; display: flex; justify-content: flex-end; background: rgb(24 27 34 / 35%); backdrop-filter: blur(2px); }
 .agenda-panel { width: min(100%, 430px); height: 100%; overflow: auto; padding: 34px 25px; background: #fffdfb; box-shadow: -8px 0 30px rgb(0 0 0 / 14%); outline: 0; }
 .agenda-panel-close { float: right; display: grid; place-items: center; width: 30px; height: 30px; border: 0; background: none; }
+.agenda-discard-backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 18px; background: rgb(24 27 34 / 42%); }
+.agenda-discard-dialog { width: min(100%, 370px); padding: 22px; border: 1px solid #e7ded6; border-radius: 8px; background: #fffdfb; box-shadow: 0 20px 50px #1d1d1d30; }
+.agenda-discard-dialog h3 { margin: 0 0 8px; font: 22px Georgia, serif; }
+.agenda-discard-dialog p { color: #65717e; font-size: 13px; }
+.agenda-discard-dialog > div { display: flex; justify-content: flex-end; gap: 9px; margin-top: 18px; }
+.agenda-discard-dialog button { min-height: 39px; padding: 8px 12px; border: 1px solid #e4d9ce; border-radius: 4px; background: white; font-size: 12px; }
+.agenda-discard-dialog button:last-child { border-color: #c45532; color: white; background: #c45532; }
 .agenda-panel h2 { margin: 0 0 4px; font: 29px Georgia, serif; }
 .agenda-panel > p { font-size: 12px; color: #6b7480; }
 .agenda-panel-context { display: flex; gap: 12px; align-items: center; padding: 13px; border: 1px solid #f0d5c7; border-radius: 4px; margin: 22px 0; color: #b94f2c; background: #fff5ef; text-transform: capitalize; }
