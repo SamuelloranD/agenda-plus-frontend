@@ -41,6 +41,7 @@
 .services-empty { display: grid; justify-items: center; padding: 65px 24px; border: 1px dashed #ddd4cb; border-radius: 7px; color: #7b8792; background: #fffdfa; text-align: center; }
 .services-empty h2 { margin: 15px 0 3px; color: #202b37; font: 600 26px 'Newsreader', Georgia, serif; }.services-empty p { margin: 0 0 20px; font-size: 13px; }
 .services-modal-backdrop { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 24px; background: #151b227d; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.services-redesign .professional-dialog-backdrop { z-index: 1001; }
 .services-modal { display: flex; flex-direction: column; width: min(100%, 600px); max-height: calc(100dvh - 48px); overflow: hidden; border: 1px solid #e7ded5; border-radius: 12px; background: #fffdfa; box-shadow: 0 22px 70px #10161d38; }
 .services-modal form { display: flex; flex-direction: column; min-height: 0; max-height: inherit; }
 .services-modal--state { align-items: center; gap: 16px; padding: 32px; }
