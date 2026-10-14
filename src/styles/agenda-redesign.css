@@ -10,11 +10,11 @@
 .agenda-navigation > button, .agenda-period, .agenda-view-switch, .agenda-filter .ui-select__trigger { min-height: 37px; border: 1px solid #e0dcd6; border-radius: 5px; background: #fff; color: #1c2430; }
 .agenda-navigation > button { padding: 0 12px; }
 .agenda-navigation > button:hover, .agenda-view-switch button:hover { color: #c45532; }
-.agenda-period { display: flex; align-items: center; gap: 8px; padding: 0 11px; white-space: nowrap; }
-.agenda-period .ui-date-picker { width: 26px; }
-.agenda-period .ui-date-picker__trigger { display: block; width: 26px; min-width: 26px; padding: 0; border: 0; background: none; }
+.agenda-period { position: relative; display: flex; align-items: center; gap: 8px; padding: 0 11px; white-space: nowrap; }
+.agenda-period .ui-date-picker { position: absolute; inset: 0; z-index: 2; width: auto; }
+.agenda-period .ui-date-picker__trigger { display: flex; align-items: center; justify-content: flex-end; width: 100%; min-width: 100%; height: 100%; min-height: 0; padding: 0 11px; border: 0; background: transparent; line-height: 1; }
 .agenda-period .ui-date-picker__trigger span, .agenda-period .ui-date-picker__icon { display: none; }
-.agenda-period .ui-date-picker__trigger::after { content: '⌄'; font-size: 19px; }
+.agenda-period .ui-date-picker__trigger::after { width: 7px; height: 7px; border-right: 1.7px solid #59636e; border-bottom: 1.7px solid #59636e; content: ''; transform: translateY(-2px) rotate(45deg); }
 .agenda-period .ui-date-picker__popover { right: 0; left: auto; z-index: 30; }
 .agenda-filter { display: grid; gap: 3px; min-width: 195px; font-size: 11px; color: #5b6471; }
 .agenda-filter .ui-select { width: 100%; }
