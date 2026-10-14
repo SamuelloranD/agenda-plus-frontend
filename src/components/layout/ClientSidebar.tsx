@@ -24,7 +24,6 @@ export function ClientSidebar({ mobileOpen = false, onNavigate }: { mobileOpen?:
         to="/agendar"
         onClick={onNavigate}
       >
-        <CalendarDays size={20} strokeWidth={1.8} aria-hidden="true" />
         <span>Novo agendamento</span>
       </NavLink>
       <nav aria-label="Área do cliente">

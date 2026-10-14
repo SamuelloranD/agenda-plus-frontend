@@ -58,9 +58,6 @@
   border-color: #af4725 !important;
 }
 
-.admin-new-appointment svg,
-.client-new-appointment svg { flex: none; }
-
 .admin-sidebar nav,
 .client-sidebar nav {
   display: grid;

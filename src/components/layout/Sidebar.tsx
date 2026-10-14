@@ -33,7 +33,6 @@ export function Sidebar({ mobileOpen = false, onNavigate }: { mobileOpen?: boole
         </span>
       </div>
       <NavLink to="/painel/agendamentos/novo" className="admin-new-appointment" onClick={onNavigate}>
-        <CalendarDays size={20} strokeWidth={1.8} aria-hidden="true" />
         <span>Novo agendamento</span>
       </NavLink>
       <nav aria-label="Área administrativa">
