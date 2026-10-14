@@ -35,14 +35,16 @@
 .agenda-times { position: sticky; left: 0; z-index: 4; background: #faf9f7; border-right: 1px solid #e9e4de; }
 .agenda-times time { position: absolute; left: 9px; transform: translateY(-6px); font-size: 10px; color: #6e7784; }
 .agenda-times time:first-child { transform: translateY(4px); }
-.agenda-day-track { position: relative; border-right: 1px solid #e9e4de; background: repeating-linear-gradient(to bottom, transparent 0, transparent 38px, #e9e4de 38px, #e9e4de 39px); }
+.agenda-day-track { position: relative; border-right: 1px solid #e9e4de; background: repeating-linear-gradient(to bottom, transparent 0, transparent 71px, #e9e4de 71px, #e9e4de 72px); }
 .agenda-time-cell { position: absolute; inset-inline: 0; width: 100%; border: 0; background: transparent; }
 .agenda-time-cell:hover:not(:disabled) { background: #faeee6; }
 .agenda-time-cell.unavailable { background: repeating-linear-gradient(135deg, #f0efed, #f0efed 3px, #f9f8f6 3px, #f9f8f6 9px); }
-.agenda-event { position: absolute; z-index: 2; min-width: 0; min-height: 74px; overflow: visible; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 5px 7px; border: 1px solid transparent; border-left: 3px solid; border-radius: 5px; text-align: left; font-size: 11px; line-height: 1.18; color: #10211b; }
+.agenda-event { position: absolute; z-index: 2; min-width: 0; overflow: visible; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 5px 7px; border: 1px solid transparent; border-left: 3px solid; border-radius: 5px; text-align: left; font-size: 11px; line-height: 1.18; color: #10211b; }
 .agenda-event small, .agenda-event strong, .agenda-event span { max-width: 100%; overflow-wrap: anywhere; white-space: normal; }
 .agenda-event small { font-size: 10px; }
 .agenda-event strong { font-size: 11px; }
+.agenda-event.short { gap: 0; padding: 2px 5px; font-size: 8px; line-height: 1; }
+.agenda-event.short small, .agenda-event.short strong, .agenda-event.short span { font-size: 8px; line-height: 1; }
 .agenda-status--confirmado { border-color: #2b9860; background: #d7f2e2; }
 .agenda-status--pendente { border-color: #d5962b; background: #ffedc9; }
 .agenda-status--cancelado { border-color: #c96b70; background: #fbe1e2; }

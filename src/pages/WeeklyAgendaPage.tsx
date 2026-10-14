@@ -117,7 +117,7 @@ export function WeeklyAgendaPage() {
   const startMinute = Math.floor(Math.min(8 * 60, ...visible.map((item) => minutes(item.inicio)), ...relevantHours.map((hour) => minutes(`0000-00-00T${hour.inicio}`))) / 30) * 30
   const endMinute = Math.ceil(Math.max(18 * 60, ...visible.map((item) => minutes(item.fim)), ...relevantHours.map((hour) => minutes(`0000-00-00T${hour.fim}`))) / 30) * 30
   const ticks = Array.from({ length: (endMinute - startMinute) / 30 + 1 }, (_, index) => startMinute + index * 30)
-  const px = 1.5
+  const px = 2.4
   const formatMinute = (minute: number) => `${String(Math.floor(minute / 60)).padStart(2, '0')}:${String(minute % 60).padStart(2, '0')}`
   const currentMinutes = now.getHours() * 60 + now.getMinutes()
 
