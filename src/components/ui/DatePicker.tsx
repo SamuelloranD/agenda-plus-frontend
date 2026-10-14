@@ -82,7 +82,10 @@ export function DatePicker({ id, value, min = todayKey(), label = 'Data do atend
         aria-expanded={open}
         aria-controls={`${id}-calendar`}
         disabled={disabled}
-        onClick={() => setOpen((current) => !current)}
+        onClick={() => {
+          if (!open) setVisibleMonth(monthStart(value ? parseDateKey(value) : minimumDate))
+          setOpen((current) => !current)
+        }}
       >
         <span>{value ? formatDate(value) : 'Selecione uma data'}</span>
         <svg className="ui-date-picker__icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
