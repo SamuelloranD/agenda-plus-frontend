@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseBrazilianPrice } from './ServiceForm'
+import { parseBrazilianPrice } from '../utils/servicePrice'
 
 describe('preço em reais', () => {
   it('converte vírgula decimal e ponto de milhar sem perder centavos', () => {

@@ -12,6 +12,7 @@ import type { ServicoResponse } from '../types/services'
 
 type Action = { type: 'delete' | 'status'; service: ServicoResponse }
 const normalize = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR')
+const emptyServices: ServicoResponse[] = []
 
 export function ServicesPage() {
   const servicesQuery = useServices()
@@ -27,7 +28,7 @@ export function ServicesPage() {
   const [notice, setNotice] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
   const orderRef = useRef<HTMLDivElement>(null)
-  const services = servicesQuery.data ?? []
+  const services = servicesQuery.data ?? emptyServices
   const updateParam = (key: string, value: string, replace = true) => setParams((current) => {
     const next = new URLSearchParams(current)
     if (value) next.set(key, value)

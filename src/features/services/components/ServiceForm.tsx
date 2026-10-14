@@ -1,13 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useRef, useState } from 'react'
 import { Info, X } from 'lucide-react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { useBlocker } from 'react-router-dom'
 import type { ApiError } from '../../../types/api'
 import type { ServicoResponse } from '../../../types/services'
 import { ProfessionalConfirmDialog } from '../../professionals/components/ProfessionalConfirmDialog'
 import { useCreateService, useUpdateService } from '../hooks/useServices'
 import { serviceSchema, type ServiceFormInput, type ServiceFormValues } from '../schemas/serviceSchema'
+import { parseBrazilianPrice } from '../utils/servicePrice'
 
 interface ServiceFormProps {
   service?: ServicoResponse | null
@@ -15,16 +16,10 @@ interface ServiceFormProps {
   onCancel?: () => void
 }
 const emptyValues: ServiceFormValues = { nome: '', descricao: '', duracaoMinutos: 30, preco: { valor: 0, moeda: 'BRL' }, ativo: true }
-export function parseBrazilianPrice(value: string) {
-  const text = value.trim()
-  if (!/^(?:0|[1-9]\d*|[1-9]\d{0,2}(?:\.\d{3})+)(?:,\d{1,2})?$/.test(text)) return Number.NaN
-  const [whole, fraction = ''] = text.replaceAll('.', '').split(',')
-  const cents = BigInt(whole) * 100n + BigInt(fraction.padEnd(2, '0') || '0')
-  return cents <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(cents) / 100 : Number.NaN
-}
-
 export function ServiceForm({ service, onDone, onCancel }: ServiceFormProps) {
   const form = useForm<ServiceFormInput, unknown, ServiceFormValues>({ resolver: zodResolver(serviceSchema), defaultValues: emptyValues })
+  const description = useWatch({ control: form.control, name: 'descricao' })
+  const active = useWatch({ control: form.control, name: 'ativo' })
   const createService = useCreateService()
   const updateService = useUpdateService()
   const [confirmClose, setConfirmClose] = useState(false)
@@ -37,7 +32,6 @@ export function ServiceForm({ service, onDone, onCancel }: ServiceFormProps) {
 
   useEffect(() => {
     form.reset(service ? { nome: service.nome, descricao: service.descricao ?? '', duracaoMinutos: service.duracaoMinutos, preco: { valor: service.preco.valor, moeda: 'BRL' }, ativo: service.ativo !== false } : emptyValues)
-    setPriceText(service ? service.preco.valor.toFixed(2).replace('.', ',') : '')
   }, [service, form])
   useEffect(() => {
     const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null
@@ -73,13 +67,13 @@ export function ServiceForm({ service, onDone, onCancel }: ServiceFormProps) {
           else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus() }
         }
       }}>
-        <form onSubmit={form.handleSubmit(submit)} noValidate>
+        <form onSubmit={(event) => { void form.handleSubmit(submit)(event) }} noValidate>
           <header className="services-drawer__header"><div><h2 id="services-drawer-title">{service ? 'Editar serviço' : 'Novo serviço'}</h2><p>{service ? 'Atualize as informações do serviço.' : 'Defina o serviço que será oferecido no agendamento.'}</p></div><button ref={closeRef} type="button" className="services-drawer__close" aria-label="Fechar painel" onClick={requestClose}><X size={20} /></button></header>
           <div className="services-drawer__body">
             <label className="services-field">Nome do serviço <span>*</span><input autoFocus {...form.register('nome')} placeholder="Ex.: Corte de cabelo" aria-invalid={Boolean(fields.nome)} />{fields.nome && <small role="alert">{fields.nome.message}</small>}</label>
-            <label className="services-field">Descrição<textarea {...form.register('descricao')} maxLength={500} rows={3} placeholder="Descreva o serviço..." aria-invalid={Boolean(fields.descricao)} />{fields.descricao && <small role="alert">{fields.descricao.message}</small>}<em>{(form.watch('descricao') ?? '').length}/500</em></label>
+            <label className="services-field">Descrição<textarea {...form.register('descricao')} maxLength={500} rows={3} placeholder="Descreva o serviço..." aria-invalid={Boolean(fields.descricao)} />{fields.descricao && <small role="alert">{fields.descricao.message}</small>}<em>{(description ?? '').length}/500</em></label>
             <div className="services-drawer__pair"><label className="services-field">Duração (minutos) <span>*</span><input type="number" min="1" step="1" {...form.register('duracaoMinutos', { valueAsNumber: true })} aria-invalid={Boolean(fields.duracaoMinutos)} />{fields.duracaoMinutos && <small role="alert">{fields.duracaoMinutos.message}</small>}</label><label className="services-field">Preço (R$) <span>*</span><input type="text" inputMode="decimal" value={priceText} placeholder="0,00" onChange={(event) => { setPriceText(event.target.value); form.setValue('preco.valor', parseBrazilianPrice(event.target.value), { shouldDirty: true, shouldValidate: true }) }} aria-invalid={Boolean(fields.preco?.valor)} />{fields.preco?.valor && <small role="alert">{fields.preco.valor.message}</small>}</label></div>
-            <label className="services-switch-row"><span><strong>Status</strong><small>Serviços inativos não aparecem no novo agendamento.</small></span><input type="checkbox" {...form.register('ativo')} aria-label="Serviço ativo" /><span className="services-switch" aria-hidden="true" />{form.watch('ativo') ? 'Ativo' : 'Inativo'}</label>
+            <label className="services-switch-row"><span><strong>Status</strong><small>Serviços inativos não aparecem no novo agendamento.</small></span><input type="checkbox" {...form.register('ativo')} aria-label="Serviço ativo" /><span className="services-switch" aria-hidden="true" />{active ? 'Ativo' : 'Inativo'}</label>
             <div className="services-drawer__info"><Info size={18} aria-hidden="true" /><p>As reservas existentes mantêm seus horários. O sistema ainda não armazena o preço histórico; alterar o preço pode mudar o valor exibido em agendamentos anteriores.</p></div>
             {error && <p className="form-error" role="alert">{error.message ?? 'Não foi possível salvar o serviço.'}</p>}
           </div>
