@@ -36,6 +36,26 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.restoreAllMocks() })
 
 describe('catalog deletion confirmations', () => {
+  it('orders professionals through a styled menu and closes it with Escape', () => {
+    hooks.professionals.mockReturnValue(loadedQuery([
+      professional,
+      { ...professional, id: 'professional-2', nome: 'Ana Lima' },
+    ]))
+    render(<MemoryRouter><ProfessionalsPage /></MemoryRouter>)
+
+    const trigger = screen.getByRole('button', { name: 'Ordenar por' })
+    expect(screen.queryByRole('group', { name: 'Opções de ordenação' })).not.toBeInTheDocument()
+    fireEvent.click(trigger)
+    expect(screen.getByRole('group', { name: 'Opções de ordenação' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Nome (Z → A)' }))
+    expect(screen.queryByRole('group', { name: 'Opções de ordenação' })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('heading', { level: 3 })[0]).toHaveTextContent('João Silva')
+
+    fireEvent.click(trigger)
+    fireEvent.keyDown(trigger, { key: 'Escape' })
+    expect(screen.queryByRole('group', { name: 'Opções de ordenação' })).not.toBeInTheDocument()
+  })
+
   it('does not delete a professional until the destructive action is confirmed', async () => {
     render(<MemoryRouter><ProfessionalsPage /></MemoryRouter>)
     fireEvent.click(screen.getByRole('button', { name: /Mais ações para/ }))

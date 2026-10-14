@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
-import { ChevronDown, Plus, Search, UsersRound } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Check, ChevronDown, Plus, Search, UsersRound } from 'lucide-react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
@@ -19,6 +19,47 @@ const emptyProfessionals: ProfissionalResponse[] = []
 
 function normalize(value: string) {
   return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR')
+}
+
+function ProfessionalOrderControl({ value, onChange }: { value: 'asc' | 'desc'; onChange: (value: 'asc' | 'desc') => void }) {
+  const [open, setOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const selectedRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const closeOutside = (event: PointerEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) setOpen(false)
+    }
+    document.addEventListener('pointerdown', closeOutside)
+    return () => document.removeEventListener('pointerdown', closeOutside)
+  }, [open])
+
+  return <div className={`professionals-order${open ? ' is-open' : ''}`} ref={containerRef} onKeyDown={(event) => {
+    if (event.key === 'Escape' && open) {
+      event.preventDefault()
+      setOpen(false)
+      triggerRef.current?.focus()
+    }
+    if (event.key === 'ArrowDown' && document.activeElement === triggerRef.current) {
+      event.preventDefault()
+      setOpen(true)
+      requestAnimationFrame(() => selectedRef.current?.focus())
+    }
+  }} onBlur={(event) => {
+    if (!event.currentTarget.contains(event.relatedTarget as Node)) setOpen(false)
+  }}>
+    <span>Ordenar por</span>
+    <button type="button" className="professionals-order__trigger" ref={triggerRef} aria-label="Ordenar por" aria-expanded={open} aria-controls={open ? 'professionals-order-options' : undefined} onClick={() => setOpen((current) => !current)}>
+      <span>{value === 'asc' ? 'Nome (A → Z)' : 'Nome (Z → A)'}</span><ChevronDown size={16} aria-hidden="true" />
+    </button>
+    {open && <div className="professionals-order__menu" id="professionals-order-options" role="group" aria-label="Opções de ordenação">
+      {(['asc', 'desc'] as const).map((option) => <button key={option} type="button" ref={value === option ? selectedRef : undefined} className={value === option ? 'is-selected' : ''} aria-pressed={value === option} onClick={() => { onChange(option); setOpen(false); triggerRef.current?.focus() }}>
+        <span>{option === 'asc' ? 'Nome (A → Z)' : 'Nome (Z → A)'}</span>{value === option && <Check size={16} aria-hidden="true" />}
+      </button>)}
+    </div>}
+  </div>
 }
 
 export function ProfessionalsPage() {
@@ -112,10 +153,7 @@ export function ProfessionalsPage() {
               <Search size={19} aria-hidden="true" />
               <input type="search" aria-label="Buscar profissionais" placeholder="Buscar por nome ou especialidade..." value={search} onChange={(event) => updateParam('busca', event.target.value)} />
             </label>
-            <label className="professionals-order">
-              <span>Ordenar por</span>
-              <span><select aria-label="Ordenar por" value={order} onChange={(event) => updateParam('ordem', event.target.value)}><option value="asc">Nome (A → Z)</option><option value="desc">Nome (Z → A)</option></select><ChevronDown size={16} aria-hidden="true" /></span>
-            </label>
+            <ProfessionalOrderControl value={order} onChange={(value) => updateParam('ordem', value)} />
             <span className="professionals-count">{filtered.length} {filtered.length === 1 ? 'profissional' : 'profissionais'}</span>
           </div>
           {filtered.length === 0 ? (
