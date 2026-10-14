@@ -5,6 +5,7 @@ const validService = {
   nome: 'Corte Clássico',
   duracaoMinutos: 45,
   preco: { valor: 85, moeda: 'BRL' },
+  descricao: '', ativo: true,
 }
 
 describe('serviceSchema', () => {
@@ -16,8 +17,12 @@ describe('serviceSchema', () => {
     expect(serviceSchema.safeParse({ ...validService, duracaoMinutos }).success).toBe(false)
   })
 
-  it.each([0, -10])('rejects an invalid price of %s', (valor) => {
+  it.each([-0.01, -10])('rejects an invalid price of %s', (valor) => {
     expect(serviceSchema.safeParse({ ...validService, preco: { ...validService.preco, valor } }).success).toBe(false)
+  })
+
+  it('accepts a free service', () => {
+    expect(serviceSchema.safeParse({ ...validService, preco: { valor: 0, moeda: 'BRL' } }).success).toBe(true)
   })
 
   it('rejects a blank service name or currency', () => {

@@ -8,10 +8,14 @@ export interface ServicoResponse {
   nome: string
   duracaoMinutos: number
   preco: PrecoResponse
+  descricao?: string | null
+  ativo?: boolean
 }
 
 export interface ServicoInput {
   nome: string
   duracaoMinutos: number
   preco: PrecoResponse
+  descricao?: string | null
+  ativo?: boolean
 }

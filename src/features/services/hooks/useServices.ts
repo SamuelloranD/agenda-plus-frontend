@@ -4,6 +4,8 @@ import type { ServicoInput } from '../../../types/services'
 
 export const servicesQueryKey = ['servicos'] as const
 export function useServices() { return useQuery({ queryKey: servicesQueryKey, queryFn: servicesApi.list }) }
+export function useService(id: string | null) { return useQuery({ queryKey: [...servicesQueryKey, id], queryFn: () => servicesApi.get(id!), enabled: Boolean(id) }) }
 export function useCreateService() { const qc = useQueryClient(); return useMutation({ mutationFn: servicesApi.create, onSuccess: () => qc.invalidateQueries({ queryKey: servicesQueryKey }) }) }
 export function useUpdateService() { const qc = useQueryClient(); return useMutation({ mutationFn: ({ id, input }: { id: string; input: ServicoInput }) => servicesApi.update(id, input), onSuccess: () => qc.invalidateQueries({ queryKey: servicesQueryKey }) }) }
 export function useDeleteService() { const qc = useQueryClient(); return useMutation({ mutationFn: servicesApi.remove, onSuccess: () => qc.invalidateQueries({ queryKey: servicesQueryKey }) }) }
+export function useChangeServiceStatus() { const qc = useQueryClient(); return useMutation({ mutationFn: ({ id, ativo }: { id: string; ativo: boolean }) => servicesApi.changeStatus(id, ativo), onSuccess: () => qc.invalidateQueries({ queryKey: servicesQueryKey }) }) }

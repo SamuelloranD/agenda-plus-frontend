@@ -108,7 +108,7 @@ export function NewAppointmentForm({ onSuccess, initialDate, initialStart }: New
 
   const clients = (clientsQuery.data ?? []).filter((client) => client.role === 'CLIENTE')
   const professionals = professionalsQuery.data ?? []
-  const services = servicesQuery.data ?? []
+  const services = (servicesQuery.data ?? []).filter((service) => service.ativo !== false)
   const missingCatalogs = [
     clients.length === 0 ? 'um cliente' : null,
     professionals.length === 0 ? 'um profissional' : null,

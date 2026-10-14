@@ -17,7 +17,9 @@ vi.mock('../features/professionals/hooks/useProfessionals', () => ({
 
 vi.mock('../features/services/hooks/useServices', () => ({
   useServices: hooks.services,
+  useService: () => loadedQuery(service),
   useDeleteService: hooks.deleteService,
+  useChangeServiceStatus: () => ({ mutateAsync: vi.fn(), isPending: false }),
 }))
 
 const professional = { id: 'professional-1', nome: 'João Silva', especialidade: 'Cabeleireiro', imagem: null, horariosTrabalho: [] }
@@ -31,7 +33,8 @@ beforeEach(() => {
   hooks.deleteProfessional.mockReturnValue({ mutateAsync: hooks.mutateProfessional, isPending: false, isError: false })
   hooks.changeProfessionalStatus.mockReturnValue({ mutateAsync: vi.fn(), isPending: false })
   hooks.mutateProfessional.mockResolvedValue(undefined)
-  hooks.deleteService.mockReturnValue({ mutate: hooks.mutateService, isPending: false, isError: false })
+  hooks.deleteService.mockReturnValue({ mutateAsync: hooks.mutateService, isPending: false, isError: false })
+  hooks.mutateService.mockResolvedValue(undefined)
 })
 afterEach(() => { cleanup(); vi.restoreAllMocks() })
 
@@ -69,14 +72,16 @@ describe('catalog deletion confirmations', () => {
     await waitFor(() => expect(hooks.mutateProfessional).toHaveBeenCalledWith('professional-1'))
   })
 
-  it('does not delete a service until the destructive action is confirmed', () => {
-    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false)
-    render(<ServicesPage />)
-    fireEvent.click(screen.getByRole('button', { name: 'Excluir' }))
-    expect(confirm).toHaveBeenCalledWith('Excluir Corte clássico? Esta ação não pode ser desfeita.')
+  it('does not delete a service until the destructive action is confirmed', async () => {
+    render(<MemoryRouter><ServicesPage /></MemoryRouter>)
+    fireEvent.click(screen.getByRole('button', { name: /es de/ }))
+    fireEvent.click(screen.getByRole('button', { name: /Excluir serv/ }))
     expect(hooks.mutateService).not.toHaveBeenCalled()
-    confirm.mockReturnValue(true)
-    fireEvent.click(screen.getByRole('button', { name: 'Excluir' }))
-    expect(hooks.mutateService).toHaveBeenCalledWith('service-1', expect.any(Object))
+    fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
+    expect(hooks.mutateService).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: /es de/ }))
+    fireEvent.click(screen.getByRole('button', { name: /Excluir serv/ }))
+    fireEvent.click(screen.getByRole('button', { name: /Excluir serv/ }))
+    await waitFor(() => expect(hooks.mutateService).toHaveBeenCalledWith('service-1'))
   })
 })

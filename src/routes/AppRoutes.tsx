@@ -45,7 +45,7 @@ export function AppRoutes({ session }: AppRoutesProps) {
     <Route path="/painel/profissionais" element={<AdminRoute session={session} title="Profissionais" subtitle="Gerencie os profissionais e os horários de atendimento."><ProfessionalsPage /></AdminRoute>} />
     <Route path="/painel/profissionais/novo" element={<AdminRoute session={session} title="Novo profissional" subtitle="Cadastre os dados e os horários de atendimento." backTo="/painel/profissionais"><ProfessionalEditorPage /></AdminRoute>} />
     <Route path="/painel/profissionais/:id/editar" element={<AdminRoute session={session} title="Editar profissional" subtitle="Atualize os dados e os horários de atendimento." backTo="/painel/profissionais"><ProfessionalEditorPage /></AdminRoute>} />
-    <Route path="/painel/servicos" element={<AdminRoute session={session} title="Serviços" subtitle="Organize o catálogo de serviços."><ServicesPage /></AdminRoute>} />
+    <Route path="/painel/servicos" element={<AdminRoute session={session} title="Serviços" subtitle="Gerencie os preços, a duração e a disponibilidade dos serviços."><ServicesPage /></AdminRoute>} />
     <Route path="/painel/agendamentos/novo" element={<AdminRoute session={session} title="Novo agendamento" subtitle="Reserve um horário para seu cliente."><NewAppointmentPage /></AdminRoute>} />
     <Route path="*" element={<Navigate to="/login" replace />} />
   </Routes>

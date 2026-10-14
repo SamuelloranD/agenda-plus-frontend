@@ -83,7 +83,7 @@ export function ClientBookingPage({
           <div className="booking-workspace" inert={booking.isSubmitting}>
             {booking.step === "service" && (
               <ServiceStep
-                services={booking.servicesQuery.data ?? []}
+                services={(booking.servicesQuery.data ?? []).filter((service) => service.ativo !== false)}
                 selectedId={selection.service?.id}
                 isLoading={booking.servicesQuery.isLoading}
                 isError={booking.servicesQuery.isError}

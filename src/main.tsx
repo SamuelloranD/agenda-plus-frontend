@@ -11,6 +11,7 @@ import './styles/booking-flow-refresh.css'
 import './styles/sidebar-standard.css'
 import './styles/client-appointments.css'
 import './styles/professionals-redesign.css'
+import './styles/services-redesign.css'
 import App from './App.tsx'
 
 const queryClient = new QueryClient()
