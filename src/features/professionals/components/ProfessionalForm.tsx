@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
-import { CalendarDays, Copy, Plus, Trash2, UserRound } from 'lucide-react'
+import { CalendarDays, Check, ChevronDown, Copy, Plus, Trash2, UserRound } from 'lucide-react'
 import type { AgendamentoResponse } from '../../../types/scheduling'
 import type { ApiError } from '../../../types/api'
 import type { ProfissionalResponse } from '../../../types/professionals'
@@ -19,6 +19,47 @@ const dayLabels: Record<Day, string> = {
 }
 const imageTypes = ['image/jpeg', 'image/png', 'image/webp']
 const maxImageBytes = 2 * 1024 * 1024
+
+function SourceDayControl({ value, options, onChange }: { value: Day; options: Day[]; onChange: (day: Day) => void }) {
+  const [open, setOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const selectedRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const closeOutside = (event: PointerEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) setOpen(false)
+    }
+    document.addEventListener('pointerdown', closeOutside)
+    return () => document.removeEventListener('pointerdown', closeOutside)
+  }, [open])
+
+  return <div className={`professional-source-day${open ? ' is-open' : ''}`} ref={containerRef} onKeyDown={(event) => {
+    if (event.key === 'Escape' && open) {
+      event.preventDefault()
+      setOpen(false)
+      triggerRef.current?.focus()
+    }
+    if (event.key === 'ArrowDown' && document.activeElement === triggerRef.current) {
+      event.preventDefault()
+      setOpen(true)
+      requestAnimationFrame(() => selectedRef.current?.focus())
+    }
+  }} onBlur={(event) => {
+    if (!event.currentTarget.contains(event.relatedTarget as Node)) setOpen(false)
+  }}>
+    <span>Dia de origem</span>
+    <button type="button" className="professional-source-day__trigger" ref={triggerRef} aria-label="Dia de origem" aria-expanded={open} aria-controls={open ? 'professional-source-day-options' : undefined} onClick={() => setOpen((current) => !current)}>
+      <span>{dayLabels[value]}</span><ChevronDown size={16} aria-hidden="true" />
+    </button>
+    {open && <div className="professional-source-day__menu" id="professional-source-day-options" role="group" aria-label="Dias de origem">
+      {options.map((day) => <button key={day} type="button" ref={day === value ? selectedRef : undefined} className={day === value ? 'is-selected' : ''} aria-pressed={day === value} onClick={() => { onChange(day); setOpen(false); triggerRef.current?.focus() }}>
+        <span>{dayLabels[day]}</span>{day === value && <Check size={16} aria-hidden="true" />}
+      </button>)}
+    </div>}
+  </div>
+}
 
 function initialDraft(professional?: ProfissionalResponse | null): Draft {
   const week = Object.fromEntries(weekdays.map((day) => [day, { enabled: false, periods: [] as Period[] }])) as WeekDraft
@@ -285,11 +326,7 @@ export function ProfessionalForm({ professional, appointments = [], appointments
           {copyOpen && selectedSource && (
             <div className="professional-copy-panel" role="group" aria-label="Copiar horários para outros dias">
               <div className="professional-copy-panel__heading"><h3>Copiar horários para outros dias</h3><button type="button" onClick={() => setCopyOpen(false)} aria-label="Fechar cópia de horários">×</button></div>
-              <label>Dia de origem
-                <select value={selectedSource} onChange={(event) => { setSourceDay(event.target.value as Day); setTargetDays([]); setReplaceAcknowledged(false) }}>
-                  {validSourceDays.map((day) => <option key={day} value={day}>{dayLabels[day]}</option>)}
-                </select>
-              </label>
+              <SourceDayControl value={selectedSource} options={validSourceDays} onChange={(day) => { setSourceDay(day); setTargetDays([]); setReplaceAcknowledged(false) }} />
               <p>Períodos: {draft.week[selectedSource].periods.map(({ inicio, fim }) => `${inicio}–${fim}`).join(' e ')}</p>
               <fieldset><legend>Copiar para</legend>{weekdays.filter((day) => day !== selectedSource).map((day) => <label key={day}><input type="checkbox" checked={targetDays.includes(day)} onChange={(event) => { setTargetDays((current) => event.target.checked ? [...current, day] : current.filter((entry) => entry !== day)); setReplaceAcknowledged(false) }} />{dayLabels[day]}</label>)}</fieldset>
               {replacements.length > 0 && <label className="professional-copy-warning"><input type="checkbox" checked={replaceAcknowledged} onChange={(event) => setReplaceAcknowledged(event.target.checked)} />Os horários existentes em {replacements.map((day) => dayLabels[day]).join(', ')} serão substituídos.</label>}

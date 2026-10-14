@@ -52,6 +52,31 @@ describe('ProfessionalForm', () => {
     expect(screen.getByLabelText(/Fim da terça-feira, período 2/)).toHaveValue('17:00')
   })
 
+  it('chooses the source day through the styled menu without changing its periods', () => {
+    render(<ProfessionalForm onDone={vi.fn()} onCancel={vi.fn()} professional={{
+      id: 'person-1', nome: 'André', especialidade: 'Barbeiro', imagem: null, ativo: true,
+      horariosTrabalho: [
+        { diaSemana: 'MONDAY', inicio: '08:00:00', fim: '12:00:00' },
+        { diaSemana: 'TUESDAY', inicio: '13:00:00', fim: '17:00:00' },
+      ],
+    }} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Copiar semana' }))
+    const sourceTrigger = screen.getByRole('button', { name: 'Dia de origem' })
+    fireEvent.click(sourceTrigger)
+    const menu = screen.getByRole('group', { name: 'Dias de origem' })
+    fireEvent.click(within(menu).getByRole('button', { name: 'Terça-feira' }))
+    expect(screen.queryByRole('group', { name: 'Dias de origem' })).not.toBeInTheDocument()
+    expect(screen.getByText('Períodos: 13:00–17:00')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Quarta-feira' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Copiar horários' }))
+    expect(screen.getByLabelText(/Início da quarta-feira, período 1/)).toHaveValue('13:00')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Copiar semana' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Dia de origem' }))
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Dia de origem' }), { key: 'Escape' })
+    expect(screen.queryByRole('group', { name: 'Dias de origem' })).not.toBeInTheDocument()
+  })
+
   it('keeps the photo and status changes in the draft until save', () => {
     const onCancel = vi.fn()
     render(<ProfessionalForm onDone={vi.fn()} onCancel={onCancel} professional={{
