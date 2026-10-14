@@ -1,4 +1,4 @@
-import { CalendarDays, MoreVertical, UserRound } from 'lucide-react'
+import { CalendarDays, UserRound } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
@@ -30,7 +30,7 @@ export function DashboardAppointmentTable({ appointments, directory, showDate = 
       <td><strong>{labels.serviceName}</strong><small>{directory.servicePrices.has(appointment.servicoId) ? 'Atendimento' : 'Serviço'}</small></td>
       <td><span className="dashboard-table__person"><UserRound size={18} aria-hidden="true" />{labels.professionalName}</span></td>
       <td><StatusBadge status={appointment.status} label={dashboardStatusLabels[appointment.status]} /></td>
-      <td><span className="dashboard-table__actions"><Link to={`/painel/agenda?agendamento=${appointment.id}`}>Ver detalhes</Link><button type="button" aria-label={`Mais ações para ${labels.clientName}`}><MoreVertical size={17} aria-hidden="true" /></button></span></td>
+      <td><span className="dashboard-table__actions"><Link to={`/painel/agenda?agendamento=${appointment.id}`}>Ver detalhes</Link></span></td>
     </tr>
   })}</tbody></table></div>
 }

@@ -424,18 +424,18 @@
 .dashboard-table-wrap { overflow-x: auto; }
 .dashboard-table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 700px; }
 .dashboard-table th:nth-child(1), .dashboard-table td:nth-child(1) { width: 15%; }
-.dashboard-table th:nth-child(2), .dashboard-table td:nth-child(2) { width: 15%; }
-.dashboard-table th:nth-child(3), .dashboard-table td:nth-child(3) { width: 15%; }
-.dashboard-table th:nth-child(4), .dashboard-table td:nth-child(4) { width: 17%; }
-.dashboard-table th:nth-child(5), .dashboard-table td:nth-child(5) { width: 18%; }
-.dashboard-table th:nth-child(6), .dashboard-table td:nth-child(6) { width: 20%; }
+.dashboard-table th:nth-child(2), .dashboard-table td:nth-child(2) { width: 18%; }
+.dashboard-table th:nth-child(3), .dashboard-table td:nth-child(3) { width: 18%; }
+.dashboard-table th:nth-child(4), .dashboard-table td:nth-child(4) { width: 18%; }
+.dashboard-table th:nth-child(5), .dashboard-table td:nth-child(5) { width: 15%; }
+.dashboard-table th:nth-child(6), .dashboard-table td:nth-child(6) { width: 16%; }
 .dashboard-table--with-date th:nth-child(1), .dashboard-table--with-date td:nth-child(1) { width: 12%; }
 .dashboard-table--with-date th:nth-child(2), .dashboard-table--with-date td:nth-child(2) { width: 13%; }
-.dashboard-table--with-date th:nth-child(3), .dashboard-table--with-date td:nth-child(3) { width: 14%; }
-.dashboard-table--with-date th:nth-child(4), .dashboard-table--with-date td:nth-child(4) { width: 14%; }
-.dashboard-table--with-date th:nth-child(5), .dashboard-table--with-date td:nth-child(5) { width: 15%; }
+.dashboard-table--with-date th:nth-child(3), .dashboard-table--with-date td:nth-child(3) { width: 16%; }
+.dashboard-table--with-date th:nth-child(4), .dashboard-table--with-date td:nth-child(4) { width: 16%; }
+.dashboard-table--with-date th:nth-child(5), .dashboard-table--with-date td:nth-child(5) { width: 16%; }
 .dashboard-table--with-date th:nth-child(6), .dashboard-table--with-date td:nth-child(6) { width: 12%; }
-.dashboard-table--with-date th:nth-child(7), .dashboard-table--with-date td:nth-child(7) { width: 20%; }
+.dashboard-table--with-date th:nth-child(7), .dashboard-table--with-date td:nth-child(7) { width: 15%; }
 .dashboard-table th { padding: 11px 14px; color: var(--muted-ink); background: #faf7f2; font-size: 9px; font-weight: 700; letter-spacing: .12em; text-align: left; text-transform: uppercase; }
 .dashboard-table td { padding: 12px 14px; border-top: 1px solid #eee9e2; font-size: 12px; vertical-align: middle; }
 .dashboard-table td strong { display: block; font-weight: 600; }
