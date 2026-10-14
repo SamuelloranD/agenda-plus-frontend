@@ -8,7 +8,7 @@ import type { ServicoResponse } from '../../../types/services'
 import { ProfessionalConfirmDialog } from '../../professionals/components/ProfessionalConfirmDialog'
 import { useCreateService, useUpdateService } from '../hooks/useServices'
 import { serviceSchema, type ServiceFormInput, type ServiceFormValues } from '../schemas/serviceSchema'
-import { parseBrazilianPrice } from '../utils/servicePrice'
+import { formatBrazilianPriceInput, parseBrazilianPrice } from '../utils/servicePrice'
 
 interface ServiceFormProps {
   service?: ServicoResponse | null
@@ -23,7 +23,7 @@ export function ServiceForm({ service, onDone, onCancel }: ServiceFormProps) {
   const createService = useCreateService()
   const updateService = useUpdateService()
   const [confirmClose, setConfirmClose] = useState(false)
-  const [priceText, setPriceText] = useState(service ? service.preco.valor.toFixed(2).replace('.', ',') : '')
+  const [priceText, setPriceText] = useState(service ? formatBrazilianPriceInput(service.preco.valor.toFixed(2)) : '')
   const panelRef = useRef<HTMLElement>(null)
   const closeRef = useRef<HTMLButtonElement>(null)
   const allowNavigation = useRef(false)
@@ -48,6 +48,11 @@ export function ServiceForm({ service, onDone, onCancel }: ServiceFormProps) {
   }, [form.formState.isDirty])
   const discard = () => { allowNavigation.current = true; cancel() }
   const requestClose = () => { if (isPending) return; if (form.formState.isDirty) setConfirmClose(true); else discard() }
+  const updatePrice = (digits: string) => {
+    const formatted = formatBrazilianPriceInput(digits)
+    setPriceText(formatted)
+    form.setValue('preco.valor', formatted ? parseBrazilianPrice(formatted) : Number.NaN, { shouldDirty: true, shouldValidate: true })
+  }
   const submit = (values: ServiceFormValues) => {
     if (!priceText.trim()) { form.setError('preco.valor', { message: 'Informe o preço.' }); return }
     if (service) updateService.mutate({ id: service.id, input: values }, { onSuccess: () => { allowNavigation.current = true; onDone() } })
@@ -72,7 +77,17 @@ export function ServiceForm({ service, onDone, onCancel }: ServiceFormProps) {
           <div className="services-modal__body">
             <label className="services-field">Nome do serviço <span>*</span><input autoFocus {...form.register('nome')} placeholder="Ex.: Corte de cabelo" aria-invalid={Boolean(fields.nome)} />{fields.nome && <small role="alert">{fields.nome.message}</small>}</label>
             <label className="services-field">Descrição<textarea {...form.register('descricao')} maxLength={500} rows={3} placeholder="Descreva o serviço..." aria-invalid={Boolean(fields.descricao)} />{fields.descricao && <small role="alert">{fields.descricao.message}</small>}<em>{(description ?? '').length}/500</em></label>
-            <div className="services-modal__pair"><label className="services-field">Duração (minutos) <span>*</span><input type="number" min="1" step="1" {...form.register('duracaoMinutos', { valueAsNumber: true })} aria-invalid={Boolean(fields.duracaoMinutos)} />{fields.duracaoMinutos && <small role="alert">{fields.duracaoMinutos.message}</small>}</label><label className="services-field">Preço (R$) <span>*</span><input type="text" inputMode="decimal" value={priceText} placeholder="0,00" onChange={(event) => { setPriceText(event.target.value); form.setValue('preco.valor', parseBrazilianPrice(event.target.value), { shouldDirty: true, shouldValidate: true }) }} aria-invalid={Boolean(fields.preco?.valor)} />{fields.preco?.valor && <small role="alert">{fields.preco.valor.message}</small>}</label></div>
+            <div className="services-modal__pair"><label className="services-field">Duração (minutos) <span>*</span><input type="number" min="1" step="1" {...form.register('duracaoMinutos', { valueAsNumber: true })} aria-invalid={Boolean(fields.duracaoMinutos)} />{fields.duracaoMinutos && <small role="alert">{fields.duracaoMinutos.message}</small>}</label><label className="services-field">Preço (R$) <span>*</span><input type="text" inputMode="numeric" value={priceText} placeholder="0,00" onChange={(event) => {
+              const raw = event.target.value
+              const previousDigits = priceText.replace(/\D/g, '').replace(/^0+(?=\d)/, '')
+              const appended = raw.startsWith(priceText) && raw.length === priceText.length + 1 && /\d$/.test(raw)
+              updatePrice(appended ? previousDigits + raw.at(-1) : raw)
+            }} onKeyDown={(event) => {
+              if (event.key === 'Backspace' && event.currentTarget.selectionStart === event.currentTarget.selectionEnd) {
+                event.preventDefault()
+                updatePrice(priceText.replace(/\D/g, '').replace(/^0+(?=\d)/, '').slice(0, -1))
+              }
+            }} aria-invalid={Boolean(fields.preco?.valor)} />{fields.preco?.valor && <small role="alert">{fields.preco.valor.message}</small>}</label></div>
             <label className="services-switch-row"><span><strong>Status</strong><small>Serviços inativos não aparecem no novo agendamento.</small></span><input type="checkbox" {...form.register('ativo')} aria-label="Serviço ativo" /><span className="services-switch" aria-hidden="true" />{active ? 'Ativo' : 'Inativo'}</label>
             <div className="services-modal__info"><Info size={18} aria-hidden="true" /><p>As reservas existentes mantêm seus horários. O sistema ainda não armazena o preço histórico; alterar o preço pode mudar o valor exibido em agendamentos anteriores.</p></div>
             {error && <p className="form-error" role="alert">{error.message ?? 'Não foi possível salvar o serviço.'}</p>}

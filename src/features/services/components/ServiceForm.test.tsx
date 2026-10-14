@@ -17,6 +17,34 @@ afterEach(cleanup)
 beforeEach(() => vi.clearAllMocks())
 
 describe('ServiceForm', () => {
+  it.each([
+    ['novo', undefined],
+    ['edição', { id: 'service-1', nome: 'Barba', descricao: '', duracaoMinutos: 30, preco: { valor: 60, moeda: 'BRL' } }],
+  ])('confirma o descarte ao cancelar no modo %s', async (_mode, service) => {
+    const onCancel = vi.fn()
+    const router = createMemoryRouter([{ path: '/', element: <ServiceForm service={service} onDone={vi.fn()} onCancel={onCancel} /> }])
+    render(<RouterProvider router={router} />)
+    fireEvent.change(screen.getByPlaceholderText('Descreva o serviço...'), { target: { value: 'Alterado' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
+    expect(screen.getByRole('dialog', { name: 'Descartar alterações?' })).toBeInTheDocument()
+    expect(onCancel).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Continuar editando' }))
+    expect(screen.getByRole('dialog', { name: service ? 'Editar serviço' : 'Novo serviço' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Descartar alterações' }))
+    expect(onCancel).toHaveBeenCalledOnce()
+  })
+
+  it('envia o valor numérico após digitação monetária da direita para a esquerda', async () => {
+    const router = createMemoryRouter([{ path: '/', element: <ServiceForm onDone={vi.fn()} /> }])
+    render(<RouterProvider router={router} />)
+    fireEvent.change(screen.getByPlaceholderText('Ex.: Corte de cabelo'), { target: { value: 'Barba' } })
+    const price = screen.getByRole('textbox', { name: /Preço \(R\$\)/ })
+    for (const digit of '123456') fireEvent.change(price, { target: { value: `${(price as HTMLInputElement).value}${digit}` } })
+    expect(price).toHaveValue('1.234,56')
+    fireEvent.click(screen.getByRole('button', { name: 'Cadastrar serviço' }))
+    await waitFor(() => expect(hooks.create.mutate).toHaveBeenCalledWith(expect.objectContaining({ preco: { valor: 1234.56, moeda: 'BRL' } }), expect.any(Object)))
+  })
   it('does not render an image field or submit image data', async () => {
     const router = createMemoryRouter([{ path: '/', element: <ServiceForm service={{ id: 'service-1', nome: 'Corte', duracaoMinutos: 30, preco: { valor: 50, moeda: 'BRL' } }} onDone={vi.fn()} /> }])
     render(<RouterProvider router={router} />)
