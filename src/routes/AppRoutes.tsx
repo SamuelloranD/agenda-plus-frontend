@@ -6,7 +6,6 @@ import { DashboardPage } from '../pages/DashboardPage'
 import { ClientBookingPage } from '../pages/ClientBookingPage'
 import { ClientAppointmentsPage } from '../pages/ClientAppointmentsPage'
 import { LoginPage } from '../pages/LoginPage'
-import { NewAppointmentPage } from '../pages/NewAppointmentPage'
 import { ProfessionalsPage } from '../pages/ProfessionalsPage'
 import { ProfessionalEditorPage } from '../pages/ProfessionalEditorPage'
 import { RegisterPage } from '../pages/RegisterPage'
@@ -41,12 +40,12 @@ export function AppRoutes({ session }: AppRoutesProps) {
     <Route path="/agendar/*" element={<ClientBookingRoute session={session} />} />
     <Route path="/meus-agendamentos" element={<ClientRoute session={session}><ClientShell title="Meus agendamentos" subtitle="Acompanhe seus horários e mantenha sua agenda em dia."><ClientAppointmentsPage /></ClientShell></ClientRoute>} />
     <Route path="/painel" element={<ProtectedRoute session={session}><AdminShell title="Painel" subtitle="Visão geral do seu estúdio."><DashboardPage /></AdminShell></ProtectedRoute>} />
-    <Route path="/painel/agenda" element={<ProtectedRoute session={session}><AdminShell title="Agenda semanal" subtitle="Organize a semana de atendimentos."><WeeklyAgendaPage /></AdminShell></ProtectedRoute>} />
+    <Route path="/painel/agenda" element={<ProtectedRoute session={session}><AdminShell title="Agenda" subtitle="Gerencie os atendimentos da sua equipe."><WeeklyAgendaPage /></AdminShell></ProtectedRoute>} />
     <Route path="/painel/profissionais" element={<AdminRoute session={session} title="Profissionais" subtitle="Gerencie os profissionais e os horários de atendimento."><ProfessionalsPage /></AdminRoute>} />
     <Route path="/painel/profissionais/novo" element={<AdminRoute session={session} title="Novo profissional" subtitle="Cadastre os dados e os horários de atendimento." backTo="/painel/profissionais"><ProfessionalEditorPage /></AdminRoute>} />
     <Route path="/painel/profissionais/:id/editar" element={<AdminRoute session={session} title="Editar profissional" subtitle="Atualize os dados e os horários de atendimento." backTo="/painel/profissionais"><ProfessionalEditorPage /></AdminRoute>} />
     <Route path="/painel/servicos" element={<AdminRoute session={session} title="Serviços" subtitle="Gerencie os preços, a duração e a disponibilidade dos serviços."><ServicesPage /></AdminRoute>} />
-    <Route path="/painel/agendamentos/novo" element={<AdminRoute session={session} title="Novo agendamento" subtitle="Reserve um horário para seu cliente."><NewAppointmentPage /></AdminRoute>} />
+    <Route path="/painel/agendamentos/novo" element={<ProtectedRoute session={session}><Navigate to="/painel/agenda?novo=1" replace /></ProtectedRoute>} />
     <Route path="*" element={<Navigate to="/login" replace />} />
   </Routes>
 }

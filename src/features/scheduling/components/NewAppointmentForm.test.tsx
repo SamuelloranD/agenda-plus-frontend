@@ -2,116 +2,74 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { NewAppointmentForm } from './NewAppointmentForm'
 
-const hooks = vi.hoisted(() => ({
-  clients: vi.fn(),
-  professionals: vi.fn(),
-  services: vi.fn(),
-  availability: vi.fn(),
-  createAppointment: vi.fn(),
-}))
-
+const hooks = vi.hoisted(() => ({ clients: vi.fn(), professionals: vi.fn(), services: vi.fn(), availability: vi.fn(), createAppointment: vi.fn() }))
 vi.mock('../../clients/hooks/useClients', () => ({ useClients: hooks.clients }))
 vi.mock('../../professionals/hooks/useProfessionals', () => ({ useProfessionals: hooks.professionals }))
 vi.mock('../../services/hooks/useServices', () => ({ useServices: hooks.services }))
 vi.mock('../hooks/useHorariosDisponiveis', () => ({ useHorariosDisponiveis: hooks.availability }))
 vi.mock('../hooks/useCreateAgendamento', () => ({ useCreateAgendamento: hooks.createAppointment }))
 
-const client = { id: '11111111-1111-4111-8111-111111111111', nome: 'Maria Souza', email: 'maria@example.com', role: 'CLIENTE' as const }
-const professional = { id: '22222222-2222-4222-8222-222222222222', nome: 'Joao Silva', especialidade: 'Cabeleireiro', horariosTrabalho: [] }
-const service = { id: '33333333-3333-4333-8333-333333333333', nome: 'Corte', duracaoMinutos: 45, preco: { valor: 80, moeda: 'BRL' } }
-
-function loadedQuery(data: unknown) {
-  return { data, isLoading: false, isError: false, refetch: vi.fn() }
-}
+const client = { id: 'client-1', nome: 'Maria Souza', email: 'maria@example.com', role: 'CLIENTE' }
+const professional = { id: 'professional-1', nome: 'João Silva', especialidade: 'Barbeiro', horariosTrabalho: [] }
+const service = { id: 'service-1', nome: 'Corte', duracaoMinutos: 45, preco: { valor: 80, moeda: 'BRL' } }
+const availableSlot = { inicio: '2099-12-20T10:00:00', fim: '2099-12-20T10:45:00' }
+const query = (data: unknown) => ({ data, isLoading: false, isError: false, refetch: vi.fn() })
 
 beforeEach(() => {
   vi.clearAllMocks()
-  hooks.clients.mockReturnValue(loadedQuery([client]))
-  hooks.professionals.mockReturnValue(loadedQuery([professional]))
-  hooks.services.mockReturnValue(loadedQuery([service]))
-  hooks.availability.mockReturnValue(loadedQuery([]))
-  hooks.createAppointment.mockReturnValue({ mutate: vi.fn(), isPending: false, isError: false, error: null })
+  hooks.clients.mockReturnValue(query([client]))
+  hooks.professionals.mockReturnValue(query([professional]))
+  hooks.services.mockReturnValue(query([service]))
+  hooks.availability.mockReturnValue(query([availableSlot]))
+  hooks.createAppointment.mockReturnValue({ mutateAsync: vi.fn().mockResolvedValue({ status: 'PENDENTE' }), isPending: false })
 })
-
 afterEach(cleanup)
 
-describe('NewAppointmentForm catalog states', () => {
-  it('offers one retry that reloads every required catalog after a load error', () => {
-    const refetchClients = vi.fn()
-    const refetchProfessionals = vi.fn()
-    const refetchServices = vi.fn()
-    hooks.clients.mockReturnValue({ ...loadedQuery(undefined), isError: true, refetch: refetchClients })
-    hooks.professionals.mockReturnValue({ ...loadedQuery([professional]), refetch: refetchProfessionals })
-    hooks.services.mockReturnValue({ ...loadedQuery([service]), refetch: refetchServices })
+function choose(id: string, option: RegExp) {
+  fireEvent.click(document.getElementById(id)!)
+  fireEvent.click(screen.getByRole('option', { name: option }))
+}
 
+describe('NewAppointmentForm', () => {
+  it('retries every catalog when loading fails', () => {
+    const clients = query(undefined); const professionals = query([]); const services = query([])
+    hooks.clients.mockReturnValue({ ...clients, isError: true })
+    hooks.professionals.mockReturnValue(professionals)
+    hooks.services.mockReturnValue(services)
     render(<NewAppointmentForm onSuccess={vi.fn()} />)
     fireEvent.click(screen.getByRole('button', { name: 'Tentar novamente' }))
-
-    expect(screen.getByRole('alert')).toHaveTextContent('Não foi possível abrir os dados necessários')
-    expect(refetchClients).toHaveBeenCalledTimes(1)
-    expect(refetchProfessionals).toHaveBeenCalledTimes(1)
-    expect(refetchServices).toHaveBeenCalledTimes(1)
+    expect(clients.refetch).toHaveBeenCalledOnce()
+    expect(professionals.refetch).toHaveBeenCalledOnce()
+    expect(services.refetch).toHaveBeenCalledOnce()
   })
 
-  it('shows every missing prerequisite instead of an unusable form', () => {
-    hooks.clients.mockReturnValue(loadedQuery([]))
-    hooks.professionals.mockReturnValue(loadedQuery([]))
-    hooks.services.mockReturnValue(loadedQuery([]))
-
-    render(<NewAppointmentForm onSuccess={vi.fn()} />)
-
-    expect(screen.getByText('Cadastre um cliente, um profissional e um serviço antes de criar um agendamento.')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Confirmar agendamento' })).not.toBeInTheDocument()
+  it('requires a real client and an available slot', () => {
+    hooks.clients.mockReturnValue(query([{ ...client, role: 'ADMIN' }]))
+    hooks.availability.mockReturnValue(query([]))
+    render(<NewAppointmentForm onSuccess={vi.fn()} initialDate="2099-12-20" />)
+    expect(screen.getByText('Cadastre um cliente antes de criar o agendamento.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Criar agendamento' })).toBeDisabled()
   })
 
-  it('does not count an administrative account as an eligible client', () => {
-    hooks.clients.mockReturnValue(loadedQuery([
-      { id: 'admin-1', nome: 'Mateus Silva', email: 'mateus@example.com', role: 'ADMIN' },
-    ]))
-
-    render(<NewAppointmentForm onSuccess={vi.fn()} />)
-
-    expect(screen.getByText('Cadastre um cliente antes de criar um agendamento.')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Confirmar agendamento' })).not.toBeInTheDocument()
-  })
-})
-
-describe('NewAppointmentForm success flow', () => {
-  it('shows the date and start time supplied by the weekly calendar as fixed values', () => {
-    render(<NewAppointmentForm initialDate="2026-09-25" initialStart="08:45" onSuccess={vi.fn()} />)
-
-    expect(screen.getByText('25/09/2026')).toHaveClass('appointment-fixed-field')
-    expect(screen.getByText('08:45')).toHaveClass('appointment-fixed-field')
-    expect(screen.queryByRole('button', { name: 'Data do atendimento' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /08:45/ })).not.toBeInTheDocument()
-    expect(document.querySelector('input[name="inicio"]')).toHaveValue('2026-09-25T08:45:00')
-  })
-
-  it('resets the selected fields after a successful appointment creation', async () => {
-    const mutate = vi.fn((_values: unknown, options: { onSuccess: () => void }) => options.onSuccess())
-    hooks.createAppointment.mockReturnValue({ mutate, isPending: false, isError: false, error: null })
-    hooks.availability.mockReturnValue(loadedQuery([{
-      inicio: '2099-12-20T10:00:00',
-      fim: '2099-12-20T10:45:00',
-    }]))
-
-    render(<NewAppointmentForm onSuccess={vi.fn()} />)
-
-    const comboboxes = screen.getAllByRole('combobox')
-    fireEvent.click(comboboxes[0])
+  it('uses the actual available period when creating a pending appointment', async () => {
+    const onSuccess = vi.fn()
+    const mutateAsync = vi.fn().mockResolvedValue({ status: 'PENDENTE' })
+    hooks.createAppointment.mockReturnValue({ mutateAsync, isPending: false })
+    render(<NewAppointmentForm onSuccess={onSuccess} initialDate="2099-12-20" initialStart="10:00" initialProfessionalId={professional.id} />)
+    expect(screen.getByRole('button', { name: 'Data do atendimento' })).toBeInTheDocument()
+    fireEvent.click(document.getElementById('appointment-client')!)
+    fireEvent.change(screen.getByRole('searchbox', { name: /Buscar cliente/ }), { target: { value: 'maria@example.com' } })
     fireEvent.click(screen.getByRole('option', { name: /Maria Souza/ }))
-    fireEvent.click(comboboxes[1])
-    fireEvent.click(screen.getByRole('option', { name: /Corte/ }))
-    fireEvent.click(comboboxes[2])
-    fireEvent.click(screen.getByRole('option', { name: /Joao Silva/ }))
-    fireEvent.click(screen.getByRole('button', { name: /10:00/ }))
-    fireEvent.change(document.querySelector('input[name="inicio"]')!, { target: { value: '2099-12-20T10:00:00' } })
-    fireEvent.change(document.querySelector('input[name="fim"]')!, { target: { value: '2099-12-20T10:45:00' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Confirmar agendamento' }))
-    await waitFor(() => expect(mutate).toHaveBeenCalledTimes(1))
-    expect(comboboxes[0]).toHaveTextContent(/Selecione quem receber/)
-    expect(comboboxes[1]).toHaveTextContent(/Selecione o servi/)
-    expect(comboboxes[2]).toHaveTextContent(/Selecione o profissional/)
-    expect(screen.queryByRole('button', { name: /10:00/ })).not.toHaveClass('time-option--selected')
+    choose('appointment-service', /Corte/)
+    fireEvent.click(screen.getByRole('button', { name: 'Criar agendamento' }))
+    await waitFor(() => expect(mutateAsync).toHaveBeenCalledWith({ clienteId: client.id, servicoId: service.id, profissionalId: professional.id, inicio: availableSlot.inicio, fim: availableSlot.fim }))
+    expect(onSuccess).toHaveBeenCalledOnce()
+  })
+
+  it('blocks a suggested time absent from server availability', () => {
+    hooks.availability.mockReturnValue(query([]))
+    render(<NewAppointmentForm onSuccess={vi.fn()} initialDate="2099-12-20" initialStart="10:00" initialProfessionalId={professional.id} />)
+    expect(screen.getByRole('button', { name: 'Criar agendamento' })).toBeDisabled()
+    expect(screen.getByText('O horário selecionado não está disponível. Escolha outro.')).toBeInTheDocument()
   })
 })

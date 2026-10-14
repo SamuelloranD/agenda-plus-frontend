@@ -14,16 +14,21 @@ interface SelectProps {
   placeholder?: string
   disabled?: boolean
   invalid?: boolean
+  searchable?: boolean
   onChange: (value: string) => void
   onBlur?: (event: FocusEvent<HTMLButtonElement>) => void
 }
 
-export function Select({ id, name, value, options, placeholder = 'Selecione uma opção', disabled = false, invalid = false, onChange, onBlur }: SelectProps) {
+export function Select({ id, name, value, options, placeholder = 'Selecione uma opção', disabled = false, invalid = false, searchable = false, onChange, onBlur }: SelectProps) {
   const rootRef = useRef<HTMLDivElement>(null)
+  const searchRef = useRef<HTMLInputElement>(null)
   const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
   const [activeIndex, setActiveIndex] = useState(() => Math.max(0, options.findIndex((option) => option.value === value)))
   const listboxId = `${id}-listbox-${useId().replaceAll(':', '')}`
   const selectedOption = options.find((option) => option.value === value)
+  const normalizedSearch = search.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  const visibleOptions = searchable && normalizedSearch ? options.filter((option) => option.label.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().includes(normalizedSearch)) : options
 
   useEffect(() => {
     const closeOnOutsidePointer = (event: PointerEvent) => {
@@ -33,12 +38,14 @@ export function Select({ id, name, value, options, placeholder = 'Selecione uma 
     document.addEventListener('pointerdown', closeOnOutsidePointer)
     return () => document.removeEventListener('pointerdown', closeOnOutsidePointer)
   }, [])
+  useEffect(() => { if (open && searchable) searchRef.current?.focus() }, [open, searchable])
 
   const choose = (option: SelectOption) => {
     if (option.disabled) return
     setActiveIndex(options.findIndex((candidate) => candidate.value === option.value))
     onChange(option.value)
     setOpen(false)
+    setSearch('')
   }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
@@ -93,8 +100,12 @@ export function Select({ id, name, value, options, placeholder = 'Selecione uma 
         </span>
       </button>
       {open && (
-        <div className="ui-select__listbox" id={listboxId} role="listbox" aria-label={selectedOption?.label ?? placeholder}>
-          {options.map((option, index) => (
+        <div className="ui-select__listbox">
+          {searchable && <input ref={searchRef} className="ui-select__search" type="search" aria-label={placeholder.startsWith('Buscar') ? placeholder : `Buscar ${placeholder.toLowerCase()}`} value={search} onChange={(event) => setSearch(event.target.value)} onKeyDown={(event) => { if (event.key === 'Escape') { setOpen(false); setSearch('') } }} />}
+          <div id={listboxId} role="listbox" aria-label={selectedOption?.label ?? placeholder}>
+          {visibleOptions.map((option) => {
+            const index = options.findIndex((candidate) => candidate.value === option.value)
+            return (
             <div
               className={option.value === value ? 'ui-select__option ui-select__option--selected' : 'ui-select__option'}
               id={`${listboxId}-option-${index}`}
@@ -112,7 +123,9 @@ export function Select({ id, name, value, options, placeholder = 'Selecione uma 
             >
               {option.label}
             </div>
-          ))}
+          )})}
+          {visibleOptions.length === 0 && <p className="ui-select__empty">Nenhum resultado encontrado.</p>}
+          </div>
         </div>
       )}
     </div>
