@@ -50,7 +50,7 @@ describe('catalog deletion confirmations', () => {
     expect(screen.queryByRole('group', { name: 'Opções de ordenação' })).not.toBeInTheDocument()
     fireEvent.click(trigger)
     expect(screen.getByRole('group', { name: 'Opções de ordenação' })).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Nome (Z → A)' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Nome (Z   A)' }))
     expect(screen.queryByRole('group', { name: 'Opções de ordenação' })).not.toBeInTheDocument()
     expect(screen.getAllByRole('heading', { level: 3 })[0]).toHaveTextContent('João Silva')
 
