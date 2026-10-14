@@ -1,6 +1,7 @@
 :root {
   --ink: #1f1f1e;
   --muted-ink: #706a61;
+  --booking-support-ink: #595752;
   --paper: #fbf9f5;
   --line: #ded6ca;
   --terracotta: #c85a32;
@@ -1193,8 +1194,8 @@ h1 {
 
 .booking-card-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-card);
 }
 
 .booking-card-grid--professionals .booking-choice {
@@ -1311,15 +1312,17 @@ h1 {
 
 .booking-time-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-card);
   max-height: min(55dvh, 38rem);
   overflow-y: auto;
-  padding: 0 4px 12px 0;
-  scrollbar-gutter: auto;
+  padding: 0 0 var(--space-card);
+  scrollbar-width: none;
   overscroll-behavior: contain;
-  scroll-padding-block-end: 12px;
+  scroll-padding-block-end: var(--space-card);
 }
+
+.booking-time-grid::-webkit-scrollbar { display: none; }
 
 .booking-time {
   min-height: clamp(80px, 8cqi, 96px);
@@ -1355,7 +1358,7 @@ h1 {
 .booking-time small {
   margin-top: 0;
   font-size: 10px;
-  white-space: normal;
+  white-space: nowrap;
   word-break: normal;
 }
 
@@ -1624,7 +1627,7 @@ h1 {
 .booking-editorial > p:last-child {
   max-width: 36ch;
   margin: 1rem 0 0;
-  color: var(--muted-ink);
+  color: var(--booking-support-ink);
   font-size: var(--type-body);
   line-height: 1.65;
 }
@@ -1652,7 +1655,8 @@ h1 {
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(220px, .85fr);
     align-items: end;
-    gap: clamp(1rem, 3cqi, 2.5rem);
+    column-gap: var(--space-card);
+    row-gap: var(--space-xs);
   }
 
   .booking-editorial .section-label,
@@ -1686,7 +1690,18 @@ h1 {
     margin: 0;
   }
 
-  .booking-sidebar { position: static; }
+  .booking-sidebar { position: static; align-self: stretch; height: 100%; }
+  .booking-sidebar:not(:has(.booking-auth-prompt)) { grid-template-rows: minmax(0, 1fr); }
+  .booking-sidebar:not(:has(.booking-auth-prompt)) .booking-summary {
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    height: auto;
+  }
+  .booking-sidebar:not(:has(.booking-auth-prompt)) .booking-summary__note {
+    margin-top: auto;
+    padding-top: var(--space-card);
+  }
 
   .booking-page:not(.booking-page--embedded) .booking-editorial {
     grid-template-rows: auto auto auto;
@@ -1722,11 +1737,12 @@ h1 {
 @container app-content (min-width: 1180px) {
   .client-main:has(.booking-intro-layout) {
     display: grid;
-    grid-template-columns: minmax(clamp(280px, 20cqi, 380px), 1fr) minmax(520px, clamp(520px, 20.3vw, 580px)) minmax(300px, clamp(300px, 11.7cqi, 340px));
+    grid-template-columns: minmax(16rem, 17.5rem) minmax(0, 580px) minmax(17rem, 19rem);
     grid-template-rows: 64px auto;
-    column-gap: clamp(1rem, 1.5cqi, 1.5rem);
-    row-gap: clamp(1rem, 1.5cqi, 1.5rem);
+    column-gap: var(--space-card);
+    row-gap: var(--space-card);
     align-content: start;
+    justify-content: center;
   }
 
   .client-main:has(.booking-intro-layout) > .admin-header {
@@ -1752,7 +1768,7 @@ h1 {
     min-width: 0;
     display: grid;
     grid-template-rows: auto auto;
-    gap: clamp(1rem, 2cqi, 1.5rem);
+    gap: var(--space-card);
     container-type: inline-size;
   }
 
@@ -1766,7 +1782,7 @@ h1 {
 
   .client-main:has(.booking-intro-layout) .booking-page-heading h1 {
     margin: 0;
-    font: 500 clamp(2.5rem, calc(26cqi - 2.2rem), 3.95rem)/1 'Newsreader', Georgia, serif;
+    font: 500 2.625rem/1.08 'Newsreader', Georgia, serif;
     letter-spacing: -.025em;
     overflow-wrap: normal;
     word-break: normal;
@@ -1778,7 +1794,7 @@ h1 {
 
   .client-main:has(.booking-intro-layout) .booking-editorial > p:last-child {
     max-width: 32ch;
-    margin-top: 1rem;
+    margin-top: var(--space-card);
   }
 
   .client-main:has(.booking-intro-layout) .booking-stepper {
@@ -1809,16 +1825,30 @@ h1 {
     grid-row: 2;
     width: 100%;
     max-width: 580px;
-    padding: clamp(1.25rem, 2.2cqi, 2.5rem);
+    padding: var(--space-card);
   }
 
   .client-main:has(.booking-intro-layout) .booking-sidebar {
     grid-column: 3;
     grid-row: 2;
-    position: sticky;
-    top: clamp(1rem, 2cqi, 2rem);
+    position: static;
+    grid-template-rows: minmax(0, 1fr);
+    align-self: stretch;
     width: 100%;
-    max-width: clamp(300px, 11.7cqi, 340px);
+    height: 100%;
+    max-width: 19rem;
+  }
+
+  .client-main:has(.booking-intro-layout) .booking-summary {
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    height: auto;
+  }
+
+  .client-main:has(.booking-intro-layout) .booking-summary__note {
+    margin-top: auto;
+    padding-top: var(--space-card);
   }
 
   .client-main:has(.booking-intro-layout) .booking-summary h2 {
@@ -1827,7 +1857,7 @@ h1 {
   }
 
   .client-main:has(.booking-intro-layout) .booking-card-grid {
-     grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 }
@@ -1838,6 +1868,21 @@ h1 {
 
 @media (max-width: 1439px) {
   .client-main:has(.booking-intro-layout) > .admin-header { display: flex; }
+}
+
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .client-main:has(.booking-intro-layout) > .admin-header {
+    margin-bottom: var(--space-card);
+  }
+
+  .client-main:has(.booking-intro-layout) > .admin-header h1 {
+    font-size: 3.25rem;
+    line-height: 1.08;
+  }
+
+  .client-main:has(.booking-intro-layout) .booking-intro-layout {
+    gap: var(--space-card);
+  }
 }
 
 @container booking-page (max-width: 719px) {

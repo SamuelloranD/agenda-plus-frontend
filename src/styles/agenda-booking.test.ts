@@ -20,7 +20,7 @@ describe('responsive agenda and booking', () => {
     expect(indexStyles).not.toContain('@media (min-width: 761px)')
     expect(indexStyles).not.toContain('@media (min-width: 981px)')
     expect(indexStyles).toContain('@container app-content (min-width: 1180px)')
-    expect(indexStyles).toContain('grid-template-columns: minmax(clamp(280px, 20cqi, 380px), 1fr) minmax(520px, clamp(520px, 20.3vw, 580px)) minmax(300px, clamp(300px, 11.7cqi, 340px));')
+    expect(indexStyles).toContain('grid-template-columns: minmax(16rem, 17.5rem) minmax(0, 580px) minmax(17rem, 19rem);')
     expect(indexStyles).not.toContain('.booking-layout {\n  height: 100%;')
     expect(indexStyles).not.toContain('.booking-layout {\n  transform: translateX(30px)')
   })

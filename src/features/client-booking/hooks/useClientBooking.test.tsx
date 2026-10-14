@@ -11,6 +11,7 @@ import { useCreateAgendamento } from '../../scheduling/hooks/useCreateAgendament
 import { useProfessionals } from '../../professionals/hooks/useProfessionals'
 import { useServices } from '../../services/hooks/useServices'
 import { useClientBooking } from './useClientBooking'
+import { addCalendarDays, todayKey } from '../utils/bookingTime'
 
 vi.mock('../../../services/api/scheduling', () => ({
   schedulingApi: {
@@ -62,8 +63,8 @@ const admin: User = {
 
 const appointment = {
   id: 'appointment-1',
-  inicio: '2026-09-20T10:00:00',
-  fim: '2026-09-20T11:00:00',
+  inicio: '2099-09-20T10:00:00',
+  fim: '2099-09-20T11:00:00',
   profissionalId: 'professional-1',
   clienteId: 'client-1',
   servicoId: 'service-1',
@@ -71,8 +72,8 @@ const appointment = {
 }
 
 const availableSlot = {
-  inicio: '2026-09-20T10:00:00',
-  fim: '2026-09-20T11:00:00',
+  inicio: '2099-09-20T10:00:00',
+  fim: '2099-09-20T11:00:00',
 }
 
 function wrapper({ children }: { children: ReactNode }) {
@@ -108,6 +109,37 @@ afterEach(() => {
 })
 
 describe('useClientBooking', () => {
+  it('keeps each choice visible until the summary advances the step', () => {
+    configureMocks(client)
+    const { result } = renderHook(() => useClientBooking(), { wrapper })
+
+    act(() => result.current.selectService(service))
+    expect(result.current.step).toBe('service')
+    act(() => result.current.goToStep('professional'))
+    expect(result.current.step).toBe('professional')
+    act(() => result.current.selectProfessional('professional-1'))
+    expect(result.current.step).toBe('professional')
+    act(() => result.current.goToStep('time'))
+    expect(result.current.step).toBe('time')
+  })
+
+  it('starts a clean booking after a completed request', async () => {
+    const mutateAsync = vi.fn().mockResolvedValue(appointment)
+    configureMocks(client, mutateAsync)
+    const { result } = renderHook(() => useClientBooking(), { wrapper })
+    act(() => result.current.selectService(service))
+    act(() => result.current.selectProfessional('professional-1'))
+    await waitFor(() => expect(result.current.slots).toHaveLength(1))
+    act(() => result.current.selectSlot(result.current.slots[0]))
+    await act(async () => { await result.current.confirmBooking() })
+
+    act(() => result.current.startOver())
+    expect(result.current.step).toBe('service')
+    expect(result.current.confirmation).toBeNull()
+    expect(result.current.selection.service).toBeNull()
+    expect(result.current.selection.slot).toBeNull()
+  })
+
   it('restores the selected booking after the wizard remounts with a CLIENTE session', async () => {
     configureMocks(null)
     const firstRender = renderHook(() => useClientBooking(), { wrapper })
@@ -196,5 +228,150 @@ describe('useClientBooking', () => {
       service,
       professional: professionals[0],
     })
+  })
+
+  it('keeps the booking pending when the selected slot disappeared before submission', async () => {
+    const mutateAsync = vi.fn()
+    configureMocks(client, mutateAsync)
+    const { result } = renderHook(() => useClientBooking(), { wrapper })
+    act(() => result.current.selectService(service))
+    act(() => result.current.selectProfessional('professional-1'))
+    await waitFor(() => expect(result.current.slots).toHaveLength(1))
+    act(() => result.current.selectSlot(result.current.slots[0]))
+    vi.mocked(schedulingApi.availableTimes).mockResolvedValue([])
+
+    await act(async () => {
+      await expect(result.current.confirmBooking()).resolves.toBeNull()
+    })
+
+    expect(mutateAsync).not.toHaveBeenCalled()
+    expect(result.current.selection.slot).toBeNull()
+    expect(result.current.bookingError).toMatch(/não está mais disponível/i)
+  })
+
+  it('finds the first afternoon slot on a later day without generating slots', async () => {
+    configureMocks(client)
+    const nextDate = addCalendarDays(todayKey(), 1)
+    vi.mocked(schedulingApi.availableTimes).mockImplementation(async ({ data }) => data === nextDate ? [
+      { inicio: `${nextDate}T09:00:00`, fim: `${nextDate}T10:00:00` },
+      { inicio: `${nextDate}T13:00:00`, fim: `${nextDate}T14:00:00` },
+    ] : [])
+    const { result } = renderHook(() => useClientBooking(), { wrapper })
+    act(() => result.current.selectService(service))
+    act(() => result.current.selectProfessional('professional-1'))
+
+    await act(async () => { await result.current.findNextAvailable('afternoon') })
+
+    expect(result.current.selection.date).toBe(nextDate)
+    expect(result.current.selection.slot?.inicio).toBe(`${nextDate}T13:00:00`)
+  })
+
+  it('keeps available professionals visible when another agenda fails', async () => {
+    configureMocks(client)
+    vi.mocked(schedulingApi.availableTimes).mockImplementation(async ({ profissionalId }) => {
+      if (profissionalId === 'professional-1') throw new Error('Agenda indisponível')
+      return [availableSlot]
+    })
+    const { result } = renderHook(() => useClientBooking(), { wrapper })
+    act(() => result.current.selectService(service))
+    act(() => result.current.selectProfessional('any'))
+
+    await waitFor(() => expect(result.current.availability.isLoading).toBe(false))
+    expect(result.current.slots).toHaveLength(1)
+    expect(result.current.slots[0].candidates).toEqual([professionals[1]])
+    expect(result.current.availability.isError).toBe(false)
+    expect(result.current.availability.isPartialError).toBe(true)
+
+    await act(async () => { await result.current.findNextAvailable('all') })
+    expect(result.current.selection.slot?.profissionalId).toBe('professional-2')
+  })
+
+  it('finds availability after the fourteenth day', async () => {
+    configureMocks(client)
+    const laterDate = addCalendarDays(todayKey(), 15)
+    vi.mocked(schedulingApi.availableTimes).mockImplementation(async ({ data }) => data === laterDate ? [
+      { inicio: `${laterDate}T09:00:00`, fim: `${laterDate}T10:00:00` },
+    ] : [])
+    const { result } = renderHook(() => useClientBooking(), { wrapper })
+    act(() => result.current.selectService(service))
+    act(() => result.current.selectProfessional('professional-1'))
+
+    await act(async () => { await result.current.findNextAvailable('all') })
+
+    expect(result.current.selection.date).toBe(laterDate)
+    expect(result.current.selection.slot?.inicio).toBe(`${laterDate}T09:00:00`)
+  })
+
+  it('sends only one request when submission is triggered twice', async () => {
+    const mutateAsync = vi.fn().mockResolvedValue(appointment)
+    configureMocks(client, mutateAsync)
+    const { result } = renderHook(() => useClientBooking(), { wrapper })
+    act(() => result.current.selectService(service))
+    act(() => result.current.selectProfessional('professional-1'))
+    await waitFor(() => expect(result.current.slots).toHaveLength(1))
+    act(() => result.current.selectSlot(result.current.slots[0]))
+
+    await act(async () => {
+      const first = result.current.confirmBooking()
+      const second = result.current.confirmBooking()
+      expect(await second).toBeNull()
+      await first
+    })
+
+    expect(mutateAsync).toHaveBeenCalledTimes(1)
+  })
+
+  it('locks the chosen booking while availability is rechecked for submission', async () => {
+    const mutateAsync = vi.fn().mockResolvedValue(appointment)
+    configureMocks(client, mutateAsync)
+    const { result } = renderHook(() => useClientBooking(), { wrapper })
+    act(() => result.current.selectService(service))
+    act(() => result.current.selectProfessional('professional-1'))
+    await waitFor(() => expect(result.current.slots).toHaveLength(1))
+    act(() => result.current.selectSlot(result.current.slots[0]))
+    act(() => result.current.goToStep('time'))
+
+    let resolveTimes!: (times: typeof availableSlot[]) => void
+    vi.mocked(schedulingApi.availableTimes).mockImplementation(() => new Promise((resolve) => { resolveTimes = resolve }))
+    let bookingPromise!: Promise<unknown>
+    act(() => { bookingPromise = result.current.confirmBooking() })
+    expect(result.current.isSubmitting).toBe(true)
+
+    act(() => {
+      result.current.goToStep('service')
+      result.current.selectService({ ...service, id: 'service-2' })
+      result.current.selectProfessional('professional-2')
+      result.current.selectDate('2099-09-21')
+      result.current.selectSlot(result.current.slots[0])
+    })
+    expect(result.current.step).toBe('time')
+    expect(result.current.selection).toMatchObject({
+      service,
+      professionalChoice: 'professional-1',
+      date: todayKey(),
+      slot: { profissionalId: 'professional-1' },
+    })
+
+    await act(async () => { resolveTimes([availableSlot]); await bookingPromise })
+    expect(mutateAsync).toHaveBeenCalledWith(expect.objectContaining({
+      profissionalId: 'professional-1',
+      servicoId: service.id,
+    }))
+    expect(result.current.confirmation?.service).toEqual(service)
+  })
+
+  it('preserves a valid slot when editing and reselecting the same service and professional', async () => {
+    configureMocks(client)
+    const { result } = renderHook(() => useClientBooking(), { wrapper })
+    act(() => result.current.selectService(service))
+    act(() => result.current.selectProfessional('professional-1'))
+    await waitFor(() => expect(result.current.slots).toHaveLength(1))
+    act(() => result.current.selectSlot(result.current.slots[0]))
+
+    act(() => result.current.goToStep('service'))
+    act(() => result.current.selectService(service))
+    act(() => result.current.selectProfessional('professional-1'))
+
+    expect(result.current.selection.slot?.inicio).toBe(availableSlot.inicio)
   })
 })

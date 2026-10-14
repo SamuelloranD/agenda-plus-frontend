@@ -6,6 +6,8 @@ import './index.css'
 import './styles/pages.css'
 import './styles/responsive.css'
 import './styles/shells.css'
+import './styles/booking-redesign.css'
+import './styles/booking-flow-refresh.css'
 import App from './App.tsx'
 
 const queryClient = new QueryClient()

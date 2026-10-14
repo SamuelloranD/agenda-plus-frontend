@@ -28,7 +28,7 @@ function ClientBookingRoute({ session }: { session?: AdminSession | null }) {
 
   if (!isClient) return page
 
-  return <ClientShell title="Novo agendamento" subtitle="">{page}</ClientShell>
+  return <ClientShell title="Novo agendamento" subtitle="Escolha o serviço, o profissional e encontre um horário para você.">{page}</ClientShell>
 }
 
 export function AppRoutes({ session }: AppRoutesProps) {

@@ -10,8 +10,10 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const WIDTHS = Array.from({ length: Math.floor((2560 - 320) / 40) + 1 }, (_, index) => 320 + index * 40)
 const ALL_WIDTHS = [...WIDTHS, 3840]
 const HEIGHTS = [720, 900]
-const SCREENSHOT_SIZES = [[3840, 2160], [2560, 1440], [1920, 1080], [1536, 864], [1440, 900], [1366, 768], [1280, 720], [1200, 800], [1097, 617], [1024, 768], [820, 1180], [390, 844]]
+const SCREENSHOT_SIZES = [[3840, 2160], [2560, 1440], [1920, 1080], [1536, 864], [1440, 900], [1366, 768], [1280, 720], [1200, 800], [1097, 617], [1024, 768], [820, 1180], [768, 1024], [390, 844]]
 const EXACT_BOOKING_VIEWPORTS = new Set(['1920x1080', '1536x864', '1440x900', '1366x768'])
+const BOOKING_STEP_SCREENSHOTS = new Set(['1920x1080', '3840x2160', '1366x768', '768x1024', '390x844'])
+const BOOKING_FULLPAGE_SCREENSHOTS = new Set(['1366x768', '390x844'])
 const ROUTES = ['/login', '/cadastro', '/painel', '/painel/agenda', '/painel/profissionais', '/painel/servicos', '/painel/agendamentos/novo', '/agendar', '/meus-agendamentos']
 const COMPOSITION_ROUTES = ['/painel', '/painel/agenda', '/painel/profissionais', '/painel/servicos', '/painel/agendamentos/novo', '/agendar', '/meus-agendamentos']
 const COMPOSITION_WIDTHS = [2560, 3840]
@@ -63,10 +65,11 @@ async function mockApi(route) {
   if (pathname === '/profissionais') return route.fulfill(jsonResponse(professionals))
   if (pathname === '/clientes') return route.fulfill(jsonResponse(clients))
   if (pathname.endsWith('/horarios-disponiveis')) {
+    const date = url.searchParams.get('data') ?? new Date().toISOString().slice(0, 10)
     return route.fulfill(jsonResponse([
-      { inicio: '2026-09-23T09:00:00', fim: '2026-09-23T09:45:00' },
-      { inicio: '2026-09-23T10:00:00', fim: '2026-09-23T10:45:00' },
-      { inicio: '2026-09-23T11:00:00', fim: '2026-09-23T11:45:00' },
+      { inicio: `${date}T09:00:00`, fim: `${date}T09:45:00` },
+      { inicio: `${date}T10:00:00`, fim: `${date}T10:45:00` },
+      { inicio: `${date}T11:00:00`, fim: `${date}T11:45:00` },
     ]))
   }
   if (pathname === '/agendamentos' || pathname === '/agendamentos/meus') {
@@ -231,6 +234,15 @@ async function inspectPage(page, routePath, width, height, expectedBookingChoice
       const first = words[0]?.rects[0]
       return first ? { word: words[0].word, width: first.width } : null
     }
+    const luminance = (value) => {
+      const channels = value.match(/[\d.]+/g)?.slice(0, 3).map(Number) ?? []
+      if (channels.length !== 3) return null
+      const linear = channels.map((channel) => {
+        const normalized = channel / 255
+        return normalized <= .04045 ? normalized / 12.92 : ((normalized + .055) / 1.055) ** 2.4
+      })
+      return linear[0] * .2126 + linear[1] * .7152 + linear[2] * .0722
+    }
     const ignoredOverflow = new Set(['calendar-scroll', 'booking-time-grid', 'ui-select__listbox', 'ui-date-picker__popover', 'admin-sidebar', 'client-sidebar', 'cancel-dialog'])
     const isInsideAllowedOverflow = (element) => [...element.classList].some((name) => ignoredOverflow.has(name)) || Boolean(element.closest([...ignoredOverflow].map((name) => `.${name}`).join(',')))
     const elements = [...document.querySelectorAll('body *')].filter(visible)
@@ -303,6 +315,22 @@ async function inspectPage(page, routePath, width, height, expectedBookingChoice
       const workspace = box(document.querySelector('.booking-workspace'))
       const sidebar = box(document.querySelector('.booking-sidebar'))
       if (intersection(workspace, sidebar) > 0) failures.push('workspace e resumo do booking sobrepostos')
+      if (routePath === '/agendar' && document.querySelector('.client-main') && width >= 720 && !document.querySelector('.booking-auth-prompt') && Math.abs(workspace.height - sidebar.height) > 2) {
+        failures.push(`altura do resumo difere do card em ${Math.round(Math.abs(workspace.height - sidebar.height))}px`)
+      }
+    }
+
+    if (routePath === '/agendar') {
+      const supportingText = document.querySelector('.booking-editorial > p:last-child')
+      const paper = document.querySelector('.booking-page')
+      if (supportingText && paper) {
+        const foreground = luminance(getComputedStyle(supportingText).color)
+        const background = luminance(getComputedStyle(paper).backgroundColor)
+        if (foreground !== null && background !== null) {
+          const ratio = (Math.max(foreground, background) + .05) / (Math.min(foreground, background) + .05)
+          if (ratio < 4.5) failures.push(`contraste do texto de apoio abaixo de 4.5:1 (${ratio.toFixed(2)}:1)`)
+        }
+      }
     }
 
     const bookingCardGrid = [...document.querySelectorAll('.booking-card-grid')].find(visible)
@@ -699,6 +727,33 @@ async function main() {
       await page.locator('.booking-card-grid .booking-choice').first().waitFor({ state: 'visible', timeout: 3000 })
       const screenshotPath = path.join(screenshotDirectory, `booking-${width}x${height}.png`)
       await page.screenshot({ path: screenshotPath, fullPage: false })
+      if (BOOKING_STEP_SCREENSHOTS.has(`${width}x${height}`)) {
+        await page.screenshot({ path: path.join(screenshotDirectory, `booking-step-01-${width}x${height}.png`), fullPage: false })
+        if (BOOKING_FULLPAGE_SCREENSHOTS.has(`${width}x${height}`)) {
+          await page.screenshot({ path: path.join(screenshotDirectory, `booking-step-01-${width}x${height}-full.png`), fullPage: true })
+        }
+        try {
+          await page.getByRole('button', { name: /Corte de cabelo/ }).first().click()
+          await page.getByRole('button', { name: /Qualquer profissional/ }).waitFor({ state: 'visible', timeout: 3000 })
+          await page.waitForTimeout(400)
+          await page.evaluate(() => window.scrollTo(0, 0))
+          await page.screenshot({ path: path.join(screenshotDirectory, `booking-step-02-${width}x${height}.png`), fullPage: false })
+          if (BOOKING_FULLPAGE_SCREENSHOTS.has(`${width}x${height}`)) {
+            await page.screenshot({ path: path.join(screenshotDirectory, `booking-step-02-${width}x${height}-full.png`), fullPage: true })
+          }
+          await page.getByRole('button', { name: /Qualquer profissional/ }).click()
+          await page.locator('.booking-time-grid .booking-time').first().waitFor({ state: 'visible', timeout: 3000 })
+          await page.locator('.booking-time-grid .booking-time').first().click()
+          await page.waitForTimeout(400)
+          await page.evaluate(() => window.scrollTo(0, 0))
+          await page.screenshot({ path: path.join(screenshotDirectory, `booking-step-03-${width}x${height}.png`), fullPage: false })
+          if (BOOKING_FULLPAGE_SCREENSHOTS.has(`${width}x${height}`)) {
+            await page.screenshot({ path: path.join(screenshotDirectory, `booking-step-03-${width}x${height}-full.png`), fullPage: true })
+          }
+        } catch (error) {
+          failures.push(`/agendar @ ${width}x${height}: capturas dos passos 02/03 indisponiveis: ${error.message}`)
+        }
+      }
       if (width === 2560 && height === 1440 && BASELINE_SCREENSHOT) {
         try {
           const comparison = await pixelDifferenceRatio(page, screenshotPath, BASELINE_SCREENSHOT)

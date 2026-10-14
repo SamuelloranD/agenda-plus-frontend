@@ -1,4 +1,5 @@
 import { Menu } from 'lucide-react'
+import type { ReactNode } from 'react'
 
 interface HeaderProps {
   title?: string
@@ -6,9 +7,10 @@ interface HeaderProps {
   sidebarOpen?: boolean
   sidebarId?: string
   onMenuClick?: () => void
+  right?: ReactNode
 }
 
-export function Header({ title = 'Painel administrativo', subtitle = 'O ritmo do seu estúdio, em um só lugar.', sidebarOpen = false, sidebarId, onMenuClick }: HeaderProps) {
+export function Header({ title = 'Painel administrativo', subtitle = 'O ritmo do seu estúdio, em um só lugar.', sidebarOpen = false, sidebarId, onMenuClick, right }: HeaderProps) {
   return (
     <header className="admin-header">
       {!sidebarOpen && (
@@ -24,6 +26,7 @@ export function Header({ title = 'Painel administrativo', subtitle = 'O ritmo do
         </button>
       )}
       <div><p className="admin-eyebrow">Agenda+</p><h1>{title}</h1><p>{subtitle}</p></div>
+      {right}
     </header>
   )
 }
