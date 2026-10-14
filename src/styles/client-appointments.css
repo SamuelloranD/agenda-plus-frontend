@@ -12,7 +12,7 @@
 .client-appointments-search input { width: 100%; min-width: 0; outline: none; border: 0; color: #202633; background: transparent; font-family: inherit; font-size: 12px; }
 .client-appointments-search:focus-within { border-color: #c45832; box-shadow: 0 0 0 2px #c4583222; }
 .client-appointments-search input::placeholder { color: #77818c; }
-.client-appointments-period { position: relative; z-index: 6; flex: none; width: 195px; color: #242a33; }
+.client-appointments-period { position: relative; z-index: 1; flex: none; width: 195px; color: #242a33; }
 .client-appointments-period__trigger { display: flex; align-items: center; gap: 9px; width: 100%; min-height: 36px; padding: 0 11px; border: 1px solid #dedbd5; border-radius: 5px; color: #242a33; background: #fffdfa; cursor: pointer; font-family: inherit; font-size: 11px; font-weight: 600; text-align: left; transition: border-color .16s, box-shadow .16s; }
 .client-appointments-period__trigger:hover, .client-appointments-period.is-open .client-appointments-period__trigger { border-color: #c8562e; }
 .client-appointments-period__trigger > svg { flex: none; }
