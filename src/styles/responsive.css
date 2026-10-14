@@ -20,7 +20,7 @@
   --type-body: clamp(1rem, .95rem + .2vw, 1.125rem);
   --type-label: clamp(.625rem, .58rem + .08vw, .75rem);
   --page-gutter: var(--space-page);
-  --shell-sidebar-width: clamp(15.625rem, 16vw, 18rem);
+  --shell-sidebar-width: 16rem;
   --safe-inline-start: env(safe-area-inset-left);
   --safe-inline-end: env(safe-area-inset-right);
   --safe-block-start: env(safe-area-inset-top);

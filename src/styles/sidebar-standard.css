@@ -1,0 +1,178 @@
+.admin-sidebar,
+.client-sidebar {
+  display: flex;
+  flex-direction: column;
+  padding: max(26px, var(--safe-block-start)) 16px max(24px, var(--safe-block-end));
+  background: #fcfaf7;
+  border-color: #e6e1db;
+  color: #181b22;
+}
+
+.admin-sidebar-brand,
+.client-sidebar-brand {
+  flex: none;
+  gap: 9px;
+  margin: 0 0 29px;
+  padding: 0 1px;
+}
+
+.admin-sidebar .brand-mark,
+.client-sidebar .brand-mark {
+  width: 29px;
+  height: 29px;
+  border-radius: 4px;
+  font-size: 23px;
+  line-height: 1;
+}
+
+.admin-sidebar .brand-name,
+.client-sidebar .brand-name {
+  font: italic 700 27px/1 'Newsreader', Georgia, serif;
+  letter-spacing: -.045em;
+}
+
+.admin-new-appointment,
+.client-new-appointment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  flex: none;
+  min-height: 47px;
+  margin: 0 0 17px;
+  padding: 10px 12px;
+  color: #fff !important;
+  background: #ca572e;
+  border: 1px solid #ca572e !important;
+  border-radius: 6px;
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 700 !important;
+  letter-spacing: 0;
+  text-align: center !important;
+}
+
+.admin-new-appointment:hover,
+.client-new-appointment:hover {
+  background: #af4725 !important;
+  border-color: #af4725 !important;
+}
+
+.admin-new-appointment svg,
+.client-new-appointment svg { flex: none; }
+
+.admin-sidebar nav,
+.client-sidebar nav {
+  display: grid;
+  gap: 5px;
+}
+
+.admin-sidebar nav a,
+.client-sidebar nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 43px;
+  padding: 9px 13px;
+  color: #566170;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.admin-sidebar nav a svg,
+.client-sidebar nav a svg { flex: none; }
+
+.admin-sidebar nav a:hover,
+.client-sidebar nav a:hover {
+  color: #b84626;
+  background: #f7f0e9;
+  border-color: transparent;
+}
+
+.admin-sidebar nav a.admin-nav-link--active,
+.client-sidebar nav a.client-nav-link--active {
+  color: #c24d28;
+  background: #fbede3;
+  border-color: transparent;
+  box-shadow: inset 3px 0 #ca572e;
+  font-weight: 600;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 18px;
+  border-top: 1px solid #e6e1db;
+}
+
+.sidebar-account {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  padding: 0 4px;
+}
+
+.sidebar-account__avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 39px;
+  height: 39px;
+  color: #794a3b;
+  background: #eee2dc;
+  border-radius: 50%;
+  font: 600 13px/1 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+}
+
+.sidebar-account__identity { display: grid; gap: 4px; min-width: 0; }
+.sidebar-account__name {
+  overflow: hidden;
+  color: #263244;
+  font-size: 12px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sidebar-account__role { color: #7d828a; font-size: 11px; }
+
+.admin-logout,
+.client-logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 43px;
+  margin: 14px 0 0;
+  padding: 8px 7px;
+  color: #697280;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-align: left;
+  text-transform: none;
+}
+
+.admin-logout:hover,
+.client-logout:hover { color: #c24d28; background: #fbede3; border-color: transparent; }
+
+.admin-sidebar :is(a, button):focus-visible,
+.client-sidebar :is(a, button):focus-visible {
+  outline: 3px solid #da8a66;
+  outline-offset: 2px;
+}
+
+@media (max-height: 800px) {
+  .admin-sidebar,
+  .client-sidebar { padding-block-start: max(16px, var(--safe-block-start)); }
+  .admin-sidebar-brand,
+  .client-sidebar-brand { margin-bottom: 18px; }
+}

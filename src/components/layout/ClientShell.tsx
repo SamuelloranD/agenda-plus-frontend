@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState, type ReactNode, type TouchEvent } from "react";
+import { useRef, type ReactNode, type TouchEvent } from "react";
 import { ClientSidebar } from "./ClientSidebar";
 import { Header } from "./Header";
 import { useAuthStore } from "../../store/authStore";
 import { useNavigate } from "react-router-dom";
+import { useSidebarDialog } from './useSidebarDialog';
 
 interface ClientShellProps {
   children: ReactNode;
@@ -14,9 +15,8 @@ export function ClientShell({ children, title, subtitle }: ClientShellProps) {
   const user = useAuthStore((state) => state.user);
   const clearSession = useAuthStore((state) => state.clearSession);
   const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { sidebarOpen, setSidebarOpen, closeSidebar, shellRef } = useSidebarDialog('client-sidebar');
   const touchStartX = useRef<number | null>(null);
-  const closeSidebar = () => setSidebarOpen(false);
 
   function handleTouchStart(event: TouchEvent) {
     if (sidebarOpen)
@@ -34,22 +34,14 @@ export function ClientShell({ children, title, subtitle }: ClientShellProps) {
       closeSidebar();
   }
 
-  useEffect(() => {
-    if (!sidebarOpen) return;
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') closeSidebar();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [sidebarOpen]);
-
   return (
     <div
+      ref={shellRef}
       className={`client-shell${sidebarOpen ? " sidebar-open" : ""}`}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <ClientSidebar />
+      <ClientSidebar mobileOpen={sidebarOpen} onNavigate={closeSidebar} />
       {sidebarOpen && (
         <button
           className="client-sidebar-overlay client-sidebar-overlay--opaque"
@@ -59,7 +51,7 @@ export function ClientShell({ children, title, subtitle }: ClientShellProps) {
           onClick={closeSidebar}
         />
       )}
-      <main className="client-main" aria-label={title}>
+      <main className="client-main" aria-label={title} inert={sidebarOpen}>
         <Header
           title={title}
           subtitle={subtitle}

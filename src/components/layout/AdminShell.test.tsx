@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, cleanup } from '@testing-library/react'
+import { fireEvent, render, screen, cleanup, within } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, describe, expect, it } from 'vitest'
 import { AdminShell } from './AdminShell'
@@ -61,6 +61,24 @@ describe('AdminShell responsive interaction', () => {
     expect(toggle).toHaveAttribute('aria-label', 'Abrir navegação')
     expect(toggle).toHaveAttribute('aria-expanded', 'false')
     expect(toggle).toHaveAttribute('aria-controls', 'admin-sidebar')
+  })
+
+  it('keeps keyboard focus in the mobile menu and returns it when closed', () => {
+    renderShell()
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir navegação' }))
+    const dialog = screen.getByRole('dialog', { name: 'Navegação administrativa' })
+    const links = within(dialog).getAllByRole('link')
+    expect(links[0]).toHaveFocus()
+    expect(screen.getByRole('main')).toHaveAttribute('inert')
+
+    const logout = within(dialog).getByRole('button', { name: 'Sair' })
+    logout.focus()
+    fireEvent.keyDown(document, { key: 'Tab' })
+    expect(links[0]).toHaveFocus()
+
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Abrir navegação' })).toHaveFocus()
   })
 
   it('clears the session and redirects to login when signing out', () => {

@@ -1,18 +1,7 @@
-/* Visual do agendamento antes da sidebar padronizada. */
-.client-shell:has(.booking-page) { --shell-sidebar-width: 252px; background: #fcfaf7; }
-.client-shell:has(.booking-page) .client-sidebar { padding: 27px 10px 22px; background: #fefdfa; border-color: #eee9e4; }
-.client-shell:has(.booking-page) .client-sidebar-brand { margin: 0 17px 34px; gap: 9px; }
-.client-shell:has(.booking-page) .client-sidebar .brand-mark { width: 29px; height: 29px; border-radius: 4px; font-size: 24px; line-height: 26px; }
-.client-shell:has(.booking-page) .client-sidebar .brand-name { font: italic 700 28px/1 'Newsreader', Georgia, serif; letter-spacing: -.05em; }
-.client-shell:has(.booking-page) .client-new-appointment,
-.client-shell:has(.booking-page) .client-sidebar nav a { display: flex; align-items: center; gap: 19px; min-height: 49px; margin: 0 0 6px; padding: 0 21px; border-radius: 6px; box-shadow: none; text-align: left !important; font-size: 14px; font-weight: 500 !important; letter-spacing: 0; }
-.client-shell:has(.booking-page) .client-new-appointment { color: #fff !important; background: #c9562e; border-color: #c9562e !important; }
-.client-shell:has(.booking-page) .client-sidebar nav a { color: #5d6066; background: transparent; border-color: transparent; }
-.client-shell:has(.booking-page) .client-sidebar nav a:hover { background: #f9f1ea; }
-.client-shell:has(.booking-page) .client-logout { position: absolute; bottom: 26px; left: 25px; width: calc(100% - 50px); min-height: 38px; margin: 0; padding: 4px 8px; color: #696c73; background: transparent; border: 0; box-shadow: none; font-size: 14px; font-weight: 400; letter-spacing: 0; text-transform: none; }
-.client-shell:has(.booking-page) .client-logout:hover { color: #c9562e; background: transparent; }
+/* O agendamento usa a mesma sidebar das demais paginas. */
+.client-shell:has(.booking-page) { background: #fcfaf7; }
 
-.client-main:has(.booking-page) { --shell-content-max: none; width: calc(100% - 252px); max-width: none; min-height: 100svh; margin: 0 0 0 252px; padding: 12px 36px 28px 40px; background: #fcfaf7; }
+.client-main:has(.booking-page) { --shell-content-max: none; width: calc(100% - var(--shell-sidebar-width)); max-width: none; min-height: 100svh; margin: 0 0 0 var(--shell-sidebar-width); padding: 12px 36px 28px 40px; background: #fcfaf7; }
 .client-main:has(.booking-page) > .admin-header { display: flex; align-items: flex-start; justify-content: space-between; min-height: 72px; margin: 0 0 13px; padding-left: 24px; gap: 20px; }
 .client-main:has(.booking-page) > .admin-header .admin-eyebrow { display: none; }
 .client-main:has(.booking-page) > .admin-header h1 { margin: 0; color: #16191e; font: 400 36px/1.15 'Newsreader', Georgia, serif; letter-spacing: -.025em; }
@@ -146,7 +135,6 @@
   .booking-flow .booking-layout { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 1023px) {
-  .client-shell:has(.booking-page) .client-sidebar { padding-top: 28px; }
   .client-main:has(.booking-page) { width: 100%; max-width: none; margin: 0; padding: 22px 24px 36px; }
   .client-main:has(.booking-page) > .admin-header { padding-left: 0; }
   .booking-stepper__item:not(:last-child)::after { margin-inline: 9px; }
