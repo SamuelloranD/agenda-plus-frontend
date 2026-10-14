@@ -39,12 +39,10 @@
 .agenda-time-cell { position: absolute; inset-inline: 0; width: 100%; border: 0; background: transparent; }
 .agenda-time-cell:hover:not(:disabled) { background: #faeee6; }
 .agenda-time-cell.unavailable { background: repeating-linear-gradient(135deg, #f0efed, #f0efed 3px, #f9f8f6 3px, #f9f8f6 9px); }
-.agenda-event { position: absolute; z-index: 2; min-width: 0; overflow: hidden; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 5px 7px; border: 1px solid transparent; border-left: 3px solid; border-radius: 5px; text-align: left; font-size: 11px; line-height: 1.18; color: #10211b; }
-.agenda-event small { font-size: 10px; white-space: nowrap; }
-.agenda-event strong { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
-.agenda-event span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.agenda-event.short { flex-direction: row; align-items: center; gap: 4px; }
-.agenda-event.short strong { font-size: 9px; }
+.agenda-event { position: absolute; z-index: 2; min-width: 0; min-height: 74px; overflow: visible; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 5px 7px; border: 1px solid transparent; border-left: 3px solid; border-radius: 5px; text-align: left; font-size: 11px; line-height: 1.18; color: #10211b; }
+.agenda-event small, .agenda-event strong, .agenda-event span { max-width: 100%; overflow-wrap: anywhere; white-space: normal; }
+.agenda-event small { font-size: 10px; }
+.agenda-event strong { font-size: 11px; }
 .agenda-status--confirmado { border-color: #2b9860; background: #d7f2e2; }
 .agenda-status--pendente { border-color: #d5962b; background: #ffedc9; }
 .agenda-status--cancelado { border-color: #c96b70; background: #fbe1e2; }
