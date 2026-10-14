@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 import type { AgendamentoResponse } from '../../../types/scheduling'
 import { ClientAppointmentCard } from './ClientAppointmentCard'
@@ -45,6 +45,21 @@ describe('ClientAppointmentCard', () => {
 
     expect(screen.getByText('PENDENTE')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Cancelar' })).not.toBeInTheDocument()
+  })
+
+  it('opens the upcoming appointment details on request', () => {
+    render(
+      <ClientAppointmentCard
+        appointment={appointment}
+        names={{ professionalName: 'João Silva', serviceName: 'Corte de Cabelo' }}
+        price={80}
+      />,
+    )
+
+    expect(screen.queryByText('Protocolo:')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Ver detalhes' }))
+    expect(screen.getByText('Protocolo:')).toBeInTheDocument()
+    expect(screen.getByText('appointment-1')).toBeInTheDocument()
   })
 
   it('never renders raw IDs when catalog names are missing', () => {

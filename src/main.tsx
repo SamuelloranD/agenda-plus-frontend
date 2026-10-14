@@ -9,6 +9,7 @@ import './styles/shells.css'
 import './styles/booking-redesign.css'
 import './styles/booking-flow-refresh.css'
 import './styles/sidebar-standard.css'
+import './styles/client-appointments.css'
 import App from './App.tsx'
 
 const queryClient = new QueryClient()

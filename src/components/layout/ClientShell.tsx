@@ -59,7 +59,7 @@ export function ClientShell({ children, title, subtitle }: ClientShellProps) {
           sidebarId="client-sidebar"
           onMenuClick={sidebarOpen ? closeSidebar : () => setSidebarOpen(true)}
           right={
-            title === "Novo agendamento" &&
+            (title === "Novo agendamento" || title === "Meus agendamentos") &&
             user && (
               <details className="client-account">
                 <summary>

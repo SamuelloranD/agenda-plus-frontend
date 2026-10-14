@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -140,7 +140,7 @@ describe('ClientRoute', () => {
       '/meus-agendamentos',
     )
 
-    fireEvent.click(screen.getByRole('button', { name: 'Sair' }))
+    fireEvent.click(within(screen.getByLabelText('Navegação do cliente')).getByRole('button', { name: 'Sair' }))
 
     expect(authStore.getState()).toMatchObject({ token: null, user: null })
     expect(screen.getByRole('heading', { name: 'Entrar' })).toBeInTheDocument()
