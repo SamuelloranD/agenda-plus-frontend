@@ -72,6 +72,23 @@ afterEach(() => {
 })
 
 describe('ClientRoute', () => {
+  it.each(['/meus-agendamentos', '/agendar'])('shows the signed-in user only in the sidebar on %s', (path) => {
+    authStore.setState({
+      token: 'client-token',
+      user: {
+        id: '53f1b75c-ffb8-4289-a536-d20e24f360b1',
+        nome: 'Cliente Agenda',
+        email: 'cliente@agenda.plus',
+        role: 'CLIENTE',
+      },
+    })
+    const { container } = renderWithQuery(<AppRoutes session={{ role: 'CLIENTE' }} />, path)
+
+    expect(within(screen.getByLabelText('Navegação do cliente')).getByText('Cliente Agenda')).toBeInTheDocument()
+    expect(container.querySelector('.client-account')).not.toBeInTheDocument()
+    expect(screen.queryByText(/Olá, Cliente/)).not.toBeInTheDocument()
+  })
+
   it('renders the client shell only for an authenticated CLIENTE', () => {
     renderWithQuery(
       <AppRoutes session={{ role: 'CLIENTE' }} />,

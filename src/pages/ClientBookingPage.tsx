@@ -60,11 +60,6 @@ export function ClientBookingPage({
                 Agenda<span>+</span>
               </span>
             </div>
-            {isClient && (
-              <span className="booking-client-name">
-                Olá, {booking.session.user?.nome}
-              </span>
-            )}
           </div>
           <header className="booking-page-heading">
             <h1>Novo agendamento</h1>

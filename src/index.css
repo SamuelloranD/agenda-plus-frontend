@@ -1032,8 +1032,7 @@ h1 {
   margin: 0 auto;
 }
 
-.booking-public-header > a,
-.booking-client-name {
+.booking-public-header > a {
   color: var(--olive);
   font-size: 12px;
   font-weight: 700;
@@ -1048,10 +1047,6 @@ h1 {
   justify-content: space-between;
   gap: 18px;
   margin-bottom: clamp(10px, 1.5dvh, 18px);
-}
-
-.booking-inline-brand .booking-client-name {
-  text-align: right;
 }
 
 .booking-stepper {

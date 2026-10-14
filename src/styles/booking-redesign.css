@@ -6,12 +6,6 @@
 .client-main:has(.booking-page) > .admin-header .admin-eyebrow { display: none; }
 .client-main:has(.booking-page) > .admin-header h1 { margin: 0; color: #16191e; font: 400 36px/1.15 'Newsreader', Georgia, serif; letter-spacing: -.025em; }
 .client-main:has(.booking-page) > .admin-header p { margin: 2px 0 0; color: #858b94; font-size: 17px; line-height: 1.35; }
-.client-account { position: relative; flex: none; margin-top: 4px; color: #232734; font-size: 14px; }
-.client-account summary { display: flex; align-items: center; gap: 15px; cursor: pointer; list-style: none; }
-.client-account summary::-webkit-details-marker { display: none; }
-.client-account__avatar { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; background: #eeece9; font-weight: 700; }
-.client-account > div { position: absolute; z-index: 5; top: 48px; right: 0; min-width: 175px; display: grid; gap: 10px; padding: 14px; background: #fff; border: 1px solid #e6e1db; border-radius: 8px; box-shadow: 0 10px 24px #241b121c; }
-.client-account > div button { color: #bd4e29; background: transparent; border: 0; cursor: pointer; text-align: left; }
 
 .booking-page, .client-main > .booking-page { width: 100%; min-height: 0; padding: 0; background: transparent; background-image: none; }
 .booking-page:not(.booking-page--embedded) { max-width: 1410px; margin-inline: auto; padding: 24px 24px 56px; }
@@ -123,7 +117,7 @@
 .booking-confirmation h2 { margin: 0; font: 400 clamp(32px, 4vw, 46px)/1.08 'Newsreader', Georgia, serif; }
 .booking-confirm-error { border-radius: 5px; }
 
-.booking-page button:focus-visible, .client-shell:has(.booking-page) button:focus-visible, .client-shell:has(.booking-page) a:focus-visible, .client-account summary:focus-visible { outline: 3px solid #dd8c65; outline-offset: 2px; }
+.booking-page button:focus-visible, .client-shell:has(.booking-page) button:focus-visible, .client-shell:has(.booking-page) a:focus-visible { outline: 3px solid #dd8c65; outline-offset: 2px; }
 
 @media (max-width: 1300px) {
   .booking-date-row { grid-template-columns: 1fr; gap: 12px; }
@@ -148,14 +142,12 @@
   .booking-stepper__label { white-space: normal; }
   .booking-stepper button { font-size: 11px; }
   .client-main:has(.booking-page) > .admin-header h1 { font-size: 31px; }
-  .client-account summary > span:not(.client-account__avatar) { display: none; }
 }
 @media (max-width: 520px) {
   .client-main:has(.booking-page) { padding: 16px 16px 32px; }
   .client-main:has(.booking-page) > .admin-header { align-items: center; min-height: 0; margin-bottom: 18px; }
   .client-main:has(.booking-page) > .admin-header h1 { font-size: 27px; }
   .client-main:has(.booking-page) > .admin-header p { font-size: 13px; }
-  .client-account__avatar { width: 36px; height: 36px; }
   .booking-flow .booking-stepper { margin-bottom: 16px; }
   .booking-stepper__item:not(:last-child)::after { margin-inline: 4px; }
   .booking-stepper button, .client-main:has(.booking-page) .booking-stepper button { gap: 0; }
