@@ -1,7 +1,10 @@
+import { CalendarDays, Check, Clock3, DollarSign } from 'lucide-react'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
 import { MetricCard } from '../features/dashboard/components/MetricCard'
-import { TodayAppointments } from '../features/dashboard/components/TodayAppointments'
+import { DashboardAppointmentTable } from '../features/dashboard/components/DashboardAppointmentTable'
+import { PendingAppointments } from '../features/dashboard/components/PendingAppointments'
+import { BusinessSummary } from '../features/dashboard/components/BusinessSummary'
 import { calculateExpectedBilling, deriveDashboardMetrics } from '../features/dashboard/utils/dashboardMetrics'
 import { useAppointmentDirectory } from '../features/scheduling/hooks/useAppointmentDirectory'
 import { useAgendamentos } from '../features/scheduling/hooks/useAgendamentos'
@@ -23,30 +26,33 @@ export function DashboardPage() {
   const directoryQuery = useAppointmentDirectory()
 
   if (futureAppointmentsQuery.isLoading) return <LoadingState message="Abrindo a agenda futura..." />
-  if (futureAppointmentsQuery.isError) return <ErrorState message="Nao foi possivel carregar os atendimentos futuros." onRetry={() => void futureAppointmentsQuery.refetch()} />
-
-  if (appointmentsQuery.isLoading || directoryQuery.isLoading) return <LoadingState message="Abrindo o caderno de hoje…" />
+  if (futureAppointmentsQuery.isError) return <ErrorState message="Não foi possível carregar os atendimentos futuros." onRetry={() => void futureAppointmentsQuery.refetch()} />
+  if (appointmentsQuery.isLoading || directoryQuery.isLoading) return <LoadingState message="Abrindo o painel..." />
   if (appointmentsQuery.isError || directoryQuery.isError) return <ErrorState message="Não foi possível carregar o painel." onRetry={() => void Promise.all([appointmentsQuery.refetch(), directoryQuery.refetch()])} />
 
   const appointments = appointmentsQuery.data?.conteudo ?? []
   const futureAppointments = futureAppointmentsQuery.data?.conteudo ?? []
+  const allAppointments = [...appointments, ...futureAppointments]
   const metrics = deriveDashboardMetrics(appointments, today)
   const expectedBilling = calculateExpectedBilling(appointments, directoryQuery.directory.servicePrices)
-  const formattedDate = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' }).format(today)
-  const billingLabel = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(expectedBilling)
+  const formattedBilling = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(expectedBilling)
+  const pendingAppointments = allAppointments.filter(({ status }) => status === 'PENDENTE').toSorted((a, b) => a.inicio.localeCompare(b.inicio))
+  const completedToday = appointments.filter(({ status }) => status === 'CONCLUIDO').length
+  const upcoming = futureAppointments.toSorted((a, b) => a.inicio.localeCompare(b.inicio))
 
   return <section className="dashboard-page">
-    <header className="dashboard-lead"><p className="section-label">{formattedDate} · caderno diário</p><h2>O ritmo do seu negócio, <em>em uma só&nbsp;folha.</em></h2></header>
-    <div className="metric-grid" aria-label="Resumo dos agendamentos">
-      <MetricCard label="Atendimentos hoje" value={metrics.todayCount} tone="terracotta" note="volume do dia" />
-      <MetricCard label="Pendentes" value={metrics.pendingCount} tone="mustard" note="aguardam confirmação" />
-      <MetricCard label="Confirmados" value={metrics.confirmedCount} tone="olive" note="agenda assegurada" />
-      <MetricCard label="Cancelados" value={metrics.cancelledCount} tone="muted" note="registro do dia" />
-      <MetricCard label="Faturamento previsto" value={billingLabel} tone="terracotta" note="pendentes, confirmados e concluídos" />
+    <div className="dashboard-metrics" aria-label="Resumo do dia">
+      <MetricCard label="Agendamentos de hoje" value={metrics.todayCount} tone="terracotta" note="+ 1 em relação a ontem" icon={<CalendarDays />} action="Ver agenda de hoje" />
+      <MetricCard label="Concluídos hoje" value={completedToday} tone="olive" note={`de ${metrics.todayCount} agendamentos`} icon={<Check />} action="Ver detalhes" />
+      <MetricCard label="Valor agendado hoje" value={formattedBilling} tone="neutral" note="Confirmados e concluídos" icon={<DollarSign />} action="Ver relatórios" />
+      <MetricCard label="Aguardando confirmação" value={pendingAppointments.length} tone="mustard" note="Solicitações para hoje e próximos dias" icon={<Clock3 />} action="Ver solicitações" />
     </div>
-    <>
-      <section className="today-panel" aria-labelledby="today-heading"><div className="section-heading"><div><p className="section-label">Linha do tempo</p><h3 id="today-heading">Atendimentos de hoje</h3></div><span>{metrics.todayCount} registros</span></div><TodayAppointments appointments={metrics.todayAppointments} directory={directoryQuery.directory} /></section>
-      <section className="today-panel" aria-labelledby="future-heading"><div className="section-heading"><div><p className="section-label">Proximos na agenda</p><h3 id="future-heading">Atendimentos futuros</h3></div><span>{futureAppointments.length} registros</span></div><TodayAppointments appointments={futureAppointments} directory={directoryQuery.directory} emptyMessage="Nenhum atendimento futuro reservado." /></section>
-    </>
+    <div className="dashboard-layout">
+      <div className="dashboard-layout__main">
+        <section className="dashboard-panel" aria-labelledby="today-heading"><header className="dashboard-panel__header"><span className="dashboard-panel__heading-icon dashboard-panel__heading-icon--terracotta"><CalendarDays size={24} /></span><div><h2 id="today-heading">Atendimentos de hoje</h2><p>{new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(today)}</p></div><a href="/painel/agenda">Ver agenda completa →</a></header><DashboardAppointmentTable appointments={metrics.todayAppointments} directory={directoryQuery.directory} /></section>
+        <section className="dashboard-panel" aria-labelledby="upcoming-heading"><header className="dashboard-panel__header"><span className="dashboard-panel__heading-icon dashboard-panel__heading-icon--terracotta"><CalendarDays size={24} /></span><div><h2 id="upcoming-heading">Próximos agendamentos</h2><p>A partir de amanhã · {upcoming.length} registros</p></div><a href="/painel/agenda">Ver agenda completa →</a></header><DashboardAppointmentTable appointments={upcoming.slice(0, 5)} directory={directoryQuery.directory} showDate /></section>
+      </div>
+      <aside className="dashboard-layout__aside"><section className="dashboard-panel" aria-labelledby="pending-heading"><header className="dashboard-panel__header"><span className="dashboard-panel__heading-icon dashboard-panel__heading-icon--mustard"><Clock3 size={24} /></span><div><h2 id="pending-heading">Aguardando confirmação</h2><p>{pendingAppointments.length} solicitações pendentes</p></div><a href="/painel/agenda">Ver todas →</a></header><PendingAppointments appointments={pendingAppointments} directory={directoryQuery.directory} /></section><BusinessSummary appointments={allAppointments} directory={directoryQuery.directory} /></aside>
+    </div>
   </section>
 }

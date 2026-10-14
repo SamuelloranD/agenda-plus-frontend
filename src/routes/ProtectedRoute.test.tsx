@@ -35,7 +35,7 @@ describe('ProtectedRoute', () => {
       </MemoryRouter>,
     )
 
-    expect(document.querySelector('.admin-header h1')).toHaveTextContent('Painel')
+    expect(document.querySelector('.admin-header h1')).toHaveTextContent('Visão geral')
     expect(screen.getByLabelText('Navegação administrativa')).toBeInTheDocument()
     expect(document.querySelector('.admin-header')).toBeInTheDocument()
     expect(document.querySelector('.admin-shell')).toBeInTheDocument()

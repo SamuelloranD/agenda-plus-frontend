@@ -35,6 +35,6 @@ describe('App session bootstrap', () => {
       </QueryClientProvider>,
     )
 
-    expect(await screen.findByRole('heading', { name: 'Painel' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Visão geral' })).toBeInTheDocument()
   })
 })

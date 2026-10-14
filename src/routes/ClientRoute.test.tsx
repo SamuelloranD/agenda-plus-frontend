@@ -129,7 +129,7 @@ describe('ClientRoute', () => {
       '/meus-agendamentos',
     )
 
-    expect(screen.getByRole('heading', { name: 'Painel' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Visão geral' })).toBeInTheDocument()
     expect(screen.getByLabelText('Localização atual')).toHaveTextContent('/painel')
   })
 

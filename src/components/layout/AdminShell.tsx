@@ -3,7 +3,7 @@ import { Header } from './Header'
 import { Sidebar } from './Sidebar'
 import { useSidebarDialog } from './useSidebarDialog'
 
-export function AdminShell({ children, title, subtitle, backTo, backLabel }: { children: ReactNode; title?: string; subtitle?: string; backTo?: string; backLabel?: string }) {
+export function AdminShell({ children, title, subtitle, backTo, backLabel, headerActions }: { children: ReactNode; title?: string; subtitle?: string; backTo?: string; backLabel?: string; headerActions?: ReactNode }) {
   const { sidebarOpen, setSidebarOpen, closeSidebar, shellRef } = useSidebarDialog('admin-sidebar')
   const touchStartX = useRef<number | null>(null)
 
@@ -30,6 +30,7 @@ export function AdminShell({ children, title, subtitle, backTo, backLabel }: { c
           sidebarOpen={sidebarOpen}
           sidebarId="admin-sidebar"
           onMenuClick={sidebarOpen ? closeSidebar : () => setSidebarOpen(true)}
+          actions={headerActions}
         />
         {children}
       </main>

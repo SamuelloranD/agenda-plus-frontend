@@ -33,6 +33,10 @@
 .client-shell .admin-header h1 { max-width: 100%; overflow-wrap: normal; word-break: normal; font-size: clamp(38px, 5vw, 64px); }
 .admin-header p,
 .client-shell .admin-header p { margin: 8px 0 0; color: var(--muted-ink); }
+.admin-header__actions { display: flex; align-items: center; gap: 20px; margin-left: auto; }
+.dashboard-notification { display: grid; place-items: center; width: 42px; height: 42px; color: var(--muted-ink); background: transparent; border: 0; cursor: pointer; }
+.dashboard-new-action { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 24px; color: #fff; background: var(--terracotta); border-radius: 5px; text-decoration: none; font-size: 13px; font-weight: 700; }
+.dashboard-new-action:hover { background: #a6472e; }
 .admin-eyebrow,
 .client-shell .admin-eyebrow { color: var(--terracotta) !important; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; font-weight: 700; }
 .admin-menu-button,
