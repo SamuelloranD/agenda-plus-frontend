@@ -58,7 +58,7 @@ export function useClientBooking() {
   const professionalsQuery = useProfessionals()
   const createAppointment = useCreateAgendamento()
   const session = useSession()
-  const professionals = useMemo(() => professionalsQuery.data ?? [], [professionalsQuery.data])
+  const professionals = useMemo(() => (professionalsQuery.data ?? []).filter((professional) => professional.ativo !== false), [professionalsQuery.data])
 
   useEffect(() => {
     sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(selection))

@@ -4,6 +4,16 @@ import type { ProfissionalInput } from '../../../types/professionals'
 
 export const professionalsQueryKey = ['profissionais'] as const
 export function useProfessionals() { return useQuery({ queryKey: professionalsQueryKey, queryFn: professionalsApi.list }) }
+export function useProfessional(id: string | undefined) {
+  return useQuery({ queryKey: [...professionalsQueryKey, id], queryFn: () => professionalsApi.get(id!), enabled: Boolean(id), retry: false })
+}
 export function useCreateProfessional() { const qc = useQueryClient(); return useMutation({ mutationFn: professionalsApi.create, onSuccess: () => qc.invalidateQueries({ queryKey: professionalsQueryKey }) }) }
 export function useUpdateProfessional() { const qc = useQueryClient(); return useMutation({ mutationFn: ({ id, input }: { id: string; input: ProfissionalInput }) => professionalsApi.update(id, input), onSuccess: () => qc.invalidateQueries({ queryKey: professionalsQueryKey }) }) }
 export function useDeleteProfessional() { const qc = useQueryClient(); return useMutation({ mutationFn: professionalsApi.remove, onSuccess: () => qc.invalidateQueries({ queryKey: professionalsQueryKey }) }) }
+export function useChangeProfessionalStatus() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, ativo }: { id: string; ativo: boolean }) => professionalsApi.changeStatus(id, ativo),
+    onSuccess: () => qc.invalidateQueries({ queryKey: professionalsQueryKey }),
+  })
+}

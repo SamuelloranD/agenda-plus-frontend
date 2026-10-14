@@ -19,8 +19,8 @@ describe('professionalSchema', () => {
     }).success).toBe(true)
   })
 
-  it('rejects a professional without work intervals', () => {
-    expect(professionalSchema.safeParse({ ...validProfessional, horariosTrabalho: [] }).success).toBe(false)
+  it('allows an empty week without inventing availability', () => {
+    expect(professionalSchema.safeParse({ ...validProfessional, horariosTrabalho: [] }).success).toBe(true)
   })
 
   it('rejects an interval that does not end after it starts', () => {
@@ -29,5 +29,11 @@ describe('professionalSchema', () => {
 
   it('rejects a work interval with an unsupported weekday', () => {
     expect(professionalSchema.safeParse({ ...validProfessional, horariosTrabalho: [{ diaSemana: 'SEGUNDA', inicio: '09:00', fim: '18:00' }] }).success).toBe(false)
+  })
+
+  it('rejects overlapping intervals but allows adjacent intervals', () => {
+    const first = { diaSemana: 'MONDAY', inicio: '09:00', fim: '12:00' }
+    expect(professionalSchema.safeParse({ ...validProfessional, horariosTrabalho: [first, { diaSemana: 'MONDAY', inicio: '11:00', fim: '18:00' }] }).success).toBe(false)
+    expect(professionalSchema.safeParse({ ...validProfessional, horariosTrabalho: [first, { diaSemana: 'MONDAY', inicio: '12:00', fim: '18:00' }] }).success).toBe(true)
   })
 })

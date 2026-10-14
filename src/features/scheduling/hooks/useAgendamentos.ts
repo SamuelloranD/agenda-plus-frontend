@@ -6,6 +6,7 @@ const MAX_PAGE_SIZE = 100
 
 export interface UseAgendamentosOptions {
   allPages?: boolean
+  enabled?: boolean
 }
 
 function safePageSize(size?: number) {
@@ -50,5 +51,5 @@ export async function fetchAgendamentos(query: AgendamentosQuery, options: UseAg
 }
 
 export function useAgendamentos(query: AgendamentosQuery, options: UseAgendamentosOptions = {}) {
-  return useQuery({ queryKey: agendamentosQueryKey(query, options), queryFn: () => fetchAgendamentos(query, options) })
+  return useQuery({ queryKey: agendamentosQueryKey(query, options), queryFn: () => fetchAgendamentos(query, options), enabled: options.enabled ?? true })
 }

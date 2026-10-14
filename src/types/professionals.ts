@@ -10,6 +10,7 @@ export interface ProfissionalResponse {
   especialidade: string
   imagem?: string | null
   horariosTrabalho: HorarioTrabalhoResponse[]
+  ativo?: boolean
 }
 
 export interface ProfissionalInput {
@@ -17,4 +18,5 @@ export interface ProfissionalInput {
   especialidade: string
   imagem: string | null
   horariosTrabalho: HorarioTrabalhoResponse[]
+  ativo: boolean
 }

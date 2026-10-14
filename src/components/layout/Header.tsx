@@ -1,4 +1,6 @@
 import { Menu } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 interface HeaderProps {
   title?: string
@@ -6,9 +8,11 @@ interface HeaderProps {
   sidebarOpen?: boolean
   sidebarId?: string
   onMenuClick?: () => void
+  backTo?: string
+  backLabel?: string
 }
 
-export function Header({ title = 'Painel administrativo', subtitle = 'O ritmo do seu estúdio, em um só lugar.', sidebarOpen = false, sidebarId, onMenuClick }: HeaderProps) {
+export function Header({ title = 'Painel administrativo', subtitle = 'O ritmo do seu estúdio, em um só lugar.', sidebarOpen = false, sidebarId, onMenuClick, backTo, backLabel }: HeaderProps) {
   return (
     <header className="admin-header">
       {!sidebarOpen && (
@@ -23,7 +27,7 @@ export function Header({ title = 'Painel administrativo', subtitle = 'O ritmo do
           <Menu size={20} strokeWidth={1.8} aria-hidden="true" />
         </button>
       )}
-      <div><p className="admin-eyebrow">Agenda+</p><h1>{title}</h1><p>{subtitle}</p></div>
+      <div>{backTo ? <Link className="professional-editor-back" to={backTo}><ArrowLeft size={18} aria-hidden="true" />{backLabel}</Link> : <p className="admin-eyebrow">Agenda+</p>}<h1>{title}</h1><p>{subtitle}</p></div>
     </header>
   )
 }
