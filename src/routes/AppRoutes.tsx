@@ -1,4 +1,3 @@
-import { Plus } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { AdminShell } from '../components/layout/AdminShell'
@@ -37,7 +36,7 @@ export function AppRoutes({ session }: AppRoutesProps) {
     <Route path="/cadastro" element={<RegisterPage />} />
     <Route path="/agendar/*" element={<ClientBookingRoute session={session} />} />
     <Route path="/meus-agendamentos" element={<ClientRoute session={session}><ClientShell title="Meus agendamentos" subtitle="Acompanhe seus horários e mantenha sua agenda em dia."><ClientAppointmentsPage /></ClientShell></ClientRoute>} />
-    <Route path="/painel" element={<ProtectedRoute session={session}><AdminShell title="Visão geral" subtitle={`Hoje, ${dashboardDate} · Studio Boa Forma`} headerActions={<Link className="dashboard-new-action" to="/painel/agendamentos/novo"><Plus size={18} />Novo agendamento</Link>}><DashboardPage /></AdminShell></ProtectedRoute>} />
+    <Route path="/painel" element={<ProtectedRoute session={session}><AdminShell title="Visão geral" subtitle={`Hoje, ${dashboardDate} · Studio Boa Forma`} headerActions={<Link className="dashboard-new-action" to="/painel/agendamentos/novo">Novo agendamento</Link>}><DashboardPage /></AdminShell></ProtectedRoute>} />
     <Route path="/painel/agenda" element={<ProtectedRoute session={session}><AdminShell title="Agenda" subtitle="Gerencie os atendimentos da sua equipe."><WeeklyAgendaPage /></AdminShell></ProtectedRoute>} />
     <Route path="/painel/profissionais" element={<AdminRoute session={session} title="Profissionais" subtitle="Gerencie os profissionais e os horários de atendimento."><ProfessionalsPage /></AdminRoute>} />
     <Route path="/painel/profissionais/novo" element={<AdminRoute session={session} title="Novo profissional" subtitle="Cadastre os dados e os horários de atendimento." backTo="/painel/profissionais"><ProfessionalEditorPage /></AdminRoute>} />
