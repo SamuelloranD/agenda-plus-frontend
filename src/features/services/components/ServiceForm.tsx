@@ -57,8 +57,8 @@ export function ServiceForm({ service, onDone, onCancel }: ServiceFormProps) {
   const error = (createService.error ?? updateService.error) as ApiError | null
   const fields = form.formState.errors
   return <>
-    <div className="services-drawer-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) requestClose() }}>
-      <section className="services-drawer" ref={panelRef} role="dialog" aria-modal="true" aria-labelledby="services-drawer-title" onKeyDown={(event) => {
+    <div className="services-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) requestClose() }}>
+      <section className="services-modal" ref={panelRef} role="dialog" aria-modal="true" aria-labelledby="services-modal-title" onKeyDown={(event) => {
         if (event.key === 'Escape' && !confirmClose) { event.preventDefault(); requestClose() }
         if (event.key === 'Tab' && !confirmClose) {
           const focusable = Array.from(panelRef.current?.querySelectorAll<HTMLElement>('button:not([disabled]),input:not([disabled]),textarea:not([disabled])') ?? [])
@@ -68,16 +68,16 @@ export function ServiceForm({ service, onDone, onCancel }: ServiceFormProps) {
         }
       }}>
         <form onSubmit={(event) => { void form.handleSubmit(submit)(event) }} noValidate>
-          <header className="services-drawer__header"><div><h2 id="services-drawer-title">{service ? 'Editar serviço' : 'Novo serviço'}</h2><p>{service ? 'Atualize as informações do serviço.' : 'Defina o serviço que será oferecido no agendamento.'}</p></div><button ref={closeRef} type="button" className="services-drawer__close" aria-label="Fechar painel" onClick={requestClose}><X size={20} /></button></header>
-          <div className="services-drawer__body">
+          <header className="services-modal__header"><div><h2 id="services-modal-title">{service ? 'Editar serviço' : 'Novo serviço'}</h2><p>{service ? 'Atualize as informações do serviço.' : 'Defina o serviço que será oferecido no agendamento.'}</p></div><button ref={closeRef} type="button" className="services-modal__close" aria-label="Fechar modal" onClick={requestClose}><X size={20} /></button></header>
+          <div className="services-modal__body">
             <label className="services-field">Nome do serviço <span>*</span><input autoFocus {...form.register('nome')} placeholder="Ex.: Corte de cabelo" aria-invalid={Boolean(fields.nome)} />{fields.nome && <small role="alert">{fields.nome.message}</small>}</label>
             <label className="services-field">Descrição<textarea {...form.register('descricao')} maxLength={500} rows={3} placeholder="Descreva o serviço..." aria-invalid={Boolean(fields.descricao)} />{fields.descricao && <small role="alert">{fields.descricao.message}</small>}<em>{(description ?? '').length}/500</em></label>
-            <div className="services-drawer__pair"><label className="services-field">Duração (minutos) <span>*</span><input type="number" min="1" step="1" {...form.register('duracaoMinutos', { valueAsNumber: true })} aria-invalid={Boolean(fields.duracaoMinutos)} />{fields.duracaoMinutos && <small role="alert">{fields.duracaoMinutos.message}</small>}</label><label className="services-field">Preço (R$) <span>*</span><input type="text" inputMode="decimal" value={priceText} placeholder="0,00" onChange={(event) => { setPriceText(event.target.value); form.setValue('preco.valor', parseBrazilianPrice(event.target.value), { shouldDirty: true, shouldValidate: true }) }} aria-invalid={Boolean(fields.preco?.valor)} />{fields.preco?.valor && <small role="alert">{fields.preco.valor.message}</small>}</label></div>
+            <div className="services-modal__pair"><label className="services-field">Duração (minutos) <span>*</span><input type="number" min="1" step="1" {...form.register('duracaoMinutos', { valueAsNumber: true })} aria-invalid={Boolean(fields.duracaoMinutos)} />{fields.duracaoMinutos && <small role="alert">{fields.duracaoMinutos.message}</small>}</label><label className="services-field">Preço (R$) <span>*</span><input type="text" inputMode="decimal" value={priceText} placeholder="0,00" onChange={(event) => { setPriceText(event.target.value); form.setValue('preco.valor', parseBrazilianPrice(event.target.value), { shouldDirty: true, shouldValidate: true }) }} aria-invalid={Boolean(fields.preco?.valor)} />{fields.preco?.valor && <small role="alert">{fields.preco.valor.message}</small>}</label></div>
             <label className="services-switch-row"><span><strong>Status</strong><small>Serviços inativos não aparecem no novo agendamento.</small></span><input type="checkbox" {...form.register('ativo')} aria-label="Serviço ativo" /><span className="services-switch" aria-hidden="true" />{active ? 'Ativo' : 'Inativo'}</label>
-            <div className="services-drawer__info"><Info size={18} aria-hidden="true" /><p>As reservas existentes mantêm seus horários. O sistema ainda não armazena o preço histórico; alterar o preço pode mudar o valor exibido em agendamentos anteriores.</p></div>
+            <div className="services-modal__info"><Info size={18} aria-hidden="true" /><p>As reservas existentes mantêm seus horários. O sistema ainda não armazena o preço histórico; alterar o preço pode mudar o valor exibido em agendamentos anteriores.</p></div>
             {error && <p className="form-error" role="alert">{error.message ?? 'Não foi possível salvar o serviço.'}</p>}
           </div>
-          <footer className="services-drawer__footer"><button type="button" className="services-drawer__cancel" onClick={requestClose}>Cancelar</button><button type="submit" className="primary-action" disabled={isPending}>{isPending ? 'Salvando…' : service ? 'Salvar alterações' : 'Cadastrar serviço'}</button></footer>
+          <footer className="services-modal__footer"><button type="button" className="services-modal__cancel" onClick={requestClose}>Cancelar</button><button type="submit" className="primary-action" disabled={isPending}>{isPending ? 'Salvando…' : service ? 'Salvar alterações' : 'Cadastrar serviço'}</button></footer>
         </form>
       </section>
     </div>
