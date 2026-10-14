@@ -7,14 +7,22 @@
 .client-appointments-tabs button.is-active { color: #ca572e; }
 .client-appointments-tabs button.is-active::after { position: absolute; right: 0; bottom: -1px; left: 0; height: 2px; background: #ca572e; content: ''; }
 .client-appointments-controls { display: flex; align-items: center; gap: 12px; padding-bottom: 9px; }
-.client-appointments-search, .client-appointments-period { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 11px; color: #6b7782; background: #fffdfa; border: 1px solid #dedbd5; border-radius: 5px; }
+.client-appointments-search { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 11px; color: #6b7782; background: #fffdfa; border: 1px solid #dedbd5; border-radius: 5px; }
 .client-appointments-search { width: min(300px, 30vw); }
 .client-appointments-search input { width: 100%; min-width: 0; outline: none; border: 0; color: #202633; background: transparent; font-family: inherit; font-size: 12px; }
-.client-appointments-search:focus-within, .client-appointments-period:focus-within { border-color: #c45832; box-shadow: 0 0 0 2px #c4583222; }
+.client-appointments-search:focus-within { border-color: #c45832; box-shadow: 0 0 0 2px #c4583222; }
 .client-appointments-search input::placeholder { color: #77818c; }
-.client-appointments-period { position: relative; flex: none; color: #242a33; }
-.client-appointments-period select { width: 143px; appearance: none; padding: 0 19px 0 0; outline: none; border: 0; color: inherit; background: transparent; cursor: pointer; font-family: inherit; font-size: 11px; font-weight: 600; }
-.client-appointments-period > svg:last-child { position: absolute; right: 8px; pointer-events: none; }
+.client-appointments-period { position: relative; z-index: 6; flex: none; width: 195px; color: #242a33; }
+.client-appointments-period__trigger { display: flex; align-items: center; gap: 9px; width: 100%; min-height: 36px; padding: 0 11px; border: 1px solid #dedbd5; border-radius: 5px; color: #242a33; background: #fffdfa; cursor: pointer; font-family: inherit; font-size: 11px; font-weight: 600; text-align: left; transition: border-color .16s, box-shadow .16s; }
+.client-appointments-period__trigger:hover, .client-appointments-period.is-open .client-appointments-period__trigger { border-color: #c8562e; }
+.client-appointments-period__trigger > svg { flex: none; }
+.client-appointments-period__trigger > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.client-appointments-period.is-open .client-appointments-period__trigger > svg:last-child { transform: rotate(180deg); }
+.client-appointments-period__menu { position: absolute; top: calc(100% + 7px); right: 0; z-index: 7; width: max(100%, 210px); padding: 6px; border: 1px solid #e6e1db; border-radius: 9px; background: #fffdfa; box-shadow: 0 14px 32px #38271d24; }
+.client-appointments-period__menu button { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 37px; padding: 8px 10px; border: 0; border-radius: 5px; color: #33404c; background: transparent; cursor: pointer; font-family: inherit; font-size: 12px; text-align: left; }
+.client-appointments-period__menu button:hover, .client-appointments-period__menu button:focus-visible { color: #b94b27; background: #fbefe8; }
+.client-appointments-period__menu button.is-selected { color: #bd4e29; background: #fbede3; font-weight: 700; }
+.client-appointments-period__menu button svg { flex: none; }
 .client-appointments-sections { gap: 24px; }
 .client-appointments-section > header { align-items: end; padding: 0; border: 0; }
 .client-appointments-section > header h2 { font: 500 clamp(27px, 3vw, 31px)/1.1 'Newsreader', Georgia, serif; letter-spacing: -.025em; }
@@ -93,8 +101,8 @@
   .client-appointments-tabs button { padding-inline: 12px; }
   .client-appointments-controls { flex-wrap: wrap; gap: 8px; }
   .client-appointments-search { flex: 1 1 100%; width: 100%; }
-  .client-appointments-period { flex: 1 1 100%; }
-  .client-appointments-period select { width: 100%; }
+  .client-appointments-period { flex: 1 1 100%; width: 100%; }
+  .client-appointments-period__menu { width: 100%; }
   .client-appointments-section > header { align-items: start; }
   .client-appointments-section > header > span { padding-top: 7px; }
   .client-appointments-section--upcoming .client-appointments-list { grid-template-columns: 1fr; }

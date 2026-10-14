@@ -102,11 +102,14 @@ describe('ClientAppointmentsPage', () => {
     }))
 
     render(<ClientAppointmentsPage />)
-    fireEvent.change(screen.getByRole('combobox', { name: 'Filtrar por período' }), { target: { value: 'next7' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Filtrar por período' }))
+    expect(screen.getByRole('group', { name: 'Opções de período' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Próximos 7 dias' }))
     expect(screen.getByText('Seu histórico ainda está vazio.')).toBeInTheDocument()
     expect(screen.getByText('1 agendamento')).toBeInTheDocument()
 
-    fireEvent.change(screen.getByRole('combobox', { name: 'Filtrar por período' }), { target: { value: 'past30' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Filtrar por período' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Últimos 30 dias' }))
     expect(screen.getByText('Nenhum próximo agendamento.')).toBeInTheDocument()
   })
 

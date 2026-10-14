@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { CalendarDays, ChevronDown, Search } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { CalendarDays, Check, ChevronDown, Search } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { ErrorState } from '../components/ui/ErrorState'
 import { LoadingState } from '../components/ui/LoadingState'
@@ -26,7 +26,78 @@ const statusFilters: { value: StatusFilter; label: string }[] = [
   { value: 'CONFIRMADO', label: 'Confirmados' },
   { value: 'CANCELADO', label: 'Cancelados' },
 ]
+const periodOptions: { value: PeriodFilter; label: string }[] = [
+  { value: 'all', label: 'Todos os períodos' },
+  { value: 'next7', label: 'Próximos 7 dias' },
+  { value: 'next30', label: 'Próximos 30 dias' },
+  { value: 'past30', label: 'Últimos 30 dias' },
+]
 const noAppointments: AgendamentoResponse[] = []
+
+function PeriodFilterControl({ value, onChange }: { value: PeriodFilter; onChange: (value: PeriodFilter) => void }) {
+  const [open, setOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const closeOutside = (event: PointerEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) setOpen(false)
+    }
+    document.addEventListener('pointerdown', closeOutside)
+    return () => document.removeEventListener('pointerdown', closeOutside)
+  }, [open])
+
+  const selectedLabel = value === 'all' ? 'Filtrar por período' : periodOptions.find((option) => option.value === value)?.label
+
+  return (
+    <div
+      className={`client-appointments-period${open ? ' is-open' : ''}`}
+      ref={containerRef}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape' && open) {
+          event.preventDefault()
+          setOpen(false)
+          triggerRef.current?.focus()
+        }
+      }}
+    >
+      <button
+        type="button"
+        className="client-appointments-period__trigger"
+        ref={triggerRef}
+        aria-label="Filtrar por período"
+        aria-expanded={open}
+        aria-controls={open ? 'client-appointments-period-options' : undefined}
+        onClick={() => setOpen((current) => !current)}
+      >
+        <CalendarDays size={18} aria-hidden="true" />
+        <span>{selectedLabel}</span>
+        <ChevronDown size={15} aria-hidden="true" />
+      </button>
+      {open && (
+        <div className="client-appointments-period__menu" id="client-appointments-period-options" role="group" aria-label="Opções de período">
+          {periodOptions.map((option) => (
+            <button
+              type="button"
+              key={option.value}
+              className={value === option.value ? 'is-selected' : ''}
+              aria-pressed={value === option.value}
+              onClick={() => {
+                onChange(option.value)
+                setOpen(false)
+                triggerRef.current?.focus()
+              }}
+            >
+              <span>{option.label}</span>
+              {value === option.value && <Check size={16} aria-hidden="true" />}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 function normalise(value: string) {
   return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR')
@@ -113,16 +184,7 @@ export function ClientAppointmentsPage() {
                   <Search size={18} aria-hidden="true" />
                   <input type="search" aria-label="Buscar agendamentos" placeholder="Buscar por serviço, profissional ou data..." value={search} onChange={(event) => setSearch(event.target.value)} />
                 </label>
-                <label className="client-appointments-period">
-                  <CalendarDays size={18} aria-hidden="true" />
-                  <select aria-label="Filtrar por período" value={periodFilter} onChange={(event) => setPeriodFilter(event.target.value as PeriodFilter)}>
-                    <option value="all">Filtrar por período</option>
-                    <option value="next7">Próximos 7 dias</option>
-                    <option value="next30">Próximos 30 dias</option>
-                    <option value="past30">Últimos 30 dias</option>
-                  </select>
-                  <ChevronDown size={15} aria-hidden="true" />
-                </label>
+                <PeriodFilterControl value={periodFilter} onChange={setPeriodFilter} />
               </div>
             </div>
           )}
